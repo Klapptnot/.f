@@ -1,0 +1,202 @@
+#! /bin/env nu
+
+use ua.nu get-rdm
+
+def get-mxm-urls [query: string, tries: int, timeout: int] {
+  let url = $"https://www.google.com/search?q=site%3Amusixmatch.com%2Flyrics+($query | url encode)"
+  let ua = (get-rdm)
+
+  mut body = ""
+  for _ in 1..$tries {
+    let res = (
+      http get --full --max-time $timeout
+        --headers ["user-agent", $ua]
+        $url
+    )
+    if $res.status == 200 {
+      $body = $res.body
+      break
+    }
+  }
+
+  if $body == "" {
+    error make {
+      msg: "Could not get the URL",
+      span: (metadata $query).span
+    }
+  }
+
+  let urls = ($body | grep -Po '(?<=><a jsname="UWckNb" href=")[^ ]*(?=" data-jsarwt="1")' | lines)
+  let desc = ($body | grep -Po '(?<=<br><h3 class="LC20lb MBeuO DKV0Md">)[^<]*(?=<)' | lines)
+
+  if ($urls | length) == 0 {
+    error make {
+      msg: "Data in response not found, please try again",
+      span: (metadata $query).span
+    }
+  }
+
+  mut items = []
+  mut urltl = []
+
+  for i in 0..(($urls | length) - 1) {
+    mut url = ($urls | get $i)
+
+    if $url =~ ".*/translation/.*" {
+      $url = $"($url | parse --regex "(?P<url>.*)/translation/.*" | get url | get 0? | default "")"
+    }
+
+    if $url in $urltl or $url == "" {
+      continue
+    }
+
+    $items = ($items | append {
+      url: $url,
+      desc: ($desc | get $i)
+    })
+    $urltl = ($urltl | append $url)
+  }
+
+  $items
+}
+
+def get-mxm-json [url: string, tries: int = 5, timeout: int = 5] {
+  let ua = (get-rdm)
+
+  mut body = ""
+  for _ in 1..$tries {
+    let res = (
+      http get --full --max-time $timeout
+        --headers ["user-agent", $ua]
+        $url
+    )
+    echo '+-----'
+    if $res.status == 200 {
+      $body = $res.body
+      break
+    }
+  }
+
+  if $body == "" {
+    error make {
+      msg: "Could not get the data from Musixmatch",
+      span: (metadata $url).span
+    }
+  }
+
+  $body | grep -Po '(?<=<script\sid="__NEXT_DATA__"\stype="application/json">).*(?=</script>)'
+}
+
+def select-url [urls: list<string>] {
+  if ($urls | length) == 1 {
+    return ($urls.0 | get url)
+  }
+
+  print $"(ansi --escape '38;2;195;79;230m')Available options are:(ansi reset)"
+  for i in 0..(($urls | length) - 1) {
+    let it = ($urls | get $i)
+    print $"  ($i) (ansi --escape '38;2;255;169;140m')-> (ansi --escape '38;2;255;232;184m')($it.desc)"
+    print $"    (ansi --escape '38;2;195;79;230m')At: (ansi --escape '38;2;189;147;249m')($it.url)(ansi reset)",
+  }
+
+  print -n $"(ansi --escape '38;2;195;79;230m')Select one from above:(ansi reset) "
+  let uinp = (input -n 1)
+
+  if $uinp != "[0-9]" {
+    return ($urls.0 | get url)
+  }
+
+  let uinp = ($uinp | into int)
+
+  ($urls | get $uinp | get url)
+}
+
+def describe-data [data: record] {
+  return {
+      name: ($data.props.pageProps.data.trackInfo.data.track.name | default "Unspecified"),
+      artist: ($data.props.pageProps.data.trackInfo.data.track.artistName | default "Unspecified"),
+      album: ($data.props.pageProps.data.trackInfo.data.track.albumName | default "Unspecified"),
+      has_lyrics: ($data.props.pageProps.data.trackInfo.data.track.hasLyrics | default false),
+      has_lyrics_struct: ($data.props.pageProps.data.trackInfo.data.track.hasTrackStructure | default false),
+      lyrics_lang: ($data.props.pageProps.data.trackInfo.data.lyrics?.languageDescription? | default "Unspecified"),
+      lyrics: ($data.props.pageProps.data.trackInfo.data.lyrics?.body? | default "No lyrics available"),
+      lyrics_struct: ($data.props.pageProps.data.trackInfo.data.trackStructureList?),
+      lyrics_copyright: ($data.props.pageProps.data.trackInfo.data.lyrics?.copyright? | default "Unspecified"),
+      genre: ($data.props.pageProps.data.trackInfo.data.track.artists.0.genres.0?.name? | default "Unspecified"),
+      cover: ($data.props.pageProps.data.trackInfo.data.track.coverImage | default ""),
+      released: ($data.props.pageProps.data.trackInfo.data.track.releaseDate | default "0000-00-00"),
+      spotify: ($"https://open.spotify.com/track/($data.props.pageProps.data.trackInfo.data.track.spotifyId)"),
+      musixmatch: ($"https://musixmatch.com/lyrics/($data.props.pageProps.data.trackInfo.data.track.vanityId)"),
+  }
+}
+
+# Get data/lyrics of musics directly from Musixmatch
+export def main [
+  query: string,    # Query used to try to find song, or musixmatch URL
+  tries: int = 5,   # Max number of retries before giving up search
+  timeout: int = 5, # Max time to wait for response
+  --lyrics (-l),    # Print only the lyrics of the songs
+  --repeat (-r),    # Print <title> - <artist> when --lyrics/-l is passed
+  --select (-s)     # Select one of the available songs found
+] -> Nothing {
+  let url = (if $query =~ "https?://musixmatch.com/lyrics/[^/]*/.*" {
+    $query
+  } else if $query =~ "^https?://[^ ]*$" {
+    error make {
+      msg: "Query looks like a plain URL",
+      help: "Use a musixmatch URL or words that may represent a song",
+      span: (metadata $query).span
+    }
+  } else {
+    if $select {
+      select-url (get-mxm-urls $query $tries $timeout)
+      } else {
+      (get-mxm-urls $query $tries $timeout).0.url
+    }
+  })
+
+  let mxm = (get-mxm-json $url $tries $timeout | from json)
+  let track = describe-data $mxm
+
+  if $lyrics {
+    if not $track.has_lyrics {
+      error make {
+        msg: "This song has no lyrics or lyrics are not available",
+      }
+    }
+    if $repeat {
+      print $"(ansi --escape '38;2;195;79;230m')($track.name)(ansi --escape '38;2;223;225;255m') - (ansi --escape '38;2;189;147;249m')($track.artist)(ansi reset)\n"
+    }
+    print $"($track.lyrics)"
+    exit 0
+  }
+
+  print $"(ansi --escape '38;2;255;169;140m')TITLE     : (ansi --escape '38;2;255;232;184m')($track.name)
+(ansi --escape '38;2;255;169;140m')ARTIST    : (ansi --escape '38;2;255;232;184m')($track.artist)
+(ansi --escape '38;2;255;169;140m')ALBUM     : (ansi --escape '38;2;255;232;184m')($track.album)
+(ansi --escape '38;2;255;169;140m')GENRE     : (ansi --escape '38;2;255;232;184m')($track.genre)
+(ansi --escape '38;2;255;169;140m')RELEASED  : (ansi --escape '38;2;255;232;184m')($track.released)
+(ansi --escape '38;2;255;169;140m')SPOTIFY   : (ansi --escape '38;2;255;232;184m')($track.spotify)
+(ansi --escape '38;2;255;169;140m')MUSIXMATCH: (ansi --escape '38;2;255;232;184m')($track.musixmatch)
+(ansi --escape '38;2;255;169;140m')LYRICS(ansi reset)\n"
+
+  if not $track.has_lyrics {
+    print "Lyrics are not available :("
+    exit 0
+  }
+
+  if not $track.has_lyrics_struct {
+    print $"($track.lyrics)(ansi reset)\n\nCopyright -> ($track.lyrics_copyright)"
+    exit 0
+  }
+
+  for $paragraph in $track.lyrics_struct {
+    print $"(ansi --escape '38;2;189;147;249m')#[section\(($paragraph.title)\)](ansi reset)"
+    for $line in $paragraph.lines {
+      print $"($line.text)"
+    }
+    print "\n"
+  }
+
+  print $"Copyright -> ($track.lyrics_copyright)"
+}

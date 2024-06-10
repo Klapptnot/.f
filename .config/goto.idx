@@ -1,0 +1,15 @@
+INTERNAL  /sdcard
+ETC       &!HOME;/../usr/etc
+BIN       &!HOME;/../usr/bin
+.c        &!HOME;/.config
+.c.       &*.c;/&%1;
+.l        &!HOME;/.local
+.l.       &*.l;/&%1;
+.s        &*.l;/share
+.s.       &*.s;/&%1;
+ut        &!HOME;/repos/utils
+ub        &!HOME;/repos/utils/bin
+ul        &!HOME;/repos/utils/lib
+l3mon     &*INTERNAL;/Music/l3mon
+obsidian  &*INTERNAL;/Documents/Obsidian
+df        &!HOME;/dotf

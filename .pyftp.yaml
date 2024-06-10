@@ -1,0 +1,18 @@
+server:
+  port: 8021
+  max_cons: 256
+  max_cons_per_ip: 5
+log_file: /data/data/com.termux/files/home/.pyftp/pyftp.log
+log_console: false
+anonymous_user: false
+anonymous_ro: true
+users:
+  root:
+    password: medotorg
+    folder: /data/data/com.termux/files/home/
+    read_only: false
+  internal:
+    password: medotorg
+    folder: /storage/emulated/0
+    read_only: false
+

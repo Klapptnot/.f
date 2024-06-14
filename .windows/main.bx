@@ -1,0 +1,69 @@
+#! /usr/bin/env brick
+
+use std::https;
+use std::quickData::Json;
+use std::quickData::args;
+use std::fs::{File, Path};
+
+struct response {
+  createdAt: i64,
+  age: i8,
+  name: str,
+  id: str,
+  tags: vec<str>
+}
+
+// `brick` is a global const struct/object, defined on the go
+#[apply([args::Parser])]
+brick Args {
+  //This will use Path::from() to get a Path object
+  #[args::Arg(l = "file", s = 'f', d = "Path to the file with ids")]
+  file: Path, // Required argument
+  //And here it will use Optional::from() to well set one
+  #[args::Arg(l = "timeout", s = 't', d = "Timeout in ms to close connections (default: 3500)", d = 3500)]
+  timeout: Optional<i32> // Optional argument
+}
+
+//!fetch the response json as a brick object
+//!from structured response
+async fun fetch(url: str, timeout: i32 = 3500) -> Result<response, str> {
+  // Wait for the response, panic on any error
+  let result = await https::get(url).panic('Just some error in the request, so panic');
+  if (result.status != 200) {
+    return Err(result.error);
+  }
+  let json_response = Json::parse(result.body, result.encoding).expect(|err| {
+    return Err(err);
+  });
+  return Ok(json_response);
+} // fun fetch(url: str) -> Result<response, str>
+
+//!Program entry point, there is no global cascading behavior
+fun main() {
+  // Brick has an internal argument parser
+  // based on the data type
+  let args = Args::parse(); // This will panic on any error
+
+  if (!args.path::exists()) {
+    panic("File {} does not exist", args.path);
+  }
+
+  let file: File = File::(
+    path = args.file::expandUser(),
+    encoding = File::encoding::UTF8
+  );
+
+  // Init vector with vec::from() to get methods
+  let mut responses: vec<response> = vec::from([]);
+  while let userId = file.next_line().unwrap() {
+    // !"" returns a `str`, any type to be used has a impl `type::Str`
+    let content = block fetch(!"https://api.awasome.app/user?id={userId}", args.timeout); // Stop execution until `fetch` returns
+    // ?"" returns a `str`, any type to be used has a impl `type::Dbg`
+    std::io::write(?"{content}", std::io::StdErr);
+    match content {
+      Ok(val) => responses.push(content.unwrap());
+      Err(error) => println("Failed to fetch '{}'", content.unwrap());
+    }
+  }
+  println(Json::stringify(responses));
+} // fun main()

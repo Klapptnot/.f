@@ -1,0 +1,27 @@
+{
+  "schemes": [
+    {
+      "name": "Cupcake",
+      "background": "#06062A",
+      "selectionBackground": "#F4F4F4",
+      "foreground": "#F9F9F9",
+      "cursorColor": "#E0E0D0",
+      "black": "#434C5E",
+      "red": "#FA5AA4",
+      "green": "#2BE491",
+      "yellow": "#FA946E",
+      "blue": "#63C5EA",
+      "purple": "#CF8EF4",
+      "cyan": "#25F0FF",
+      "white": "#F7F7F7",
+      "brightBlack": "#4C566A",
+      "brightRed": "#FA74B2",
+      "brightGreen": "#44EB9F",
+      "brightYellow": "#E8EB64",
+      "brightBlue": "#7ACBEA",
+      "brightPurple": "#D8A6F4",
+      "brightCyan": "#6BF5FF",
+      "brightWhite": "#f4f4f4"
+    }
+  ]
+}

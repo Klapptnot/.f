@@ -1,5 +1,6 @@
 #! /bin/env nu
 
+use std log
 use ua.nu get-rdm
 
 def get-mxm-urls [query: string, tries: int, timeout: int] {
@@ -17,6 +18,7 @@ def get-mxm-urls [query: string, tries: int, timeout: int] {
       $body = $res.body
       break
     }
+    log warning $'[HTTP] Status code ($res.status)'
   }
 
   if $body == "" {
@@ -70,7 +72,6 @@ def get-mxm-json [url: string, tries: int = 5, timeout: int = 5] {
         --headers ["user-agent", $ua]
         $url
     )
-    echo '+-----'
     if $res.status == 200 {
       $body = $res.body
       break
@@ -149,7 +150,8 @@ export def main [
     }
   } else {
     if $select {
-      select-url (get-mxm-urls $query $tries $timeout)
+      let urls = get-mxm-urls $query $tries $timeout
+      select-url $urls
       } else {
       (get-mxm-urls $query $tries $timeout).0.url
     }

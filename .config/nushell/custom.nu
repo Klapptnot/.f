@@ -1,3 +1,5 @@
+$env.LS_COLORS = (vivid generate 'catppuccin-mocha' | str trim)
+
 $env.UTILS = ([$env.HOME, "repos", "utils"] | path join)
 $env.PATH = [
   $env.PATH,
@@ -9,7 +11,7 @@ $env.PATH = [
 
 $env.prompt = {
   rdircolor: true,
-  indicator: (if (is-admin) { $"(char elevated) " } else { $"► " })
+  indicator: (if (is-admin) { $"(char elevated) " } else { "► " })
   ldir: nothing.
   sdir: nothing
 }
@@ -44,6 +46,8 @@ $env.prompt.color = {
   }
 }
 
+$env.prompt.indicator = $"(ansi --escape $env.prompt.color.normal)($env.prompt.indicator)(ansi reset)"
+
 def path-shorten [path: string] -> string {
   let path_parts = ($path | split row (char path_sep))
   let parts_count = ($path_parts | length) - 1
@@ -59,6 +63,11 @@ def path-shorten [path: string] -> string {
 }
 
 def get-path-color [path: path] {
+  if ((which cksum).command?.0? == null) {
+    return {
+      fg: $env.prompt.color.dir
+    }
+  }
   let hex = (pwd | cksum | split row " ").0 | awk '{printf "%x", $1}' | fill --width 6 --character 0 | parse --regex '(?P<r>.{2})(?P<g>.{2})(?P<b>.{2})'
   let rgb = [
     $hex.r,
@@ -85,7 +94,7 @@ def git_status_info [] {
   }
 }
 
-$env.PROMPT_COMMAND = { ||
+def left_prompt_command_ [] {
   let dir = match (do --ignore-shell-errors { $env.PWD | path relative-to $nu.home-path }) {
     null => $env.PWD
     '' => '~'
@@ -119,7 +128,7 @@ $env.PROMPT_COMMAND = { ||
   $"($identity)(ansi --escape $env.prompt.color.cdir)($env.prompt.sdir)"
 }
 
-$env.PROMPT_COMMAND_RIGHT = { ||
+def right_prompt_command_ [] {
   # create a right prompt in magenta with green separators and am/pm underlined
   let time_segment = ([
     (ansi reset)
@@ -148,9 +157,11 @@ $env.PROMPT_COMMAND_RIGHT = { ||
   ([$git_info, $last_exit_code, (char space), $time_segment] | str join)
 }
 
-$env.PROMPT_INDICATOR = {|| $"(ansi --escape $env.prompt.color.normal)($env.prompt.indicator)(ansi reset)" }
+$env.PROMPT_COMMAND = { left_prompt_command_ }
+$env.PROMPT_COMMAND_RIGHT = { right_prompt_command_ }
+$env.PROMPT_INDICATOR = { $env.prompt.indicator }
 
-$env.TRANSIENT_PROMPT_COMMAND = {|| $"🚀 " }
+$env.TRANSIENT_PROMPT_COMMAND = {|| "🚀 " }
 $env.TRANSIENT_PROMPT_INDICATOR = {|| $env.prompt.indicator }
 # $env.TRANSIENT_PROMPT_COMMAND_RIGHT = {|| "⏎" }
 

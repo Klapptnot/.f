@@ -154,7 +154,10 @@ def right_prompt_command_ [] {
     ""
   })
 
-  ([$git_info, $last_exit_code, (char space), $time_segment] | str join)
+  # TODO: Check for SQL history
+  let duration = " " + (history | last | get duration | into string | str replace --regex --all '([0-9]+)' $"(ansi plum1)${1}(ansi reset)")
+
+  ([$git_info, $duration, $last_exit_code, (char space), $time_segment] | str join)
 }
 
 $env.PROMPT_COMMAND = { left_prompt_command_ }

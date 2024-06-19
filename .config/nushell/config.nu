@@ -501,7 +501,7 @@ $env.config = {
             mode: [emacs, vi_normal, vi_insert]
             event: {
                 send: executehostcommand,
-                cmd: "^clear" # somehow it's faster than the builtin
+                cmd: "clear --all" # somehow ^clear is faster than the builtin, but anyways
             }
         }
         {

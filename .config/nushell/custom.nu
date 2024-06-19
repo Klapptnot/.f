@@ -107,10 +107,10 @@ def left_prompt_command_ [] {
     $env.prompt.sdir
   })
 
-  $env.prompt.color.cdir = (if $env.prompt.ldir != $dir {
+  $env.prompt.color.cdir = (if $env.prompt.ldir != $dir and $env.prompt.rdircolor {
     get-path-color $dir
   } else {
-    $env.prompt.color.cdir
+    $env.prompt.color.dir
   })
   $env.prompt.ldir = $dir
 

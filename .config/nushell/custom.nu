@@ -1,3 +1,6 @@
+use std
+
+
 $env.LS_COLORS = (vivid generate 'catppuccin-mocha' | str trim)
 
 $env.UTILS = ([$env.HOME, "repos", "utils"] | path join)
@@ -44,6 +47,12 @@ $env.prompt.color = {
   at:     {
     fg: "#e8e8e8"
   }
+  git:    {
+    i: (ansi seagreen1b)
+    d: (ansi red1)
+    a: (ansi lightcyan1),
+    s: (ansi def)
+  }
 }
 
 $env.prompt.indicator = $"(ansi --escape $env.prompt.color.normal)($env.prompt.indicator)(ansi reset)"
@@ -80,16 +89,19 @@ def get-path-color [path: path] {
   }
 }
 
-def git_status_info [] {
+def git_status_info [path: path] {
   let changes = git diff --shortstat | parse --regex "\\s*(?<f>[0-9]+)[^0-9]*(?<i>[0-9]+)[^0-9]*(?<d>[0-9]+)"
-  let untracked = (git ls-files --other --directory --exclude-standard | wc -l | into int)
+  let untracked = (git ls-files --other --exclude-standard $path | lines)
+  let u_folders = ($untracked | each { dirname $in } | uniq | length)
+
 
   # Create an object with the calculated values
   {
     f: ($changes | get f.0? | default 0),
     i: ($changes | get i.0? | default 0),
     d: ($changes | get d.0? | default 0),
-    u: $untracked,
+    u: ($untracked | length),
+    U: $u_folders,
     b: (git branch --show-current)
   }
 }
@@ -141,15 +153,12 @@ def right_prompt_command_ [] {
     $"(ansi rb)[($env.LAST_EXIT_CODE)]"
   } else { "" }
 
-  let git_info = (if ([$env.PWD, ".git"] | path join | path exists) {
-    let col = {
-      a: (ansi lightcyan1),
-      s: (ansi def)
-      i: (ansi seagreen1b)
-      d: (ansi red1)
-    }
-    let data = git_status_info
-    $"($col.a)($data.f)($col.s)@($col.a)($data.b)($col.s) => ($col.i)+($col.a)($data.i)($col.s)/($col.d)-($col.a)($data.d) \(($data.u) ●\)(ansi reset)"
+  let git_path = (git rev-parse --show-toplevel e> (std null-device))
+
+  let git_info = (if ($git_path | str length) > 0 {
+    let col = $env.prompt.color.git
+    let data = git_status_info $git_path
+    $"($col.a)($data.f)($col.s)@($col.a)($data.b)($col.s) => ($col.i)+($col.a)($data.i)($col.s)/($col.d)-($col.a)($data.d) \(($data.u)($col.s)@($col.a)($data.U) ●\)(ansi reset)"
   } else {
     ""
   })

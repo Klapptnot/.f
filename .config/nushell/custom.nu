@@ -1,5 +1,6 @@
 use std
 
+$env.NULL_DEV = (std null-device)
 
 $env.LS_COLORS = (vivid generate 'catppuccin-mocha' | str trim)
 
@@ -90,19 +91,19 @@ def get-path-color [path: path] {
 }
 
 def git_status_info [path: path] {
-  let changes = git diff --shortstat | parse --regex "\\s*(?<f>[0-9]+)[^0-9]*(?<i>[0-9]+)[^0-9]*(?<d>[0-9]+)"
-  let untracked = (git ls-files --other --exclude-standard $path | lines)
-  let u_folders = ($untracked | each { dirname $in } | uniq | length)
+  let changes = (git diff --shortstat e> $env.NULL_DEV | parse --regex "\\s*(?<f>[0-9]+)[^0-9]*(?<i>[0-9]+)[^0-9]*(?<d>[0-9]+)")
+  let untracked = (git ls-files --other --exclude-standard $path e> $env.NULL_DEV | lines)
+  let u_folders = ($untracked | each { $in | path dirname } | uniq | length)
 
 
   # Create an object with the calculated values
   {
-    f: ($changes | get f.0? | default 0),
-    i: ($changes | get i.0? | default 0),
-    d: ($changes | get d.0? | default 0),
+    f: ($changes | get f.0? | default 0 | into int),
+    i: ($changes | get i.0? | default 0 | into int),
+    d: ($changes | get d.0? | default 0 | into int),
     u: ($untracked | length),
     U: $u_folders,
-    b: (git branch --show-current)
+    b: (git branch --show-current e> $env.NULL_DEV)
   }
 }
 
@@ -141,7 +142,7 @@ def left_prompt_command_ [] {
 }
 
 def right_prompt_command_ [] {
-  # create a right prompt in magenta with green separators and am/pm underlined
+  # create a right prompt in grey with brigth grey separators and am/pm underlined
   let time_segment = ([
     (ansi reset)
     (ansi grey74)
@@ -153,7 +154,7 @@ def right_prompt_command_ [] {
     $"(ansi rb)[($env.LAST_EXIT_CODE)]"
   } else { "" }
 
-  let git_path = (git rev-parse --show-toplevel e> (std null-device))
+  let git_path = (git rev-parse --show-toplevel e> $env.NULL_DEV)
 
   let git_info = (if ($git_path | str length) > 0 {
     let col = $env.prompt.color.git

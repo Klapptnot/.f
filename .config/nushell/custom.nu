@@ -15,6 +15,7 @@ $env.PATH = [
 
 $env.prompt = {
   rdircolor: true,
+  collapse: 120,
   indicator: (if (is-admin) { $"(char elevated) " } else { "► " })
   ldir: nothing.
   sdir: nothing
@@ -107,6 +108,10 @@ def git_status_info [path: path] {
   }
 }
 
+def do_collapse_ [] -> bool {
+  $env.prompt.collapse > (term size).columns
+}
+
 def left_prompt_command_ [] {
   let dir = match (do --ignore-shell-errors { $env.PWD | path relative-to $nu.home-path }) {
     null => $env.PWD
@@ -155,14 +160,16 @@ def right_prompt_command_ [] {
   } else { "" }
 
   let git_path = (git rev-parse --show-toplevel e> $env.NULL_DEV)
+  let col = $env.prompt.color.git
 
-  let git_info = (if ($git_path | str length) > 0 {
-    let col = $env.prompt.color.git
-    let data = git_status_info $git_path
-    $"($col.a)($data.f)($col.s)@($col.a)($data.b)($col.s) => ($col.i)+($col.a)($data.i)($col.s)/($col.d)-($col.a)($data.d) \(($data.u)($col.s)@($col.a)($data.U) ●\)(ansi reset)"
-  } else {
-    ""
-  })
+  let git_info = match [(($git_path | str length) > 0), (do_collapse_)] {
+    [true, true] => $"($col.a)(git branch --show-current)($col.s)",
+    [true, false] => {
+      let data = git_status_info $git_path
+      $"($col.a)($data.f)($col.s)@($col.a)($data.b)($col.s) => ($col.i)+($col.a)($data.i)($col.s)/($col.d)-($col.a)($data.d) \(($data.u)($col.s)@($col.a)($data.U) ●\)"
+    },
+    _ => ""
+  }
 
   # TODO: Check for SQL history
   let duration = " " + (history | last | get duration | into string | str replace --regex --all '([0-9]+)' $"(ansi plum1)${1}(ansi reset)")

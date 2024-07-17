@@ -2,6 +2,7 @@ use std
 
 $env.NULL_DEV = (std null-device)
 
+$env.FZF_DEFAULT_COMMAND = 'ag --hidden --ignore .git -l -g ""'
 $env.LS_COLORS = (vivid generate 'catppuccin-mocha' | str trim)
 
 $env.UTILS = ([$env.HOME, "repos", "utils"] | path join)

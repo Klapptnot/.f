@@ -121,7 +121,7 @@ function update_prompt {
   local NUM_JOBS=0
   for job in $(jobs -p); do [[ $job ]] && ((NUM_JOBS++)); done
   # Update the prompt string
-  PS1=$"${PSP}\033[0J\033[0K\033[38;2;235;100;52mbash\033[00m\033[38;2;255;255;255m as \033[00m\033[38;2;155;92;237mklapptnot\033[00m:\033[38;2;4;201;172m${SPWD}\033[00m${STATUS_INDC}${DELIM@E} "
+  PS1=$"${PSP}\033[0J\033[0K\033[38;2;235;100;52mbash\033[00m\033[38;2;255;255;255m::\033[00m\033[38;2;155;92;237mklapptnot\033[00m:\033[38;2;4;201;172m${SPWD}\033[00m${STATUS_INDC}${DELIM@E} "
   # Save a string with info
   BPUI="${PWD}:${_s}"
 }
@@ -166,8 +166,7 @@ fi
 
 function unc() {
   [ -d ~/.config/nvim ] && rm -rf ~/.config/nvim/*
-  # git clone "https://github.com/Klapptnot/spruce.git" ~/.config/nvim/
-  git clone ~/repos/spruce/ ~/.config/nvim/
+  git clone "https://github.com/Klapptnot/spruce.git" ~/.config/nvim/
 }
 function print_path() {
   for p in ${PATH//:/\ }; do

@@ -175,3 +175,4 @@ function print_path() {
 }
 alias apt-fu='apt update; apt upgrade -y; apt update'
 alias gt='goto'
+. "$HOME/.cargo/env"

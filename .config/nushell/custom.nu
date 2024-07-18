@@ -13,53 +13,35 @@ $env.PATH = [
   ([$env.HOME, "repos", "utils", "bin"] | path join),
   ([$nu.default-config-dir, "bin"] | path join),
 ]
-# $env.PATH = ($env.PATH | uniq)
 
-$env.prompt = {
-  rdircolor: true,
-  collapse: 120,
-  indicator: (if (is-admin) { $"(char elevated) " } else { "► " })
-  ldir: nothing.
-  sdir: nothing
+$env.mirko = ([$env.HOME, ".config", "mirkosh.yaml"] | path join)
+
+# Have a default config
+if not ($env.mirko | path exists) {
+  cp ([$nu.default-config-dir, "mirkosh.yaml"] | path join) $env.mirko
 }
 
-$env.prompt.str = {
-  user: "klapptnot",
-  host: "zircon",
-  at  : (match ($env.SSH_TTY? | default nothing) {
-    nothing => " at ",
-    _ => " in "
-  })
+# Contains strings, thresholds, colors, etc.
+$env.mirko = ($env.mirko | open)
+
+# GIT info colors
+$env.mirko.color.git =   {
+  i: (ansi $env.mirko.color.git.i)
+  d: (ansi $env.mirko.color.git.d)
+  a: (ansi $env.mirko.color.git.a),
+  s: (ansi $env.mirko.color.git.s)
 }
 
-$env.prompt.color = {
-  host:   {
-    fg: "#9b5ced"
-  },
-  user:   {
-    fg: "#bd93f9"
-  },
-  error:  {
-    fg: "#de4b4b"
-  }
-  dir:    {
-    fg: "#e8e8e8"
-  }
-  normal: {
-    fg: "#e8e8e8"
-  }
-  at:     {
-    fg: "#e8e8e8"
-  }
-  git:    {
-    i: (ansi seagreen1b)
-    d: (ansi red1)
-    a: (ansi lightcyan1),
-    s: (ansi def)
-  }
-}
+# Distinguish between a SSH connection and a local shell session
+$env.mirko.str.from = (if ($env.SSH_TTY? | default nothing) == nothing { $env.mirko.str.from.base } else { $env.mirko.str.from.sshd })
 
-$env.prompt.indicator = $"(ansi --escape $env.prompt.color.normal)($env.prompt.indicator)(ansi reset)"
+# PATH_SHORTENING variables, last and short
+$env.mirko.ldir = ""
+$env.mirko.sdir = ""
+
+# PROMPT_INDICATOR character for admin and normal user
+$env.mirko.str.char = (if (is-admin) { $env.mirko.str.char.root } else { $env.mirko.str.char.else })
+$env.mirko.str.char = $"(ansi --escape $env.mirko.color.normal)($env.mirko.str.char)(ansi reset)"
 
 def path-shorten [path: string] -> string {
   let path_parts = ($path | split row (char path_sep))
@@ -78,7 +60,7 @@ def path-shorten [path: string] -> string {
 def get-path-color [path: path] {
   if ((which cksum).command?.0? == null) {
     return {
-      fg: $env.prompt.color.dir
+      fg: $env.mirko.color.dir
     }
   }
   let hex = (pwd | cksum | split row " ").0 | awk '{printf "%x", $1}' | fill --width 6 --character 0 | parse --regex '(?P<r>.{2})(?P<g>.{2})(?P<b>.{2})'
@@ -111,7 +93,7 @@ def git_status_info [path: path] {
 }
 
 def do_collapse_ [] -> bool {
-  $env.prompt.collapse > (term size).columns
+  $env.mirko.collapse > (term size).columns
 }
 
 def left_prompt_command_ [] {
@@ -121,31 +103,31 @@ def left_prompt_command_ [] {
     $relative_pwd => ([~ $relative_pwd] | path join)
   }
 
-  $env.prompt.sdir = (if $env.prompt.ldir != $dir {
+  $env.mirko.sdir = (if $env.mirko.ldir != $dir {
     path-shorten $dir
   } else {
-    $env.prompt.sdir
+    $env.mirko.sdir
   })
 
-  $env.prompt.color.cdir = (if $env.prompt.ldir != $dir and $env.prompt.rdircolor {
+  $env.mirko.color.cdir = (if $env.mirko.ldir != $dir and $env.mirko.rdircolor {
     get-path-color $dir
   } else {
-    $env.prompt.color.dir
+    $env.mirko.color.dir
   })
-  $env.prompt.ldir = $dir
+  $env.mirko.ldir = $dir
 
   let identity = ([
-    (ansi --escape $env.prompt.color.user),
-    ($env.prompt.str.user),
-    (ansi --escape $env.prompt.color.at),
-    ($env.prompt.str.at),
-    (ansi --escape $env.prompt.color.host),
-    ($env.prompt.str.host),
-    (ansi --escape $env.prompt.color.normal),
+    (ansi --escape $env.mirko.color.user),
+    ($env.mirko.str.user),
+    (ansi --escape $env.mirko.color.from),
+    ($env.mirko.str.from),
+    (ansi --escape $env.mirko.color.host),
+    ($env.mirko.str.host),
+    (ansi --escape $env.mirko.color.normal),
     ":"
   ] | str join)
 
-  $"($identity)(ansi --escape $env.prompt.color.cdir)($env.prompt.sdir)"
+  $"($identity)(ansi --escape $env.mirko.color.cdir)($env.mirko.sdir)"
 }
 
 def right_prompt_command_ [] {
@@ -162,7 +144,7 @@ def right_prompt_command_ [] {
   } else { "" }
 
   let git_path = (git rev-parse --show-toplevel e> $env.NULL_DEV)
-  let col = $env.prompt.color.git
+  let col = $env.mirko.color.git
 
   let git_info = match [(($git_path | str length) > 0), (do_collapse_)] {
     [true, true] => $"($col.a)(git branch --show-current)($col.s)",
@@ -181,10 +163,10 @@ def right_prompt_command_ [] {
 
 $env.PROMPT_COMMAND = { left_prompt_command_ }
 $env.PROMPT_COMMAND_RIGHT = { right_prompt_command_ }
-$env.PROMPT_INDICATOR = { $env.prompt.indicator }
+$env.PROMPT_INDICATOR = { $env.mirko.str.char }
 
 $env.TRANSIENT_PROMPT_COMMAND = {|| "🚀 " }
-$env.TRANSIENT_PROMPT_INDICATOR = {|| $env.prompt.indicator }
+$env.TRANSIENT_PROMPT_INDICATOR = {|| $env.mirko.str.char }
 # $env.TRANSIENT_PROMPT_COMMAND_RIGHT = {|| "⏎" }
 
 source goto.nu

@@ -1,0 +1,30 @@
+str:
+  user: <user>
+  host: <host>
+  char:
+    root: "⚡ "
+    else: "► "
+  from:
+    base: " at "
+    sshd: " in "
+collapse: 120
+rdircolor: true
+
+color:
+  host:
+    fg: "#9b5ced"
+  user:
+    fg: "#bd93f9"
+  error:
+    fg: "#de4b4b"
+  dir:
+    fg: "#e8e8e8"
+  normal:
+    fg: "#e8e8e8"
+  from:
+    fg: "#e8e8e8"
+  git:
+    i: seagreen1b
+    d: red1
+    a: lightcyan1
+    s: def

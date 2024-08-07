@@ -123,41 +123,90 @@ let catppuccin = {
 }
 
 let stheme = $catppuccin.mocha
-let theme = {
-  separator: $stheme.overlay0
-  leading_trailing_space_bg: $stheme.overlay0
-  header: $stheme.green
-  date: $stheme.mauve
-  filesize: $stheme.blue
-  row_index: $stheme.pink
-  bool: $stheme.peach
-  int: $stheme.peach
-  duration: $stheme.peach
-  range: $stheme.peach
-  float: $stheme.peach
-  string: $stheme.green
-  nothing: $stheme.peach
-  binary: $stheme.peach
-  cellpath: $stheme.peach
-  hints: dark_gray
 
-  shape_garbage: { fg: $stheme.crust bg: $stheme.red attr: b }
-  shape_bool: $stheme.blue
-  shape_int: { fg: $stheme.mauve attr: b}
-  shape_float: { fg: $stheme.mauve attr: b}
-  shape_range: { fg: $stheme.yellow attr: b}
-  shape_internalcall: { fg: $stheme.blue attr: b}
-  shape_external: { fg: $stheme.blue attr: b}
-  shape_externalarg: $stheme.text
-  shape_literal: $stheme.blue
-  shape_operator: $stheme.yellow
-  shape_signature: { fg: $stheme.green attr: b}
-  shape_string: $stheme.green
-  shape_filepath: $stheme.yellow
-  shape_globpattern: { fg: $stheme.blue attr: b}
-  shape_variable: $stheme.text
-  shape_flag: { fg: $stheme.blue attr: b}
-  shape_custom: {attr: b}
+let theme = {
+    separator: $stheme.overlay0
+    leading_trailing_space_bg: { attr: "n" }
+    header: { fg: $stheme.blue attr: "b" }
+    empty: $stheme.lavender
+    bool: $stheme.lavender
+    int: $stheme.peach
+    duration: $stheme.text
+    filesize: {|e|
+        if $e < 1mb {
+            $stheme.green
+        } else if $e < 100mb {
+            $stheme.yellow
+        } else if $e < 500mb {
+            $stheme.peach
+        } else if $e < 800mb {
+            $stheme.maroon
+        } else if $e > 800mb {
+            $stheme.red
+        }
+    }
+    date: {|| (date now) - $in |
+        if $in < 1hr {
+            $stheme.green
+        } else if $in < 1day {
+            $stheme.yellow
+        } else if $in < 3day {
+            $stheme.peach
+        } else if $in < 1wk {
+            $stheme.maroon
+        } else if $in > 1wk {
+            $stheme.red
+        }
+    }
+    range: $stheme.text
+    float: $stheme.text
+    string: $stheme.text
+    nothing: $stheme.text
+    binary: $stheme.text
+    'cell-path': $stheme.text
+    row_index: { fg: $stheme.mauve attr: "b" }
+    record: $stheme.text
+    list: $stheme.text
+    block: $stheme.text
+    hints: $stheme.overlay1
+    search_result: { fg: $stheme.red bg: $stheme.text }
+
+    shape_and: { fg: $stheme.pink attr: "b" }
+    shape_binary: { fg: $stheme.pink attr: "b" }
+    shape_block: { fg: $stheme.blue attr: "b" }
+    shape_bool: $stheme.teal
+    shape_custom: $stheme.green
+    shape_datetime: { fg: $stheme.teal attr: "b" }
+    shape_directory: $stheme.teal
+    shape_external: $stheme.teal
+    shape_externalarg: { fg: $stheme.green attr: "b" }
+    shape_filepath: $stheme.teal
+    shape_flag: { fg: $stheme.blue attr: "b" }
+    shape_float: { fg: $stheme.pink attr: "b" }
+    shape_garbage: { fg: $stheme.text bg: $stheme.red attr: "b" }
+    shape_globpattern: { fg: $stheme.teal attr: "b" }
+    shape_int: { fg: $stheme.pink attr: "b" }
+    shape_internalcall: { fg: $stheme.teal attr: "b" }
+    shape_list: { fg: $stheme.teal attr: "b" }
+    shape_literal: $stheme.blue
+    shape_match_pattern: $stheme.green
+    shape_matching_brackets: { attr: "u" }
+    shape_nothing: $stheme.teal
+    shape_operator: $stheme.peach
+    shape_or: { fg: $stheme.pink attr: "b" }
+    shape_pipe: { fg: $stheme.pink attr: "b" }
+    shape_range: { fg: $stheme.peach attr: "b" }
+    shape_record: { fg: $stheme.teal attr: "b" }
+    shape_redirection: { fg: $stheme.pink attr: "b" }
+    shape_signature: { fg: $stheme.green attr: "b" }
+    shape_string: $stheme.green
+    shape_string_interpolation: { fg: $stheme.teal attr: "b" }
+    shape_table: { fg: $stheme.blue attr: "b" }
+    shape_variable: $stheme.pink
+
+    background: $stheme.base
+    foreground: $stheme.text
+    cursor: $stheme.blue
 }
 
 # External completer example
@@ -186,7 +235,7 @@ $env.config = {
         trim: {
             methodology: wrapping # wrapping or truncating
             wrapping_try_keep_words: true # A strategy used by the 'wrapping' methodology
-            truncating_suffix: "..." # A suffix used by the 'truncating' methodology
+            truncating_suffix: "…" # A suffix used by the 'truncating' methodology
         }
         header_on_separator: false # show header text on separator/border line
         # abbreviated_row_count: 10 # limit data rows from top and bottom after reaching a set point
@@ -236,7 +285,7 @@ $env.config = {
             max_results: 100 # setting it lower can improve completion performance at the cost of omitting some options
             completer: null # check 'carapace_completer' above as an example
         }
-        use_ls_colors: false # set this to true to enable file/path/directory completions using LS_COLORS
+        use_ls_colors: true # set this to true to enable file/path/directory completions using LS_COLORS
     }
 
     filesize: {
@@ -518,11 +567,9 @@ $env.config = {
             mode: [emacs, vi_normal, vi_insert]
             event: {
                 send: executehostcommand,
-                cmd: "let f = (
-                    fzf --prompt 'File: ' --pointer '=>' --marker '=='
+                cmd: "let f = (fzf --prompt 'File: ' --pointer '=>' --marker '==' -m
                         --preview-window '65%' --preview-label 'Preview'
-                        --preview='bat --paging never --wrap character --number --color always --italic-text always --theme \"Catppuccin Mocha\" --line-range :250 {}'
-                ); if $f != '' { nvim $f }"
+                        --preview 'bat {}'); if $f != '' { nvim $f }"
             }
         }
         {

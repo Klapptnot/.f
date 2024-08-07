@@ -26,4 +26,8 @@ _darcs
 ^/COPYING
 
 
-\misc
+misc
+\.termux
+\.zshrc
+\.pyftp.yaml
+\.ignore.shml

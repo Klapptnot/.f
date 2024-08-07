@@ -31,7 +31,7 @@ function fzf_get_file {
   file=$(
     fzf --prompt 'File: ' --pointer '=>' --marker '==' \
       --preview-window '65%' --preview-label 'Preview' \
-      --preview='bat --paging never --wrap character --number --color always --italic-text always --line-range :250 {}'
+      --preview='bat {}'
   )
   if ! [ -f "${file}" ]; then
     return 1
@@ -53,27 +53,34 @@ function fgfc {
   fi
 }
 
+function print_path() {
+  for p in ${PATH//:/\ }; do
+    printf '%s\n' "${p}"
+  done
+}
+
 # shellcheck disable=SC2120
 function short_pwd {
-  local DWP ODWP="${PWD}"
+  local short_pwd_s=""
+  local old_pwd="${PWD}"
   if [[ "${PWD}" == "${HOME}"* ]]; then
-    ODWP="${PWD#*"${HOME}"}"
-    DWP='~'
+    old_pwd="${PWD#*"${HOME}"}"
+    short_pwd_s='~'
   fi
-  for dir_item in ${ODWP//\// }; do
+  for dir_item in ${old_pwd//\// }; do
     if [ "${dir_item}" == "${PWD##*/}" ]; then
-      DWP+="/${dir_item}"
+      short_pwd_s+="/${dir_item}"
       break
     elif [ "${dir_item:0:1}" == "." ]; then
-      DWP+="/${dir_item:0:2}"
+      short_pwd_s+="/${dir_item:0:2}"
       continue
     fi
-    DWP+="/${dir_item:0:1}"
+    short_pwd_s+="/${dir_item:0:1}"
   done
   if [ "${1}" == '-e' ]; then
-    export SPWD="${DWP}"
+    export SPWD="${short_pwd_s}"
   else
-    printf '%b' "${DWP}"
+    printf '%b' "${short_pwd_s}"
   fi
 }
 
@@ -83,50 +90,42 @@ function curpos() {
   oldstty=$(stty -g)
   stty raw -echo min 0
   # on my system, the following line can be replaced by the line below it
-  echo -en "\033[6n" >/dev/tty
-  # tput u7 > /dev/tty    # when TERM=xterm (and relatives)
+  printf "\033[6n" >/dev/tty
+  [ "${TERM}" == "xterm" ] && tput u7 >/dev/tty # when TERM=xterm (and relatives)
   IFS=';' read -r -d R -a pos
   stty "${oldstty}"
   row="${pos[0]:2}" # strip off the esc-[
   col="${pos[1]}"
   # change from one-based to zero based so they work with: tput cup $row $col
-  printf "%s:%s" "$((row - 1))" "$((col - 1))"
+  printf "%s %s" "$((row - 1))" "$((col - 1))"
 }
 
-function update_prompt {
+function prompt {
   # Set the string for exit status indicator
   local _s="${?}"
-  # Early return when no update needed
-  [ "${BPUI}" == "${PWD}:${_s}" ] && return
-  # local STATUS_INDC="\[\033[01;32m\]\[\342\234\223\]\[\033[00m\]"
-  local STATUS_INDC=""
-  [ "${_s}" -gt 0 ] && STATUS_INDC="\033[38;05;01m[${_s}]\033[00m"
-  # Set a fish-like pwd
-  # shellcheck disable=SC2155
-  local SPWD="$(short_pwd)"
-  # Set custom delimeters
-  local DELIM="\u25ba"                 # ►
-  [ 0 -eq "$(id -u)" ] && DELIM="\u26a1" # ⚡
-  # Get cursor pos and add a \n if needed
-  # shellcheck disable=SC2155
-  local CURSOR_POS="$(curpos 2>/dev/null)"
-  # local cROW="${CURSOR_POS%:*}"
-  local cCOL="${CURSOR_POS#*:}"
 
-  local PSP=""
-  # Add a new line before prompt if process does not add one
-  [ "${cCOL}" != 0 ] && PSP=$"\n"
+  local last_cmd_status=""
+  (( "${_s}" > 0 )) && last_cmd_status="\033[38;05;01m[${_s}]\033[00m"
+  # A fish-like pwd
+  local short_cwd="$(short_pwd)"
 
-  jobs &>/dev/null
-  local NUM_JOBS=0
-  for job in $(jobs -p); do [[ $job ]] && ((NUM_JOBS++)); done
+  local delim="\u25ba"                  # ►
+  ((0 == "$(id -u)")) && delim="\u26a1" # ⚡
+
+  # Add a \n if needed
+  IFS=' ' read -r cROW cCOL < <(curpos 2>/dev/null)
+  local pPS1=""
+  (("${cCOL}" != 0)) && pPS1="\033[38;5;242m⏎\033[0m\n"
+
+  # jobs &>/dev/null
+  # local NUM_JOBS=0
+  # for job in $(jobs -p); do [[ $job ]] && ((NUM_JOBS++)); done
   # Update the prompt string
-  PS1=$"${PSP}\033[0J\033[0K\033[38;2;235;100;52mbash\033[00m\033[38;2;255;255;255m::\033[00m\033[38;2;155;92;237mklapptnot\033[00m:\033[38;2;4;201;172m${SPWD}\033[00m${STATUS_INDC}${DELIM@E} "
-  # Save a string with info
-  BPUI="${PWD}:${_s}"
+  pPS1+="\033[38;2;235;100;52mbash\033[00m\033[38;2;255;255;255m::\033[00m\033[38;2;155;92;237m\u\033[00m:\033[38;2;4;201;172m${short_cwd}\033[00m${last_cmd_status}${delim@E} "
+  PS1="${pPS1}"
 }
 
-PROMPT_COMMAND='update_prompt'
+PROMPT_COMMAND='prompt'
 
 # colored GCC warnings and errors
 export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
@@ -136,10 +135,6 @@ bind -x '"\C-l": clear'
 bind -x '"\C-o": fnvim'
 bind -x '"\C-u": fgfc'
 
-# Add an "alert" alias for long running commands.  Use like so:
-#   sleep 10; alert
-alias alert='termux-notification -t "$([ ${?} == 0 ] && echo Terminal: succeded || echo Terminal: error)" -c  "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
-
 # Alias definitions.
 # You may want to put all your additions into a separate file like
 # ~/.bash_aliases, instead of adding them here directly.
@@ -147,6 +142,10 @@ alias alert='termux-notification -t "$([ ${?} == 0 ] && echo Terminal: succeded 
 
 # shellcheck disable=SC1090
 [ -f ~/.bash_aliases ] && source ~/.bash_aliases
+
+[ -f "${HOME}/.cargo/env" ] && source "${HOME}/.cargo/env"
+[ -f "${UTILS}/lib/goto.sh" ] && source "${UTILS}/lib/goto.sh"
+alias gt='goto'
 
 # enable programmable completion features (you don't need to enable
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
@@ -160,19 +159,3 @@ if ! shopt -oq posix; then
     source "${PREFIX}/etc/bash_completion"
   fi
 fi
-
-# shellcheck disable=SC1091
-[ -f "${UTILS}/lib/goto.sh" ] && source "${UTILS}/lib/goto.sh"
-
-function unc() {
-  [ -d ~/.config/nvim ] && rm -rf ~/.config/nvim/*
-  git clone "https://github.com/Klapptnot/spruce.git" ~/.config/nvim/
-}
-function print_path() {
-  for p in ${PATH//:/\ }; do
-    printf '%s\n' "${p}"
-  done
-}
-alias apt-fu='apt update; apt upgrade -y; apt update'
-alias gt='goto'
-. "$HOME/.cargo/env"

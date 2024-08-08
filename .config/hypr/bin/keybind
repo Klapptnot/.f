@@ -1,0 +1,95 @@
+#! /bin/env bash
+
+# |>----|>----|>----|><-><|----<|----<|----<|
+# |>    from Klapptnot's Hyprland setup    <|
+# |>   https://github.com/Klapptnot/dotf   <|
+# |>----|>----|>----|><-><|----<|----<|----<|
+
+# Creates a window showing Hyprland keybindings
+# On double-click or enter executes the command/action
+
+# Currently, the bind flags are
+# l -> locked, will also work when an input inhibitor (e.g. a lockscreen) is active.
+# r -> release, will trigger on release of a key.
+# e -> repeat, will repeat when held.
+# n -> non-consuming, key/mouse events will be passed to the active window in addition to triggering the dispatcher.
+# m -> mouse binding.
+# t -> transparent, cannot be shadowed by other binds.
+# i -> ignore mods, will ignore modifiers.
+# s -> separate, will arbitrarily combine keys between each mod/key.
+# d -> has description, will allow you to write a description for your bind.
+# p -> bypasses the app's requests to inhibit keybinds.
+
+function show_window {
+  local CONFIG_FILE=~/.config/hypr/hyprland.conf
+  local title="Hyprland 󰧹 "
+  local bind_flags="[lrenmtisdp]{0,10}"
+  local bind_regex="^[^#]*bind${bind_flags}\ =\ *([A-Za-z0-9_\ ]*?)\ *,\ *([A-Za-z0-9:_]+)\ *,\ *([a-zA-Z0-9_-]+)(\ *,\ *(.*?))?\ *#\ *(.*)$"
+
+  local BINDINGS=()
+  local matches_count=0
+  local total_count=0
+  while read -r line; do
+    if [[ "${line}" =~ ${bind_regex} ]]; then
+      local MOD="${BASH_REMATCH[1]:-none}"
+      local KEY="${BASH_REMATCH[2]:-none}"
+      local CMD="${BASH_REMATCH[3]:-none}" # Can't be empty
+      local ARGS="${BASH_REMATCH[5]}"
+      local DESC="${BASH_REMATCH[6]:-none}"
+      if [[ "${ARGS}" == -* ]]; then
+        BINDINGS+=("${MOD}" "${KEY}" "${DESC}" "${CMD}" -- "${ARGS}")
+      else
+        BINDINGS+=("${MOD}" "${KEY}" "${DESC}" "${CMD}" "${ARGS}")
+      fi
+      ((matches_count++))
+    fi
+    ((total_count++))
+  done <<<"$(grep -oP "^[^#]*bind${bind_flags}\s*=.*" "${CONFIG_FILE}")"
+
+    title="${title}(${matches_count}/${total_count})"
+
+  # Detect monitor resolution and scale
+  IFS=' ' read -r WIDTH HEIGHT SCALE < <(hyprctl -j monitors |
+    jq -rM '.[] | select(.focused==true) | [ (.width|tostring), (.height|tostring), (.scale|tostring) ] | join(" ")')
+
+  # Calculate width and height based on percentages and monitor resolution
+  WIDTH=$(bc <<<"${WIDTH}/${SCALE}")
+  HEIGHT=$(bc <<<"${HEIGHT}/${SCALE}")
+
+  # Set maximum width and height
+  local MAX_WIDTH=1200
+  local MAX_HEIGHT=1000
+
+  # Calculate dynamic width and height
+  local DWIDTH=$((WIDTH * 70 / 100))
+  local DHEIGHT=$((HEIGHT * 70 / 100))
+
+  # Limit width and height to maximum values
+  DWIDTH=$((DWIDTH > MAX_WIDTH ? MAX_WIDTH : DWIDTH))
+  DHEIGHT=$((DHEIGHT > MAX_HEIGHT ? MAX_HEIGHT : DHEIGHT))
+
+  yad --width ${DWIDTH} --height ${DHEIGHT} --center --on-top \
+    --title="${title}" --no-buttons --list \
+    --dclick-action "${THIS_SCRIPT} %s" \
+    --column="Mod key" --column="Key" --column="Description" --column="Hyprland dispatcher" --column="Command args" \
+    "${BINDINGS[@]}"
+}
+
+function main {
+  if [[ "$(type -p yad)" == "" ]]; then
+    printf '%s\n' 'Yad not installed, exiting..'
+    return 1
+  fi
+
+  THIS_SCRIPT="$(realpath "${0}")"
+  if [ ${#} == 0 ]; then
+    show_window
+    return
+  fi
+  # Execute the Hyprland dispatcher
+  local CMD="${4}"
+  local ARGS="${5}"
+  printf 'Command: %s results in: %s\n' "${CMD} ${ARGS}" "$(hyprctl dispatch "${CMD}" "${ARGS}")"
+}
+
+main "${@}"

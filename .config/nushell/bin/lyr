@@ -1,5 +1,14 @@
 #! /bin/env nu
 
+# |>----|>----|>----|><-><|----<|----<|----<|
+# |>    from Klapptnot's Nushell setup     <|
+# |>   https://github.com/Klapptnot/dotf   <|
+# |>----|>----|>----|><-><|----<|----<|----<|
+
+# Script to try Nushell scripting
+# Get data from some song using title, artist and name
+# use https://github.com/Klapptnot/lyrics instead
+
 use std log
 use ua.nu get-rdm
 

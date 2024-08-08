@@ -1,3 +1,10 @@
+# |>----|>----|>----|><-><|----<|----<|----<|
+# |>     from Klapptnot's Shell setup      <|
+# |>   https://github.com/Klapptnot/dotf   <|
+# |>----|>----|>----|><-><|----<|----<|----<|
+
+# Default config for a simple but nice shell prompt
+
 str:
   user: <user>
   host: <host>

@@ -1,6 +1,7 @@
-# Nushell Config File
-#
-# version = "0.93.0"
+# |>----|>----|>----|><-><|----<|----<|----<|
+# |>    from Klapptnot's Nushell config    <|
+# |>   https://github.com/Klapptnot/dotf   <|
+# |>----|>----|>----|><-><|----<|----<|----<|
 
 # For more information on defining custom themes, see
 # https://www.nushell.sh/book/coloring_and_theming.html

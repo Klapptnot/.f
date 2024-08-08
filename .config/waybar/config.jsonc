@@ -1,0 +1,409 @@
+{
+  "layer": "top",
+  "modules-left": [
+    "group/motherboard",
+    "custom/weather",
+    "hyprland/workspaces",
+    "cava"
+  ],
+  "modules-center": [
+    "hyprland/window"
+  ],
+  "modules-right": [
+    "tray",
+    "custom/notification",
+    "custom/playerctl",
+    "custom/media",
+    "group/network-grp",
+    "backlight",
+    "group/audio-grp",
+    "clock",
+    "group/battery-grp",
+    "custom/power"
+  ],
+  "idle_inhibitor": {
+    "format": "<b>{icon}</b>",
+    "format-icons": {
+      "activated": " ",
+      "deactivated": " "
+    },
+    "tooltip": false
+  },
+  "mpd": {
+    "tooltip": false,
+    "format": "{stateIcon} {artist} - {album} - {title} ({elapsedTime:%M:%S}/{totalTime:%M:%S})",
+    "format-stopped": "{stateIcon} {artist} - {album} - {title} ({elapsedTime:%M:%S}/{totalTime:%M:%S})",
+    "format-disconnected": "",
+    "state-icons": {
+      "stopped": "󰓛",
+      "playing": "󰏤",
+      "paused": "󰐊"
+    }
+  },
+  "cava": {
+    "framerate": 30,
+    "autosens": 1,
+    "bars": 14,
+    "lower_cutoff_freq": 50,
+    "higher_cutoff_freq": 10000,
+    "method": "pipewire",
+    "source": "auto",
+    "stereo": true,
+    "bar_delimiter": 0,
+    "noise_reduction": 0.77,
+    "input_delay": 2,
+    "hide_on_silence": true,
+    "format-icons": [
+      "▁",
+      "▂",
+      "▃",
+      "▄",
+      "▅",
+      "▆",
+      "▇",
+      "█"
+    ],
+    "actions": {
+      "on-click-right": "mode"
+    }
+  },
+  "mpris": {
+    "format": "{player_icon} {status_icon} {dynamic}",
+    "interval": 1,
+    "dynamic-len": 40,
+    "max-length": 32,
+    "status-icons": {
+      "playing": "",
+      "paused": "",
+      "stopped": ""
+    },
+    "player_icons": {
+      "chromium": "",
+      "spotify": " "
+    },
+    "dynamic-order": [
+      "title",
+      "artist"
+    ],
+    "ignored-players": []
+  },
+  "pulseaudio": {
+    "format": "{icon} {volume}%",
+    "format-muted": "  Muted",
+    "format-bluetooth": " {icon} {volume}%",
+    "format-bluetooth-muted": "   Muted",
+    "on-click": "pamixer -t",
+    "on-click-right": "pavucontrol",
+    "on-scroll-up": "pamixer -i 5",
+    "on-scroll-down": "pamixer -d 5",
+    "scroll-step": 5,
+    "format-icons": {
+      "headphone": "",
+      "hands-free": "",
+      "headset": "",
+      "phone": "",
+      "portable": "",
+      "car": "",
+      "default": [
+        "",
+        "",
+        ""
+      ]
+    },
+    "smooth-scrolling-threshold": 1
+  },
+  "pulseaudio#microphone": {
+    "format": "{format_source}",
+    "format-source": "󰍬 {volume}%",
+    "format-source-muted": "󰍭 Muted",
+    "on-click": "pamixer --default-source -t",
+    "on-scroll-up": "pamixer --default-source -i 5",
+    "on-scroll-down": "pamixer --default-source -d 5",
+    "scroll-step": 5,
+    "smooth-scrolling-threshold": 1
+  },
+  "wireplumber": {
+    "format": "{icon} {volume}%",
+    "format-muted": "  Muted",
+    "format-bluetooth": " {icon} {volume}%",
+    "format-bluetooth-muted": "   Muted",
+    "format-icons": {
+      "headphone": "",
+      "hands-free": "",
+      "headset": "",
+      "phone": "",
+      "portable": "",
+      "car": "",
+      "default": [
+        "",
+        "",
+        ""
+      ]
+    },
+    "on-click": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
+    "on-scroll-up": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+",
+    "on-scroll-down": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"
+  },
+  "hyprland/window": {
+    "format": "{}",
+    "max-length": 24
+  },
+  "hyprland/workspaces": {
+    "disable-scroll": true,
+    "all-outputs": true,
+    "on-click": "activate",
+    "format-icons": {
+      "active": "󰮯",
+      "default": "󰊠",
+      "persistent": "󰊠"
+    },
+    "format": "{icon} {name}"
+  },
+  "network": {
+    "format-wifi": "{icon}",
+    "format-icons": [
+      "󰤟 ",
+      "󰤢 ",
+      "󰤥 ",
+      "󰤨 "
+    ],
+    "tooltip": false
+  },
+  "network#nname": {
+    "format-wifi": "{essid}",
+    "format-ethernet": "󰌗 {ipaddr}/{cidr}",
+    "format-disconnected": "󰤮 N/A",
+    "tooltip-format": "{ipaddr} => {bandwidthTotalBytes} ({signalStrength}%)",
+    "max-width": 32
+  },
+  "backlight": {
+    "tooltip": false,
+    "format": "{icon} {}%",
+    "interval": 1,
+    "format-icons": [
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ],
+    "on-scroll-up": "brightness set 5%+",
+    "on-scroll-down": "brightness set 5%-",
+    "smooth-scrolling-threshold": 1
+  },
+  "battery": {
+    "states": {
+      "good": 95,
+      "warning": 30,
+      "critical": 20
+    },
+    "format": "{icon} {capacity}%",
+    "format-charging": " {icon} {capacity}%",
+    "format-plugged": " {icon} {capacity}%",
+    "format-alt": "{time} {icon}",
+    "format-icons": [
+      "󰁺",
+      "󰁻",
+      "󰁼",
+      "󰁽",
+      "󰁾",
+      "󰁿",
+      "󰂀",
+      "󰂁",
+      "󰂂",
+      "󰁹"
+    ]
+  },
+  "tray": {
+    "icon-size": 20,
+    "spacing": 10
+  },
+  "clock": {
+    "format": "{:%H:%M - %d/%m}",
+    "format-alt": "{:%A, %B %d, %Y (%I:%M %p)}",
+    "tooltip-format": "<tt><small>{calendar}</small></tt>",
+    "calendar": {
+      "mode": "month",
+      "mode-mon-col": 3,
+      "weeks-pos": "right",
+      "on-scroll": 1,
+      "format": {
+        "months": "<span color='#ffead3'><b>{}</b></span>",
+        "days": "<span color='#ecc6d9'><b>{}</b></span>",
+        "weeks": "<span color='#99ffdd'><b>W{}</b></span>",
+        "weekdays": "<span color='#ffcc66'><b>{}</b></span>",
+        "today": "<span color='#ff6699'><b><u>{}</u></b></span>"
+      }
+    },
+    "actions": {
+      "on-click-right": "mode",
+      "on-click-forward": "tz_up",
+      "on-click-backward": "tz_down",
+      "on-scroll-up": "shift_up",
+      "on-scroll-down": "shift_down"
+    }
+  },
+  "keyboard-state": {
+    "numlock": true,
+    "capslock": true,
+    "format": {
+      "numlock": "N {icon}",
+      "capslock": "󰪛 {icon}"
+    },
+    "format-icons": {
+      "locked": "",
+      "unlocked": ""
+    }
+  },
+  "cpu": {
+    "interval": 5,
+    "format": " {}%",
+    "max-length": 10
+  },
+  "memory": {
+    "interval": 15,
+    "format": " {}%",
+    "max-length": 10
+  },
+  "temperature": {
+    "interval": 10,
+    "tooltip": true,
+    "critical-threshold": 82,
+    "format-critical": "{temperatureC}°C {icon}",
+    "format": "{temperatureC}°C {icon}",
+    "format-disconnected": "{temperatureC}°C {icon}",
+    "format-icons": [
+      "󰈸"
+    ],
+    "on-click": "kitty --title nvtop sh -c 'nvtop'"
+  },
+  "disk": {
+    "interval": 30,
+    "path": "/",
+    "format": "{percentage_used}% 󰋊",
+    "tooltip-format": "{used} used out of {total} on {path} ({percentage_used}%)"
+  },
+  "group/motherboard": {
+    "orientation": "horizontal",
+    "children-class": "motherboard-item",
+    "modules": [
+      "cpu",
+      "memory",
+      "temperature"
+      // "disk"
+    ]
+  },
+  "group/audio-grp": {
+    "orientation": "horizontal",
+    "modules": [
+      "pulseaudio",
+      "pulseaudio#microphone"
+    ]
+  },
+  "group/network-grp": {
+    "orientation": "horizontal",
+    "modules": [
+      "network",
+      "network#nname"
+    ]
+  },
+  "group/battery-grp": {
+    "orientation": "horizontal",
+    "modules": [
+      "battery",
+      "idle_inhibitor"
+    ]
+  },
+  "custom/launcher": {
+    "format": " ",
+    "on-click": "rofi -show drun",
+    "on-click-right": "killall rofi"
+  },
+  "custom/updates": {
+    "format": "{} Update(s)",
+    "exec": "checkupdates | wc -l",
+    "exec-if": "[[ $(checkupdates | wc -l) != 0 ]]",
+    "interval": 15,
+    "on-click": "kitty -e pacman -Syu && notify-send 'The system has been updated'"
+  },
+  "custom/playerctl": {
+    "format": "<span>{icon}{}</span>",
+    "format-icons": {
+      "spotify": " ",
+      "default": "󰎇 "
+    },
+    "return-type": "json",
+    "max-length": 32,
+    "exec": "playerctl -a metadata --format '{\"text\": \"{{markup_escape(title)}} ~ {{artist}}\", \"tooltip\": \"{{playerName}} : {{markup_escape(title)}}\", \"alt\": \"{{status}}\", \"class\": \"{{status}}\"}' -F",
+    "on-click": "playerctl play-pause",
+    "on-scroll-up": "playerctl next",
+    "on-scroll-down": "playerctl previous",
+    "scroll-step": 1,
+    "smooth-scrolling-threshold": 1
+  },
+  "custom/notification": {
+    "tooltip": false,
+    "format": "{icon}",
+    "format-icons": {
+      "notification": "<span foreground='red'><sup></sup></span>",
+      "none": "",
+      "dnd-notification": "<span foreground='red'><sup></sup></span>",
+      "dnd-none": "",
+      "inhibited-notification": "<span foreground='red'><sup></sup></span>",
+      "inhibited-none": "",
+      "dnd-inhibited-notification": "<span foreground='red'><sup></sup></span>",
+      "dnd-inhibited-none": ""
+    },
+    "return-type": "json",
+    "exec-if": "which swaync-client",
+    "exec": "swaync-client -swb",
+    "on-click": "swaync-client -t -sw",
+    "on-click-right": "swaync-client -d -sw",
+    "escape": true
+  },
+  "custom/power": {
+    "format": "⏻ ",
+    "on-click": "~/.config/waybar/bin/wlogout.sh",
+    "tooltip": false
+  },
+  "custom/weather": {
+    "format": "{}",
+    "format-alt": "{alt}: {}",
+    "format-alt-click": "click",
+    "interval": 3600,
+    "return-type": "json",
+    "exec": "~/.config/waybar/bin/weather.py",
+    "exec-if": "ping wttr.in -c1",
+    "tooltip": true
+  },
+  "custom/separator#dot": {
+    "format": " ",
+    "interval": "once",
+    "tooltip": false
+  },
+  "custom/separator#line": {
+    "format": "|",
+    "interval": "once",
+    "tooltip": false
+  },
+  "custom/separator#blank": {
+    "format": "",
+    "interval": "once",
+    "tooltip": false
+  },
+  "custom/separator#tab": {
+    "format": "  ",
+    "interval": "once",
+    "tooltip": false
+  }
+}

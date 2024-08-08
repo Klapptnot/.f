@@ -1,0 +1,31 @@
+/* 
+  * Custom theme for GUI elements
+  * based on nothing but look
+*/
+
+@define-color wb-bg transparent;
+@define-color black   #161619;
+@define-color white   #ede4ff;
+@define-color gray    #a5adc8;
+@define-color warning #ff5e6e;
+@define-color caution #ffe85c;
+@define-color success #5ff660;
+@define-color color0  #6a00ff;
+@define-color color1  #7b00f7;
+@define-color color2  #801de6;
+@define-color color3  #a020f0;
+@define-color color4  #ab78f3;
+@define-color color5  #bd93f9;
+@define-color color6  #cba6f7;
+@define-color color7  #c9cbff;
+@define-color color8  #fdc5f5;
+@define-color color9  #fdc5c5;
+@define-color color10 #ffe8b8;
+@define-color color11 #ffa98c;
+@define-color color12 #f28fad;
+@define-color color13 #b8966c;
+@define-color color14 #bd93f9;
+@define-color color15 #abe9b3;
+
+@define-color borders @color8;
+

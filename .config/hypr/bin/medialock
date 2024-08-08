@@ -1,0 +1,23 @@
+#! /bin/env bash
+
+# |>----|>----|>----|><-><|----<|----<|----<|
+# |>    from Klapptnot's Hyprland setup    <|
+# |>   https://github.com/Klapptnot/dotf   <|
+# |>----|>----|>----|><-><|----<|----<|----<|
+
+# constantly check to update a file with the art
+# image of the current playing media, for Hyprlock
+
+function main {
+  local last=""
+  local medI=""
+  while sleep 1; do
+    medI="$(playerctl metadata mpris:artUrl)"
+    if [ "${last}" != "${medI}" ]; then
+      cat "${medI:7}" > ~/.cache/hyprland/medialock.cache
+      last="${medI}"
+    fi
+  done
+}
+
+main "${@}" #&

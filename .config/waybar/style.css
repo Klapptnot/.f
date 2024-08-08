@@ -1,0 +1,264 @@
+@import url("theme.css");
+
+
+* {
+  border: none;
+  font-family: "CaskaydiaCove Nerd Font";
+  font-feature-settings: '"zero", "ss01", "ss02", "ss03", "ss04", "ss05", "cv31"';
+  font-size: 13px;
+  min-height: 25px;
+}
+
+window#waybar {
+  background: @wb-bg;
+}
+
+/* Single elements */
+#window,
+#backlight,
+#clock,
+#tray,
+#cava,
+#mpris,
+#workspaces button,
+#custom-weather,
+#custom-notification,
+#custom-launcher,
+#custom-playerctl,
+#custom-power,
+#custom-updates,
+#custom-media {
+  margin: 1px;
+  padding-left: 10px;
+  padding-right: 10px;
+  border-radius: 15px;
+  transition: none;
+  border: 1px solid @borders;
+}
+
+/* Groups */
+#network-grp,
+#audio-grp,
+#motherboard,
+#battery-grp
+{
+  margin: 1px;
+  border-radius: 15px;
+  transition: none;
+  border: 1px solid @borders;
+}
+
+/* 1 group elements */
+#network-grp > widget:nth-child(1) > *,
+#audio-grp > widget:nth-child(1) > *,
+#motherboard > widget:nth-child(1) > *,
+#battery-grp > widget:nth-child(1) > *
+{
+  padding-left: 10px;
+  border-radius: 15px;
+}
+
+/* All group elements but 1 */
+#network-grp > widget:not(:nth-child(1)) > *,
+#audio-grp > widget:not(:nth-child(1)) > *,
+#motherboard > widget:not(:nth-child(1)) > *,
+#battery-grp > widget:not(:nth-child(1)) > * {
+  padding-left: 10px;
+  padding-right: 10px;
+  border-radius: 15px;
+}
+
+#window {
+  background: #202020;
+  color: #fdc5c5;
+}
+
+tooltip {
+	color: #cba6f7;
+	background: #1e0430;
+	border-radius: 10px;
+	border: 1px solid @borders;
+  margin: 0px;
+  padding: 0px;
+}
+tooltip > * {
+  margin: 0px;
+  padding: 0px;
+}
+
+window.empty #window {
+  background: transparent;
+  color: transparent;
+  border: none;
+}
+
+#workspaces {
+  /* parent has padding: 0 to just be a background */
+  /* background: #bd93f9; */
+  padding-left: 0px;
+  padding-right: 0px;
+  border-radius: 15px;
+  font-weight: 600;
+  margin: 1px;
+  transition: none;
+}
+#workspaces button {
+  margin: 0px;
+  background: #161320;
+  color: #ab78f3;
+  padding: 0px 5px 0px 5px;
+}
+#workspaces button.active {
+  padding-left: 8px;
+  padding-right: 8px;
+  color: #8419f0;
+}
+#workspaces button.focused {
+  background: #a6adc8;
+  color: #eba0ac;
+}
+#workspaces button.urgent {
+  color: #a6e3a1;
+}
+#workspaces button:hover:not(.active) {
+  color: #cdd6f4;
+}
+
+#network-grp {
+  background: #161320;
+  color: #bd93f9;
+  padding-right: 7px;
+}
+#network-grp > widget:nth-child(2) > #network.nname {
+  font-size: 0px;
+  padding: 0px;
+}
+/* Hover in main group to activate, and hover on it to maintain */
+#network-grp:hover > widget:nth-child(2) > #network.nname,
+#network-grp > widget:nth-child(2) > #network.nname:hover
+{
+  padding-left: 2px;
+  padding-right: 2px;
+  border-radius: 15px;
+  font-size: 13px;
+}
+
+#audio-grp {
+  background: #1a1826;
+  color: #fae3b0;
+  padding-right: 8px;
+}
+#audio-grp > widget:nth-child(2) > #pulseaudio {
+  font-size: 0px;
+  padding: 0px;
+}
+/*
+  I don't need to :hover on output audio element to do things, so, not
+  having the posibility to use the scroll, click, etc on it is fine
+*/
+#audio-grp:hover > widget:nth-child(2) > #pulseaudio,
+#audio-grp > widget:nth-child(2) > #pulseaudio:hover
+{
+  padding-left: 7px;
+  padding-right: 2px;
+  border-radius: 15px;
+  font-size: 13px;
+}
+
+#motherboard {
+  background: #161320;
+  color: #96cdfb;
+}
+#motherboard > widget:not(:nth-child(1)) > label {
+  padding-left: 5px;
+}
+
+#battery-grp {
+  background: #161320;
+  color: #b5e8e0;
+}
+#battery-grp > widget > #battery.charging,
+#battery-grp > widget > #battery.plugged {
+  color: #76ddce;
+}
+#battery-grp > widget > #battery.critical:not(.charging) {
+  background: #161320;
+  animation-name: blink;
+  animation-duration: 0.5s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+  border-radius: 15px;
+  padding-right: 10px;
+}
+
+@keyframes blink {
+  to {
+    background: #b5e8e0;
+  }
+}
+
+#backlight {
+  background: #161320;
+  color: #f8bd96;
+}
+
+#clock {
+  background: #161320;
+  color: #abe9b3;
+}
+
+#tray {
+  color: #b5e8e0;
+  background: #161620;
+}
+
+/* #tray > widget:not(:nth-child(1)) {
+  color: #b5e8e0;
+  background: #1b1b2b;
+} */
+
+#custom-launcher {
+  /* Launcher font icon size */
+  font-size: 20px;
+  background: #89dceb;
+  color: #161320;
+}
+
+#custom-notification {
+  font-size: 16px;
+  padding: 0px 13px 0px 8px;
+  color: #898beb;
+  background: #161320;
+}
+
+#custom-power {
+  /* Power menu font icon size */
+  font-size: 18px;
+  padding-left: 7px;
+  padding-right: 0px;
+  background: #161320;
+  color: #f28fad;
+}
+
+#custom-playerctl {
+  /* {icon} name - artist */
+  background: #161320;
+  color: #c9cbff;
+}
+
+#custom-weather {
+  padding-right: 14px;
+  background: #161320;
+  color: #c9cbff;
+}
+
+#custom-updates {
+  background: #161320;
+  color: #e8a2af;
+}
+
+#custom-media {
+  background: #161320;
+  color: #f2cdcd;
+}

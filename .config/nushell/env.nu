@@ -1,6 +1,8 @@
 # Nushell Environment Config File
-#
-# version = "0.93.0"
+# |>----|>----|>----|><-><|----<|----<|----<|
+# |>    from Klapptnot's Nushell setup     <|
+# |>   https://github.com/Klapptnot/dotf   <|
+# |>----|>----|>----|><-><|----<|----<|----<|
 
 def create_left_prompt [] {
     let dir = match (do --ignore-shell-errors { $env.PWD | path relative-to $nu.home-path }) {

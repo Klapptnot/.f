@@ -1,3 +1,8 @@
+# |>----|>----|>----|><-><|----<|----<|----<|
+# |>    from Klapptnot's nushell setup     <|
+# |>   https://github.com/Klapptnot/dotf   <|
+# |>----|>----|>----|><-><|----<|----<|----<|
+
 # Small utility to go to folders by alias
 export def --env gt [
   path?: string,   # Alias (or path) to go to

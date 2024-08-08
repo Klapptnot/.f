@@ -44,6 +44,8 @@ SETUVAR fish_pager_color_selected_description:\x1d
 SETUVAR fish_pager_color_selected_prefix:\x1d
 SETUVAR fish_prompt_at:\x20at\x20
 SETUVAR fish_prompt_at_ssh:\x20in\x20
+
+# In Termux, you have (something like) u0_a234
 SETUVAR fish_prompt_host:zircon
 SETUVAR fish_prompt_user:klapptnot
-SETUVAR fish_user_paths:/data/data/com\x2etermux/files/usr/bin\x1e/data/data/com\x2etermux/files/home/bin\x1e/data/data/com\x2etermux/files/home/repos/utils/bin
+

@@ -1,8 +1,16 @@
+#! /bin/env fish
+
+# |>----|>----|>----|><-><|----<|----<|----<|
+# |>     from Klapptnot's Termux setup     <|
+# |>   https://github.com/Klapptnot/dotf   <|
+# |>----|>----|>----|><-><|----<|----<|----<|
+
+# Completions for goto utility
 # ~/.config/fish/completions/goto.fish
 
 # Read aliased from config file and add them to completions with flags
 # on completion request when there is no alias on commandline
-# preventing aliases from 
+# preventing aliases from
 function __fish_goto_opt_alias
   print "{}\n" (grep -Po '^\s*\K[^\s]+' "$HOME/.config/goto.idx") -h -l -p --help --list --print
 end

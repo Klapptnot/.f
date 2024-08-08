@@ -1,3 +1,10 @@
+#! /bin/env fish
+# |>----|>----|>----|><-><|----<|----<|----<|
+# |>     from Klapptnot's Termux setup     <|
+# |>   https://github.com/Klapptnot/dotf   <|
+# |>----|>----|>----|><-><|----<|----<|----<|
+
+# A wrapper for termux-api (Completions)
 # ~/.config/fish/completions/api.fish
 
 # Function to get the list of services

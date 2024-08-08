@@ -1,6 +1,6 @@
 # name: Disco
 # author: Fabian Homborg
-# It's modified
+# It's modified, original ones comes with Fish
 
 function fish_prompt
     set -l last_status $status

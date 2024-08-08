@@ -1,13 +1,11 @@
-#!/bin/env fish
+#! /bin/env fish
+
+# |>----|>----|>----|><-><|----<|----<|----<|
+# |>      from Klapptnot's unix setup      <|
+# |>   https://github.com/Klapptnot/dotf   <|
+# |>----|>----|>----|><-><|----<|----<|----<|
 
 # Small utility to go to folders by alias
-
-# Check if this script is being executed as the main script
-# if test $status -ne 0
-#   # Break execution
-#   print "[\x1b[38;05;160m*\x1b[00m] This script is not made to run as a normal script\n"
-#   exit 1
-# end
 
 function goto -d 'Alias based fast cd (change dir)'
   argparse -x h,l h/help l/list print -- $argv

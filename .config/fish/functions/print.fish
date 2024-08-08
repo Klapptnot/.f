@@ -1,3 +1,10 @@
+#! /bin/env fish
+
+# |>----|>----|>----|><-><|----<|----<|----<|
+# |>      from Klapptnot's unix setup      <|
+# |>   https://github.com/Klapptnot/dotf   <|
+# |>----|>----|>----|><-><|----<|----<|----<|
+
 function print -d 'printf with color formatting ability'
   set -f __format_str__ $argv[1]
   set -f args $argv[2..-1]

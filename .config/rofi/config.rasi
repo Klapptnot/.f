@@ -9,7 +9,7 @@ configuration {
   location: 0;
   disable-history: false;
   hide-scrollbar: true;
-  display-drun: " Apps ";
+  display-drun: " Apps ";
   display-run: "  Run ";
   display-window: "󰘔 Windows";
   display-Network: "󰤨 Network";
@@ -62,7 +62,7 @@ listview {
   /* border: 0px 0px 0px; */
   /* padding: 6px 0px 0px; */
   margin: 5px 20px 0px 20px;
-  columns: 2;
+  columns: 1;
   background-color: @bg-col;
 }
 

@@ -1,0 +1,42 @@
+#! /bin/env bash
+
+function print_palette_16() {
+  # Define array of ANSI color names
+  color_names=(
+    "Black"        # 00:
+    "Red"          # 01:
+    "Green"        # 02:
+    "Yellow"       # 03:
+    "Blue"         # 04:
+    "Purple"       # 05:
+    "Cyan"         # 06:
+    "Light Gray"   # 07:
+    "Dark Gray"    # 08:
+    "Light Red"    # 09:
+    "Light Green"  # 10:
+    "Light Yellow" # 11:
+    "Light Blue"   # 12:
+    "Light Purple" # 13:
+    "Light Cyan"   # 14:
+    "White"        # 15:
+  )
+
+  # Print color names and ANSI codes
+  for ((i = 0; i < 16; i++)); do
+    printf "%16s [%2d] \x1b[48;5;%sm                \x1b[0m\n" "${color_names[i]}" "${i}" "${i}"
+  done
+}
+
+function colormap() {
+  for c in {0..255}; do
+    local d=$(((c + 3) % 6))
+    printf "\x1b[48;5;%dm   \x1b[00m\x1b[49m\x1b[38;5;%dm%03d \x1b[00m" "${c}" "${c}" "${c}"
+    [ "${d}" -eq "0" ] && printf '\n'
+  done
+}
+
+if [[ "${1}" =~ ^-f|--full|full$ ]]; then
+  colormap
+  exit
+fi
+print_palette_16

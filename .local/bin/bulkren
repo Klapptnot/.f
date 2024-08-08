@@ -1,0 +1,73 @@
+#! /bin/env bash
+
+# shellcheck disable=SC1091
+source "${HOME}/.local/lib/shlib/rsum.sh"
+
+function bulk_rename() {
+  barg.parse "${@}" << BARG
+    #[progname='bulkren']
+    @req f/files[vec[str]] => files || F/folder[str] => folder
+    @opt s/suffix[str] => suffix p/prefix[vec[bool]] => prefix
+    @opt format[str] |> "{rand}.{ext}" => format
+    @opt r/replace[str] => replace_str
+    @opt D/dry[bool] => dry_run
+    @opt I/ignore-folders[bool] => ignore_folders
+BARG
+  ${dry_run} && printf '%s\n' "Dry run, no changes will be made"
+  if [ ${#files[@]} -eq 0 ]; then
+    if [ -z "${folder}" ]; then
+      return
+    fi
+    for file in "${folder}"/*; do
+      files+=("${file}")
+    done
+    [ ${#files[@]} -eq 0 ] && return
+  fi
+  # for file in "${files[@]}"; do
+  # shellcheck disable=SC2155
+  for ((iter = 0; iter < "${#files[@]}"; iter++)); do
+    local file="${files[iter]}"
+    local file_path=$(realpath "${file}")
+    if ${ignore_folders} && [ -d "${file_path}" ]; then
+      continue
+    fi
+    local file_name=$(basename "${file_path}")
+    # Nothing to replace, skip
+    if [ -n "${replace_str}" ]; then
+      # shellcheck disable=SC2076  # Match literally
+      [[ "${file_name}" =~ "${replace_str}" ]] || continue
+    fi
+    local fp_dir=$(dirname "${file_path}")
+
+    local ext="${file_name##*.}"
+    local name="${format}"
+
+    while [[ "${name}" == *'{rand}'* ]]; do
+      name="${name/\{rand\}/$(rsum)}"
+    done
+
+    name="${name//\{prefix\}/${prefix}}"
+    name="${name//\{suffix\}/${suffix}}"
+    name="${name//\{ext\}/${ext}}"
+    name="${name//\{iter\}/${iter}}"
+
+    # Replace the replace string with the generated name
+    if [ -n "${replace_str}" ]; then
+      name="${file_name//${replace_str}/${name}}"
+    fi
+    # If the generated name is the same as the original name, then skip
+    if [ "${name}" == "${file_name}" ]; then
+      continue
+    fi
+
+    printf '%b\n' "Moving \x1b[38;05;12m${file_path}\x1b[00m to \x1b[38;05;7m${fp_dir}/${name}\x1b[00m"
+    if [ -f "${fp_dir}/${name}" ]; then
+      local mkmdds=$(rsum -l6)
+      printf '%b\n' "    - File exists, renaming to \x1b[38;05;7m${fp_dir}/${name}_${mkmdds}.${ext}\x1b[00m"
+      ! ${dry_run} && mv "${file_path}" "${fp_dir}/${name}_${mkmdds}.${ext}"
+    else
+      ! ${dry_run} && mv "${file_path}" "${fp_dir}/${name}"
+    fi
+  done
+}
+bulk_rename "${@}"

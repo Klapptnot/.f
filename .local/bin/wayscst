@@ -1,0 +1,93 @@
+#! /bin/env bash
+
+function _not_proc {
+  local exitc=${1}
+  shift 1
+  printf '\x1b[38;5;1m[ ERR ]\x1b[00m %s\n' "${@}" >&2
+  exit ${exitc}
+}
+
+# Slurp adds a surface, we use the surface to blink on
+# capture
+function indicate_take {
+  slurp -b#67469860 &
+  local pid=${!}
+  sleep 0.150
+  kill -9 ${pid}
+}
+
+function take_n_save {
+  local filename="${1}"
+  shift 1
+
+  grim -t png "${@}" - |
+    tee "${filename}" |
+    wl-copy -t image/png ||
+    {
+      rm "${filename}" &>/dev/null
+      _not_proc 2 'Unable to take a screen capture'
+    }
+}
+
+function main {
+  local SS_FOLDER="$(xdg-user-dir PICTURES)/Screenshots"
+  [ ! -f "${SS_FOLDER}" ] && mkdir -p "${SS_FOLDER}"
+
+  for cmd in grim slurp hyprctl xdg-user-dir wl-paste; do
+    local COMMAND="$(type -p "${cmd}")"
+    if [ -z "${COMMAND}" ]; then
+      _not_proc 3 'Command "%s" not found in PATH\n' "${COMMAND}"
+    fi
+  done
+  unset COMMAND
+
+  local MODE="${1}"
+  shift 1
+
+  local args_to_grim=()
+
+  if [[ "${1}" == "--cursor" || "${1}" == "-c" ]]; then
+    args_to_grim+=("-c")
+    shift 1
+  fi
+
+  local SAVE_PATH="${SS_FOLDER}/screenshot_$(date +'%Y-%m-%d-%H-%M-%S')"
+
+  case "${MODE}" in
+  screen)
+    indicate_take &
+    take_n_save "${SAVE_PATH}.png" "${args_to_grim[@]}"
+    ;;
+  selection)
+    local POS_N_SIZE="$(slurp -b#67469860 -c#7b00f7ff)"
+    local filename="${SAVE_PATH}.png"
+    [ -z "${POS_N_SIZE}" ] && _not_proc 4 'Nothing selected, abort'
+
+    args_to_grim+=(-g "${POS_N_SIZE}")
+
+    take_n_save "${filename}" "${args_to_grim[@]}"
+    ;;
+  window)
+    {
+      read -r POS_N_SIZE
+      read -r WCLASS
+    } < <(hyprctl activewindow -j | jq -rM '(.at[0]|tostring) + "," + (.at[1]|tostring) + " " + (.size[0]|tostring) + "x" + (.size[1]|tostring) + "\n" + .class')
+    [ "${POS_N_SIZE}" == 'null,null nullxnull' ] && _not_proc 4 'No window found, abort'
+
+    local filename="${SAVE_PATH}_${WCLASS}.png"
+
+    args_to_grim+=(
+      -g
+      "${POS_N_SIZE}"
+    )
+
+    indicate_take &
+    take_n_save "${filename}" "${args_to_grim[@]}"
+    ;;
+  *)
+    _not_proc 1 'Select one of screen, selection, window\nUsage: %s {screen|selection|window}\n' "$(basename ${0})"
+    ;;
+  esac
+}
+
+main "${@}"

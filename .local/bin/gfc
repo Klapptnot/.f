@@ -1,0 +1,72 @@
+#! /bin/env bash
+
+# Print the content of a file, but allow using ranges
+
+function main() {
+  local _file_="${1}"
+  local _section_="${2}"
+
+  if [ -z "${_file_}" ] || ! [ -f "${_file_}" ]; then
+    printf 'Usage: gfc <file> [section[N:N]]\n'
+    return 1
+  fi
+
+  # Check if the input is empty
+  if [ -z "${_section_}" ]; then
+    cat "${_file_}" # Print the entire file
+    return 0
+  fi
+
+  # Use regex to match the patterns N:N, :N, N:-N, :-N, and N:
+  if [[ ! ${_section_} =~ ^(-?[0-9]*)?:(-?[0-9]*)?$ ]]; then
+    printf 'Error: Invalid section format. Please use N:N, N:-N, -N:-N, :N, N: or :-N\n'
+    return 2
+  fi
+  local _start_line_=${BASH_REMATCH[1]}
+  local _end_line_=${BASH_REMATCH[2]}
+  # Check if start_line and end_line are empty
+  if [ -z "${_start_line_}" ] && [ -z "${_end_line_}" ]; then
+    printf 'Error: Invalid section. Please use N:N, N:-N, -N:-N, :N, N: or :-N\n'
+    return 2
+  fi
+
+  local _rev_end_=false
+  local _rev_stt_=false
+  # Ensure that negative number is valid
+  if [ "${_end_line_:0:1}" = '-' ]; then
+    local _rev_end_=true
+    _end_line_="${_end_line_:1:${#_end_line_}}"
+    [ "${#_end_line_}" -eq 0 ] && _end_line_='0'
+  fi
+  if [ "${_start_line_:0:1}" = '-' ]; then
+    local _rev_stt_=true
+    _start_line_="${_start_line_:1:${#_start_line_}}"
+    [ "${#_start_line_}" -eq 0 ] && _start_line_='0'
+  fi
+  if ${_rev_stt_} && ! ${_rev_end_}; then
+    printf 'Error: Invalid section. Can not -N:N or -N:, please use :-N, or -N:-N\n'
+    return 3
+  fi
+
+  # If both, print _section_
+  if [ -n "${_start_line_}" ] && [ -n "${_end_line_}" ]; then
+    if ${_rev_stt_} && ${_rev_end_}; then
+      tail -n "${_start_line_}" "${_file_}" | head -n -"${_end_line_}"
+    elif ${_rev_end_}; then
+      tail -n +"${_start_line_}" "${_file_}" | head -n -"${_end_line_}"
+    else
+      head -n "${_end_line_}" "${_file_}" | tail -n +"${_start_line_}"
+    fi
+  elif [ -n "${_end_line_}" ]; then
+    if ${_rev_end_}; then
+      head -n -"${_end_line_}" "${_file_}"
+    else
+      head -n "${_end_line_}" "${_file_}" # From start (head) to _end_line_
+    fi
+  else # If only _start_line_, print from _start_line_ to end
+    tail -n +"${_start_line_}" "${_file_}"
+  fi
+  return 0
+}
+
+main "${@}"

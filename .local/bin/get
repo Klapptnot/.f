@@ -1,0 +1,76 @@
+#! /bin/env python3
+
+import http.server
+import socketserver
+import argparse
+import os
+
+# import colors
+
+parser = argparse.ArgumentParser(
+    description="A simple server for file transfering for curl"
+)
+parser.add_argument(
+    "--dir",
+    "-d",
+    type=str,
+    help="Directory to save files into it (Header may override this)",
+)
+parser.add_argument("--port", "-p", type=int, help="Server port, default 8080")
+
+args = parser.parse_args()
+
+
+class MyHandler(http.server.SimpleHTTPRequestHandler):
+    def do_PUT(self):
+        # Obtener el nombre del archivo desde la cabecera Save-As
+        save_as = self.headers.get("Save-As")
+        if not save_as:
+            self.send_error(400, "Missing Save-As header")
+            return
+        save_in = self.headers.get("Save-In")
+        if not save_in:
+            if not args.dir or not os.path.exists(args.dir):
+                save_in = os.getcwd()
+            else:
+                save_in = args.dir
+        if not save_in.endswith("/"):
+            path = save_in + "/" + save_as
+        else:
+            path = save_in + save_as
+
+        # Error si exixte un archivo con el mismo nombre
+        if os.path.exists(path):
+            self.send_error(403, f"File in path {path} already exists")
+            return
+
+        # Guardar el archivo subido con el nombre de la cabecera Save-As
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        try:
+            length = int(self.headers.get("Content-Length"))
+        except ValueError:
+            self.send_error(400, "Invalid Content-Length header")
+            return
+
+        with open(path, "wb") as f:
+            try:
+                f.write(self.rfile.read(length))
+                # Responder con un código de éxito
+                self.send_response(201, "Successfully saved!")
+            except Exception as e:
+                self.send_error(400, f"Could not be saved, error {e}")
+
+        self.end_headers()
+
+
+# Configurar y arrancar el servidor
+if args.port and (args.port > 1024 and args.port < 65535):
+    PORT = args.port
+else:
+    PORT = 8080
+with socketserver.TCPServer(("", PORT), MyHandler) as httpd:
+    print("Serving on port", PORT)
+    try:
+        httpd.serve_forever()
+    except KeyboardInterrupt:
+        print("\x1b[0G\x1b[38;5;90m[•] -> KeyboardInterrupt: exiting...\x1b[0m")

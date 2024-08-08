@@ -21,10 +21,10 @@
 # p -> bypasses the app's requests to inhibit keybinds.
 
 function show_window {
-  local CONFIG_FILE=~/.config/hypr/hyprland.conf
+  local CONFIG_FILE=~/.config/hypr/conf.d/bindings.conf
   local title="Hyprland 󰧹 "
   local bind_flags="[lrenmtisdp]{0,10}"
-  local bind_regex="^[^#]*bind${bind_flags}\ =\ *([A-Za-z0-9_\ ]*?)\ *,\ *([A-Za-z0-9:_]+)\ *,\ *([a-zA-Z0-9_-]+)(\ *,\ *(.*?))?\ *#\ *(.*)$"
+  local bind_regex="^[^#\ ]*bind${bind_flags}\ =\ *([A-Za-z0-9_\ ]*?)\ *,\ *([A-Za-z0-9:_]+)\ *,\ *([a-zA-Z0-9_-]+)(\ *,\ *(.*?))?\ +#\ *(.*)$"
 
   local BINDINGS=()
   local matches_count=0
@@ -42,11 +42,18 @@ function show_window {
         BINDINGS+=("${MOD}" "${KEY}" "${DESC}" "${CMD}" "${ARGS}")
       fi
       ((matches_count++))
+    else
+      printf '[>>>] Line not in format: %s\n' "${line}" >&2
     fi
     ((total_count++))
-  done <<<"$(grep -oP "^[^#]*bind${bind_flags}\s*=.*" "${CONFIG_FILE}")"
+  done <<<"$(grep -oP "^[^#\ ]*bind${bind_flags}\s*=.*" "${CONFIG_FILE}")"
 
-    title="${title}(${matches_count}/${total_count})"
+  title="${title}(${matches_count}/${total_count})"
+
+  ((matches_count != total_count)) && {
+    printf '\n[>>>] Some lines don'\''t follow the format. Hint: add spaces at start to ignore line\n' >&2
+    printf '[>>>] Use this format: bind[flags] = [mod], <key>, <dispatcher>...[, [args]] # [description]\n' >&2
+  }
 
   # Detect monitor resolution and scale
   IFS=' ' read -r WIDTH HEIGHT SCALE < <(hyprctl -j monitors |
@@ -89,7 +96,8 @@ function main {
   # Execute the Hyprland dispatcher
   local CMD="${4}"
   local ARGS="${5}"
-  printf 'Command: %s results in: %s\n' "${CMD} ${ARGS}" "$(hyprctl dispatch "${CMD}" "${ARGS}")"
+  # shellcheck disable=SC2086 # I actually want word spliting in ${ARGS}
+  hyprctl dispatch "${CMD}" ${ARGS} | printf 'Command: "%s" results in: %s\n' "${CMD} ${ARGS}" "$(cat)"
 }
 
 main "${@}"

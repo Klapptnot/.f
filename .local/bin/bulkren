@@ -1,7 +1,7 @@
 #! /bin/env bash
 
 # shellcheck disable=SC1091
-source "${HOME}/.local/lib/shlib/rsum.sh"
+source "${HOME}/.local/lib/bash/rsum.sh"
 
 function bulk_rename() {
   barg.parse "${@}" << BARG

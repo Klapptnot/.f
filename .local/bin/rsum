@@ -38,7 +38,7 @@ if [[ "${1}" =~ ^-h$|^--help$|^help$ ]]; then
 fi
 
 # shellcheck disable=SC1091
-source "${HOME}/.local/lib/shlib/rsum.sh"
+source "${HOME}/.local/lib/bash/rsum.sh"
 
 if [ "${1}" != "-P" ]; then
   rsum "${@}"

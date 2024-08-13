@@ -144,7 +144,7 @@ bind -x '"\C-u": fgfc'
 [ -f ~/.bash_aliases ] && source ~/.bash_aliases
 
 [ -f "${HOME}/.cargo/env" ] && source "${HOME}/.cargo/env"
-[ -f "${HOME}/.local/lib/shlib/goto.sh" ] && source "${HOME}/.local/lib/shlib/goto.sh"
+[ -f "${HOME}/.local/lib/bash/goto.sh" ] && source "${HOME}/.local/lib/bash/goto.sh"
 alias gt='goto'
 
 # enable programmable completion features (you don't need to enable

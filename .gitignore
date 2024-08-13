@@ -1,3 +1,4 @@
 .config/nushell/history*
-.local/lib/shlib/shml.sh
+.local/lib/bash/shml.sh
 .gitconfig
+**/__pycache__

@@ -1,7 +1,9 @@
 configuration {
+  modi: "drun";
   font: "CaskaydiaCove Nerd Font 14";
-  show-icons: false;
+  show-icons: true;
   icon-theme: "Papirus-Dark";
+  drun-display-format: "{icon} {name} [<span weight="light" size="small"><i>{generic}</i></span>]";
   disable-history: false;
   hide-scrollbar: true;
   fake-trasparency: true;
@@ -37,7 +39,7 @@ entry {
   text-color: @foreground;
   border-radius: 5px;
   background-color: @trasparent;
-  placeholder: "  Search";
+  placeholder: "  Apps";
 }
 
 textbox-prompt-colon {

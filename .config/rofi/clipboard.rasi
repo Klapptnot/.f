@@ -1,9 +1,8 @@
 configuration {
   font: "CaskaydiaCove Nerd Font 14";
   show-icons: false;
-  icon-theme: "Papirus-Dark";
-  disable-history: false;
   hide-scrollbar: true;
+  sidebar-mode: true;
   fake-trasparency: true;
 }
 
@@ -11,7 +10,7 @@ configuration {
 
 window {
   trasparency: "real";
-  height: 65%;
+  height: 50%;
   border: 2px;
   border-color: @border;
   border-radius: 8px;
@@ -37,7 +36,7 @@ entry {
   text-color: @foreground;
   border-radius: 5px;
   background-color: @trasparent;
-  placeholder: "  Search";
+  placeholder: "   Clipboard";
 }
 
 textbox-prompt-colon {
@@ -57,22 +56,13 @@ element {
   text-color: @foreground;
 }
 
-element-text,
-element-icon {
+element-text {
   background-color: inherit;
   text-color: inherit;
-}
-
-element-icon {
-  size: 25px;
 }
 
 element selected {
   background-color: @selected;
   border-radius: 5px;
   text-color: @selected-fg;
-}
-
-mode-switcher {
-  enabled: false;
 }

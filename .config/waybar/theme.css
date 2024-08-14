@@ -1,4 +1,4 @@
-/* 
+/*
   * Custom theme for GUI elements
   * based on nothing but look
 */
@@ -27,5 +27,5 @@
 @define-color color14 #bd93f9;
 @define-color color15 #abe9b3;
 
-@define-color borders @color8;
+@define-color borders @color4;
 

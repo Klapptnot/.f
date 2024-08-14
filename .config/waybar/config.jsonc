@@ -170,11 +170,14 @@
     "tooltip": false
   },
   "network#nname": {
+    "interval": 10,
+    "format": "󰌙 OFF",
     "format-wifi": "{essid}",
     "format-ethernet": "󰌗 {ipaddr}/{cidr}",
     "format-disconnected": "󰤮 N/A",
     "tooltip-format": "{ipaddr} => {bandwidthTotalBytes} ({signalStrength}%)",
-    "max-width": 32
+    "max-width": 32,
+    "on-click": "~/.config/rofi/bin/rofim.sh wifi"
   },
   "backlight": {
     "tooltip": false,
@@ -373,7 +376,7 @@
   },
   "custom/power": {
     "format": "⏻ ",
-    "on-click": "~/.config/waybar/bin/wlogout.sh",
+    "on-click": "~/.config/hypr/bin/wlogout.sh",
     "tooltip": false
   },
   "custom/weather": {
@@ -382,7 +385,7 @@
     "format-alt-click": "click",
     "interval": 3600,
     "return-type": "json",
-    "exec": "~/.config/waybar/bin/weather.py",
+    "exec": "~/.config/hypr/bin/weather.py waybar",
     "exec-if": "ping wttr.in -c1",
     "tooltip": true
   },

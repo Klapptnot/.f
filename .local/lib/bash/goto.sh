@@ -10,7 +10,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
 fi
 
 # shellcheck disable=SC1091
-source "${UTILS}/lib/printfc.sh"
+source "${HOME}/.local/lib/bash/printfc.sh"
 
 function goto() {
   if [ -z "${1}" ]; then

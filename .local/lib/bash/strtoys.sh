@@ -110,8 +110,8 @@ function str.null_empty() {
 # Usage: str.strip "string"
 function str.strip() {
   local string="${*}"
-  string="${string%"${string##*[![:space:]]}"}"
-  string="${string#"${string%%[![:space:]]*}"}"
+  string="${string%"${string##*[![:space:]\n]}"}"
+  string="${string#"${string%%[![:space:]\n]*}"}"
   printf "%s" "${string}"
 }
 

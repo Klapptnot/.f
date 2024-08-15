@@ -6,14 +6,14 @@ function log {
   local format="${2}"
   shift 2
 
-  declare -Al log_colors=(
+  declare -A log_colors=(
     ['d']='\x1b[32m'
     ['i']='\x1b[34m'
     ['w']='\x1b[33m'
     ['e']='\x1b[31m'
     ['c']='\x1b[30m\x1b[41m'
   )
-  declare -Al log_names=(
+  declare -A log_names=(
     ['d']='debug'
     ['i']='info'
     ['w']='warn'

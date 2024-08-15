@@ -16,7 +16,7 @@ source ~/.local/lib/bash/logger.sh
 
 function o+e_handler {
   "${@}" 2> "${epPipe}" | {
-    local o="$(cat)"
+    local o="$(cat -)"
     test -n "${o}" && log i "${o}"
   } &
   read -ra err < "${epPipe}"

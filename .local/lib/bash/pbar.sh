@@ -72,7 +72,7 @@ function pb.do() {
   }
 
   # if [[ -p /dev/stdin ]]; then
-  #   # STDIN="$(cat)"
+  #   # STDIN="$(cat -)"
   #   read -r STDIN
   # fi
 

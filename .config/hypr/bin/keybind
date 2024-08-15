@@ -97,7 +97,7 @@ function main {
   local CMD="${4}"
   local ARGS="${5}"
   # shellcheck disable=SC2086 # I actually want word spliting in ${ARGS}
-  hyprctl dispatch "${CMD}" ${ARGS} | printf 'Command: "%s" results in: %s\n' "${CMD} ${ARGS}" "$(cat)"
+  hyprctl dispatch "${CMD}" ${ARGS} | printf 'Command: "%s" results in: %s\n' "${CMD} ${ARGS}" "$(cat -)"
 }
 
 main "${@}"

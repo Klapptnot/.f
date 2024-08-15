@@ -60,6 +60,7 @@ function main {
     ;;
   selection)
     local POS_N_SIZE="$(slurp -b#67469860 -c#7b00f7ff)"
+    # sleep 0.1 # Slurp lines are saved in the screenshot, prevent
     local filename="${SAVE_PATH}.png"
     [ -z "${POS_N_SIZE}" ] && _not_proc 4 'Nothing selected, abort'
 

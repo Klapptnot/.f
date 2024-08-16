@@ -70,8 +70,8 @@ function media-metadata-get {
       ELAPSED="$(((${METAINFO%%.*} * 100) / TOTAL))"
 
       if [[ "${what}" == *"bar" ]]; then
-        ELAPSED="$((ELAPSED/4))"
-        local ELAPSEDR="$((25 - ELAPSED))"
+        ELAPSED="$((ELAPSED/3))"
+        local ELAPSEDR="$((33 - ELAPSED))"
         printf "%${ELAPSED}s" | tr ' ' '-' | printf -- "$(cat -)%${ELAPSEDR}s"
       else
         printf '%s' "${ELAPSED}"

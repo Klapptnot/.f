@@ -3,17 +3,7 @@
 # |>   https://github.com/Klapptnot/dotf   <|
 # |>----|>----|>----|><-><|----<|----<|----<|
 
-# Small utility to go to folders by alias
-export def --env gt [
-  path?: string,   # Alias (or path) to go to
-  ...mods: string  # Modifiers for path or alias
-  --list (-l),     # Display the aliases definitions
-  --return (-r)    # Return the path instead of going to it
-] -> string {
-
-  let path = ($path | default $env.HOME)
-  mut args = $mods
-
+def get-aliased-paths [] -> table<alias: string[], expand: string[]> {
   let def = if ($"($env.HOME)/.config/goto.idx" | path exists) {
     (open $"($env.HOME)/.config/goto.idx" | lines)
   } else {
@@ -28,7 +18,24 @@ export def --env gt [
       'nvcfg    &*cfg;/nvim'
     ]
   }
-  let def = ($def | parse "{alias} {expand}" | str trim)
+  $def | parse "{alias} {expand}" | str trim
+}
+
+def complete-aliases [] -> string[] {
+  get-aliased-paths | get alias
+}
+
+# Small utility to go to folders by alias
+export def --env gt [
+  path?: string@complete-aliases,   # Alias (or path) to go to
+  ...mods: string  # Modifiers for path or alias
+  --list (-l),     # Display the aliases definitions
+  --return (-r)    # Return the path instead of going to it
+] -> string {
+
+  let path = ($path | default $env.HOME)
+  mut args = $mods
+  let def = get-aliased-paths
 
   if $list {
     print $def

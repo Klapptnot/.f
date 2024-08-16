@@ -49,5 +49,4 @@ SETUVAR fish_pager_color_selected_description:\x1d
 SETUVAR fish_pager_color_selected_prefix:\x1d
 SETUVAR fish_prompt_at:\x20at\x20
 SETUVAR fish_prompt_at_ssh:\x20in\x20
-SETUVAR fish_prompt_host:zircon
-SETUVAR fish_prompt_user:klapptnot
+

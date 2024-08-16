@@ -52,6 +52,9 @@ bind \co fuzzy_nvim
 bind \cu fuzzy_bat
 bind \cl 'clear; commandline -f repaint'
 
+set fish_prompt_user (yq -rM .str.user ~/.config/mirkop.yaml || echo $USER)
+set fish_prompt_host (yq -rM .str.host ~/.config/mirkop.yaml || echo $hostname)
+
 if status is-interactive
   # Commands to run in interactive sessions can go here
 end

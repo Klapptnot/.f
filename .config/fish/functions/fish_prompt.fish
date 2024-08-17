@@ -1,6 +1,7 @@
 # name: Disco
 # author: Fabian Homborg
 # It's modified, original ones comes with Fish
+# so it is not disco anymore, I guess it's USB now
 
 function fish_prompt
     set -l last_status $status
@@ -9,13 +10,9 @@ function fish_prompt
     set -l usercolor (set_color $fish_color_user)
 
     set -l delim \U25BA
-    # If we don't have unicode use a simpler delimiter
-    string match -qi "*.utf-8" -- $LANG $LC_CTYPE $LC_ALL; or set delim ">"
-
-    fish_is_root_user; and set delim "#"
 
     set -l cwd (set_color $fish_color_cwd)
-    if command -sq cksum
+    if command -sq cksum; and $fish_prompt_rdircolor
         # randomized cwd color
         # We hash the physical PWD and turn that into a color. That means directories (usually) get different colors,
         # but every directory always gets the same color. It's deterministic.
@@ -44,10 +41,6 @@ function fish_prompt
     if not set -q prompt_host
         set -g prompt_host ""
         if set -q SSH_TTY
-            # or begin
-            # command -sq systemd-detect-virt; and systemd-detect-virt -q
-            # end
-            # set prompt_host $usercolor$fish_prompt_user$normal(set_color $fish_color_at)$fish_prompt_at_ssh$normal(set_color $fish_color_host)$fish_prompt_host$normal":"
             set prompt_host (set_color $fish_color_user)$fish_prompt_user$normal(set_color $fish_color_at)$fish_prompt_at_ssh$normal(set_color $fish_color_host)$fish_prompt_host$normal":"
         else
             set prompt_host (set_color $fish_color_user)$fish_prompt_user$normal(set_color $fish_color_at)$fish_prompt_at$normal(set_color $fish_color_host)$fish_prompt_host$normal":"

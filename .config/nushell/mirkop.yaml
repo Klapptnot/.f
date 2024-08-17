@@ -9,8 +9,8 @@ str:
   user: <user>
   host: <host>
   char:
-    root: "⚡ "
-    else: "► "
+    root: "⚡"
+    else: "►"
   from:
     base: " at "
     sshd: " in "

@@ -32,7 +32,7 @@ $env.mirko.sdir = ""
 
 # PROMPT_INDICATOR character for admin and normal user
 $env.mirko.str.char = (if (is-admin) { $env.mirko.str.char.root } else { $env.mirko.str.char.else })
-$env.mirko.str.char = $"(ansi --escape $env.mirko.color.normal)($env.mirko.str.char)(ansi reset)"
+$env.mirko.str.char = $"(ansi --escape $env.mirko.color.normal)($env.mirko.str.char)(ansi reset) "
 
 def path-shorten [path: string] -> string {
   let path_parts = ($path | split row (char path_sep))

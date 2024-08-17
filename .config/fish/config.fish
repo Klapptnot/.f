@@ -10,6 +10,8 @@ if [ $__fish_init_user_env_var = 1 ]
   set -gx L3MON https://open.spotify.com/playlist/4FmJwjqqdgpLXc0ZDcadJ4
 end
 
+set -gx PATH (printf '%s\n' $PATH)
+
 # set -U fish_history_histcontrol 'ignorespace'
 
 function fzf_get_file -d "Use fzf to get a file"
@@ -39,10 +41,6 @@ function fuzzy_bat -d "Print the content of a file searched by fzf"
   end
 end
 
-function __fish_goto_wrapper -d 'Gets the path and goes to it'
-  cd (goto $argv)
-end
-
 # `cd` with alias support (fish function)
 function gt --wraps goto --description 'alias gt=goto'
   goto $argv
@@ -52,8 +50,20 @@ bind \co fuzzy_nvim
 bind \cu fuzzy_bat
 bind \cl 'clear; commandline -f repaint'
 
-set fish_prompt_user (yq -rM .str.user ~/.config/mirkop.yaml || echo $USER)
-set fish_prompt_host (yq -rM .str.host ~/.config/mirkop.yaml || echo $hostname)
+set fish_prompt_cfgf ~/.config/mirkop.yaml
+
+set fish_prompt_user (yq -rM .str.user $fish_prompt_cfgf || echo $USER)
+set fish_prompt_host (yq -rM .str.host $fish_prompt_cfgf || echo $hostname)
+set fish_prompt_rdircolor (yq -rM .rdircolor $fish_prompt_cfgf || echo true)
+if fish_is_root_user
+  set fish_prompt_delim (yq -rM .str.char.root $fish_prompt_cfgf || echo '#')
+else
+  set fish_prompt_delim (yq -rM .str.char.else $fish_prompt_cfgf || echo '>')
+end
+# If we don't have unicode use a simpler delimiter
+if not string match -qi "*.utf-8" -- $LANG $LC_CTYPE $LC_ALL
+  fish_is_root_user; and set fish_prompt_delim "#"; or set fish_prompt_delim ">"
+end
 
 if status is-interactive
   # Commands to run in interactive sessions can go here

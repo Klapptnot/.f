@@ -562,15 +562,13 @@ $env.config = {
             event: { send: searchhistory }
         }
         {
-            name: open_command_editor
+            name: open_nvim_fzf_file
             modifier: control
             keycode: char_o
             mode: [emacs, vi_normal, vi_insert]
             event: {
                 send: executehostcommand,
-                cmd: "let f = (fzf --prompt 'File: ' --pointer '=>' --marker '==' -m
-                        --preview-window '65%' --preview-label 'Preview'
-                        --preview 'bat {}'); if $f != '' { nvim $f }"
+                cmd: "__open_nvim_fzf_file"
             }
         }
         {

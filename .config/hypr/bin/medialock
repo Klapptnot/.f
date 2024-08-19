@@ -11,6 +11,40 @@
 # shellcheck disable=SC1090
 source ~/.local/lib/bash/rsum.sh
 
+function main {
+  local what="${1:?Need something do: \{hwman,artup,artdown,title,artist,album,player,elapsed\}}"
+  shift 1
+
+  # Icon is the action to be made, not the status, except stop
+  declare -A states=(
+    ['playing']=""
+    ['paused']=""
+    ['stopped']=""
+  )
+  MEDIA_ART_CACHE_LOC=~/.cache/hyprland/medialock.cache
+
+  if [ "${what}" == "artup" ]; then
+    test -f "${MEDIA_ART_CACHE_LOC}" && rm "${MEDIA_ART_CACHE_LOC}" 2> /dev/null
+    touch "${MEDIA_ART_CACHE_LOC}"
+    media-art-cache &> /dev/null &
+    return
+  elif [ "${what}" == "artup" ]; then
+    test -f "${MEDIA_ART_CACHE_LOC}" && rm "${MEDIA_ART_CACHE_LOC}" 2> /dev/null
+    return
+  elif [ "${what}" == "hwman" ]; then
+    hyprlock-mw-source-manager &> /dev/null &
+    return
+  fi
+
+  local format_it='\{\{([a-z_]+)\}\}'
+  while [[ "${what}" =~ ${format_it} ]]; do
+    IFS=$'\n' read -r res < <(media-metadata-get "${BASH_REMATCH[1]}")
+    what="${what//"${BASH_REMATCH[0]}"/"${res}"}"
+  done
+
+  printf '%s' "${what}"
+}
+
 function media-art-cache {
   local last=""
   local medI=""
@@ -113,40 +147,6 @@ function hyprlock-mw-source-manager {
     fi
     sleep 1
   done
-}
-
-function main {
-  local what="${1:?Need something do: \{hwman,artup,artdown,title,artist,album,player,elapsed\}}"
-  shift 1
-
-  # Icon is the action to be made, not the status, except stop
-  declare -A states=(
-    ['playing']=""
-    ['paused']=""
-    ['stopped']=""
-  )
-  MEDIA_ART_CACHE_LOC=~/.cache/hyprland/medialock.cache
-
-  if [ "${what}" == "artup" ]; then
-    test -f "${MEDIA_ART_CACHE_LOC}" && rm "${MEDIA_ART_CACHE_LOC}" 2> /dev/null
-    touch "${MEDIA_ART_CACHE_LOC}"
-    media-art-cache &> /dev/null &
-    return
-  elif [ "${what}" == "artup" ]; then
-    test -f "${MEDIA_ART_CACHE_LOC}" && rm "${MEDIA_ART_CACHE_LOC}" 2> /dev/null
-    return
-  elif [ "${what}" == "hwman" ]; then
-    hyprlock-mw-source-manager &> /dev/null &
-    return
-  fi
-
-  local format_it='\{\{([a-z_]+)\}\}'
-  while [[ "${what}" =~ ${format_it} ]]; do
-    IFS=$'\n' read -r res < <(media-metadata-get "${BASH_REMATCH[1]}")
-    what="${what//"${BASH_REMATCH[0]}"/"${res}"}"
-  done
-
-  printf '%s' "${what}"
 }
 
 main "${@}"

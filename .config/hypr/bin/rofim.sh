@@ -14,6 +14,49 @@ source ~/.local/lib/bash/strtoys.sh
 source ~/.local/lib/bash/rsum.sh
 source ~/.local/lib/bash/logger.sh
 
+function main {
+  local mode="${1:?A mode is needed: \{runner, clipboard, emoji, wifi, bluetooth\}}"
+  shift 1
+
+  command -v rofi &> /dev/null || {
+    log e "Rofi not installed or not in PATH" >&2
+    exit
+  }
+
+  function no_tlf {
+    printf '%s' "${2:0:(${#2} - 1)}"
+  }
+
+  killall rofi &> /dev/null
+  case "${mode}" in
+    runner)
+      rofi -show drun -theme ~/.config/rofi/drun.rasi
+      ;;
+    clipboard)
+      cliphist list |
+        sed 's/\([0-9]*\)\t\(.*\)/\2\r\1/g' | # The \t is ugly
+        rofi -dmenu -p '   Clip ' -theme ~/.config/rofi/clipboard.rasi |
+        sed 's/\(.*\)\r\([0-9]*\)/\2\t\1/g' |
+        cliphist decode |
+        wl-copy
+      ;;
+    emoji)
+      python3 ~/.config/hypr/bin/emoji.py list |
+        rofi -dmenu -p ' 󰱨 Emoji ' -theme ~/.config/rofi/emoji.rasi |
+        python3 ~/.config/rofi/bin/emoji.py decode |
+        wl-copy
+      ;;
+    wifi)
+      while true; do
+        rofi-wifi-menu-do || break
+      done
+      ;;
+    bluetooth)
+      return
+      ;;
+  esac
+}
+
 function o+e_handler {
   "${@}" 2> "${epPipe}" | {
     local o="$(cat -)"
@@ -167,49 +210,6 @@ function rofi-wifi-menu-do {
   esac
   rm "${opPipe}" "${epPipe}" &>/dev/null
   return 0
-}
-
-function main {
-  local mode="${1:?A mode is needed: \{runner, clipboard, emoji, wifi, bluetooth\}}"
-  shift 1
-
-  command -v rofi &> /dev/null || {
-    log e "Rofi not installed or not in PATH" >&2
-    exit
-  }
-
-  function no_tlf {
-    printf '%s' "${2:0:(${#2} - 1)}"
-  }
-
-  killall rofi &> /dev/null
-  case "${mode}" in
-    runner)
-      rofi -show drun -theme ~/.config/rofi/drun.rasi
-      ;;
-    clipboard)
-      cliphist list |
-        sed 's/\([0-9]*\)\t\(.*\)/\2\r\1/g' | # The \t is ugly
-        rofi -dmenu -p '   Clip ' -theme ~/.config/rofi/clipboard.rasi |
-        sed 's/\(.*\)\r\([0-9]*\)/\2\t\1/g' |
-        cliphist decode |
-        wl-copy
-      ;;
-    emoji)
-      python3 ~/.config/hypr/bin/emoji.py list |
-        rofi -dmenu -p ' 󰱨 Emoji ' -theme ~/.config/rofi/emoji.rasi |
-        python3 ~/.config/rofi/bin/emoji.py decode |
-        wl-copy
-      ;;
-    wifi)
-      while true; do
-        rofi-wifi-menu-do || break
-      done
-      ;;
-    bluetooth)
-      return
-      ;;
-  esac
 }
 
 main "${@}"

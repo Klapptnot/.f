@@ -1,6 +1,14 @@
 #! /bin/env bash
 
-function print_palette_16() {
+function main {
+  if [[ "${1}" =~ ^-f|--full|full$ ]]; then
+    colormap
+    exit
+  fi
+  print_palette_16
+}
+
+function print_palette_16 {
   # Define array of ANSI color names
   color_names=(
     "Black"        # 00:
@@ -35,8 +43,4 @@ function colormap() {
   done
 }
 
-if [[ "${1}" =~ ^-f|--full|full$ ]]; then
-  colormap
-  exit
-fi
-print_palette_16
+main "${@}"

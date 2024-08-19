@@ -183,4 +183,4 @@ function tared() {
     return "${_exit_code}"
   fi
 }
-tared "${@}" || exit "${?}"
+main "${@}" || exit "${?}"

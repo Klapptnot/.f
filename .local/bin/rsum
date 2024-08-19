@@ -1,59 +1,49 @@
 #! /bin/env bash
 
-#  LIB HELP
-#    HELP! - \033[38;5;87mrsum\033[00m Just a easy way to get/generate (random) strings.
-#    Usage:
-#    '-l' [LENGHT]     int
-#    '-c' [CHAR]       string
-#    '-s' [SEPARATOR]  string
-#    '-t' [TIMES]      int
-#    '-n' [Linebreak at end]
-#    Example:
-#       rsum -l 16 -c '0-9' -s '-' -t 5 -n
-#    Return: A string of 5 '16 number' strings separated by \"-\" and trailing linebreak
-#    Default: 16 lenght alphanumeric string without trailing linebreak
-#
+function main {
+  if [[ "${1}" =~ ^-h$|^--help$|^help$ ]]; then
+    lns=(
+      "\033[38;5;87mrsum\033[00m Just a easy way to get/generate (random) strings.\n"
+      "Usage:\n"
+      "    '-l' [LENGHT]     int\n"
+      "    '-c' [CHAR]       string\n"
+      "    '-s' [SEPARATOR]  string\n"
+      "    '-t' [TIMES]      int\n"
+      "    '-n' [Linebreak at end]\n"
+      "    '-P' [PRESET]     string\n"
+      "Presets (Not available in lib)\n"
+      "    'password'   - Use default char for passwords\n"
+      "    'code-r'     - Simple code for any redeem\n"
+      "Example:\n"
+      "    rsum -l 16 -c '0-9' -s '-' -t 5 -n\n"
+      "Return: A string of 5 '16 number' strings separated by \"-\" and trailing linebreak\n"
+      "Default: 16 lenght alphanumeric string without trailing linebreak"
+    )
+    IFS= tlns="${lns[*]}"
+    printf "${tlns}"
+    exit
+  fi
 
-if [[ "${1}" =~ ^-h$|^--help$|^help$ ]]; then
-  lns=(
-    "HELP! - \033[38;5;87mrsum\033[00m Just a easy way to get/generate (random) strings.\n"
-    "Usage:\n"
-    "    '-l' [LENGHT]     int\n"
-    "    '-c' [CHAR]       string\n"
-    "    '-s' [SEPARATOR]  string\n"
-    "    '-t' [TIMES]      int\n"
-    "    '-n' [Linebreak at end]\n"
-    "    '-P' [PRESET]     string\n"
-    "Presets (Not available in lib)\n"
-    "    'password'   - Use default char for passwords\n"
-    "    'code-r'     - Simple code for any redeem\n"
-    "Example:\n"
-    "    rsum -l 16 -c '0-9' -s '-' -t 5 -n\n"
-    "Return: A string of 5 '16 number' strings separated by \"-\" and trailing linebreak\n"
-    "Default: 16 lenght alphanumeric string without trailing linebreak"
-  )
-  IFS= tlns="${lns[*]}"
-  printf "${tlns}"
-  exit
-fi
+  # shellcheck disable=SC1091
+  source "${HOME}/.local/lib/bash/rsum.sh"
 
-# shellcheck disable=SC1091
-source "${HOME}/.local/lib/bash/rsum.sh"
+  if [ "${1}" != "-P" ]; then
+    rsum "${@}"
+  else
+    shift
+    case "${1}" in
+      'password')
+        # rsum -c '[:print:]' "${@}"
+        rsum -c '[:alnum:][:punct:]' "${@}"
+        ;;
+      'code-r')
+        rsum -c 'B-DF-HJ-NP-RT-Z236789' -s '-' -t5 -l5
+        ;;
+      *)
+        printf '%b\n' "Unknown preset: ${1}"
+        ;;
+    esac
+  fi
+}
 
-if [ "${1}" != "-P" ]; then
-  rsum "${@}"
-else
-  shift
-  case "${1}" in
-    'password')
-      # rsum -c '[:print:]' "${@}"
-      rsum -c '[:alnum:][:punct:]' "${@}"
-      ;;
-    'code-r')
-      rsum -c 'B-DF-HJ-NP-RT-Z236789' -s '-' -t5 -l5
-      ;;
-    *)
-      printf '%b\n' "Unknown preset: ${1}"
-      ;;
-  esac
-fi
+main "${@}"

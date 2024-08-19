@@ -20,6 +20,24 @@
 # d -> has description, will allow you to write a description for your bind.
 # p -> bypasses the app's requests to inhibit keybinds.
 
+function main {
+  if [[ "$(type -p yad)" == "" ]]; then
+    printf '%s\n' 'Yad not installed, exiting..' >&2
+    return 1
+  fi
+
+  THIS_SCRIPT="$(realpath "${0}")"
+  if [ ${#} == 0 ]; then
+    show_window
+    return
+  fi
+  # Execute the Hyprland dispatcher
+  local CMD="${4}"
+  local ARGS="${5}"
+  # shellcheck disable=SC2086 # I actually want word spliting in ${ARGS}
+  hyprctl dispatch "${CMD}" ${ARGS} | printf 'Command: "%s" results in: %s\n' "${CMD} ${ARGS}" "$(cat -)"
+}
+
 function show_window {
   local CONFIG_FILE=~/.config/hypr/conf.d/bindings.conf
   local title="Hyprland 󰧹 "
@@ -80,24 +98,6 @@ function show_window {
     --dclick-action "${THIS_SCRIPT} %s" \
     --column="Mod key" --column="Key" --column="Description" --column="Hyprland dispatcher" --column="Command args" \
     "${BINDINGS[@]}"
-}
-
-function main {
-  if [[ "$(type -p yad)" == "" ]]; then
-    printf '%s\n' 'Yad not installed, exiting..'
-    return 1
-  fi
-
-  THIS_SCRIPT="$(realpath "${0}")"
-  if [ ${#} == 0 ]; then
-    show_window
-    return
-  fi
-  # Execute the Hyprland dispatcher
-  local CMD="${4}"
-  local ARGS="${5}"
-  # shellcheck disable=SC2086 # I actually want word spliting in ${ARGS}
-  hyprctl dispatch "${CMD}" ${ARGS} | printf 'Command: "%s" results in: %s\n' "${CMD} ${ARGS}" "$(cat -)"
 }
 
 main "${@}"

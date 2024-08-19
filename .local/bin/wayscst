@@ -1,34 +1,5 @@
 #! /bin/env bash
 
-function _not_proc {
-  local exitc=${1}
-  shift 1
-  printf '\x1b[38;5;1m[ ERR ]\x1b[00m %s\n' "${@}" >&2
-  exit ${exitc}
-}
-
-# Slurp adds a surface, we use the surface to blink on
-# capture
-function indicate_take {
-  slurp -b#67469860 &
-  local pid=${!}
-  sleep 0.150
-  kill -9 ${pid}
-}
-
-function take_n_save {
-  local filename="${1}"
-  shift 1
-
-  grim -t png "${@}" - |
-    tee "${filename}" |
-    wl-copy -t image/png ||
-    {
-      rm "${filename}" &>/dev/null
-      _not_proc 2 'Unable to take a screen capture'
-    }
-}
-
 function main {
   local SS_FOLDER="$(xdg-user-dir PICTURES)/Screenshots"
   [ ! -f "${SS_FOLDER}" ] && mkdir -p "${SS_FOLDER}"
@@ -86,9 +57,39 @@ function main {
     take_n_save "${filename}" "${args_to_grim[@]}"
     ;;
   *)
-    _not_proc 1 'Select one of screen, selection, window\nUsage: %s {screen|selection|window}\n' "$(basename ${0})"
+    _not_proc 1 'Select one of screen, selection, window\nUsage: %s {screen|selection|window}\n' "$(basename "${0}")"
     ;;
   esac
+}
+
+
+function _not_proc {
+  local exitc=${1}
+  shift 1
+  printf '\x1b[38;5;1m[ ERR ]\x1b[00m %s\n' "${@}" >&2
+  exit "${exitc}"
+}
+
+# Slurp adds a surface, we use the surface to blink on
+# capture
+function indicate_take {
+  slurp -b#67469860 &
+  local pid=${!}
+  sleep 0.150
+  kill -9 ${pid}
+}
+
+function take_n_save {
+  local filename="${1}"
+  shift 1
+
+  grim -t png "${@}" - |
+    tee "${filename}" |
+    wl-copy -t image/png ||
+    {
+      rm "${filename}" &>/dev/null
+      _not_proc 2 'Unable to take a screen capture'
+    }
 }
 
 main "${@}"

@@ -2,7 +2,7 @@
 
 # Print the content of a file, but allow using ranges
 
-function main() {
+function main {
   local _file_="${1}"
   local _section_="${2}"
 

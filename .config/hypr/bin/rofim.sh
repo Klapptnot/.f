@@ -43,7 +43,7 @@ function main {
     emoji)
       python3 ~/.config/hypr/bin/emoji.py list |
         rofi -dmenu -p ' 󰱨 Emoji ' -theme ~/.config/rofi/emoji.rasi |
-        python3 ~/.config/rofi/bin/emoji.py decode |
+        python3 ~/.config/hypr/bin/emoji.py decode |
         wl-copy
       ;;
     wifi)

@@ -21,3 +21,23 @@ ignore = [
 ...ignore = ".config/kitty"    #[if_not(pkg(kitty))]
 ...ignore = ".config/goto.idx" #[if_not(has(&shells !SHELL))]
 
+packages = [
+  "git"
+  "rofi-wayland"
+  "cliphist"
+  "nushell"
+  "waybar"
+  "swaync"
+  "wlogout"
+  "brightnessctl"
+  "papirus-icon-theme"
+  "ttf-cascadia-code-nerd"
+  "bluez"
+  "bluez-utils"
+  "xdg-user-dirs"
+  "playerctl"
+  "hyprlock"
+  "hyprpaper"
+  "tumbler"
+  "fastfetch"
+]

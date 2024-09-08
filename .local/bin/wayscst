@@ -57,7 +57,7 @@ function main {
     take_n_save "${filename}" "${args_to_grim[@]}"
     ;;
   *)
-    _not_proc 1 'Select one of screen, selection, window\nUsage: %s {screen|selection|window}\n' "$(basename "${0}")"
+    _not_proc 1 'Select one of screen, selection, window. Usage: %s {screen|selection|window}' "$(basename "${0}")"
     ;;
   esac
 }
@@ -66,7 +66,8 @@ function main {
 function _not_proc {
   local exitc=${1}
   shift 1
-  printf '\x1b[38;5;1m[ ERR ]\x1b[00m %s\n' "${@}" >&2
+  printf -v _str "${@}"
+  printf '\x1b[38;5;1m[ ERR ]\x1b[00m %s\n' "${_str}" >&2
   exit "${exitc}"
 }
 

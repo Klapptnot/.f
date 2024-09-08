@@ -1,6 +1,6 @@
 #! /bin/env bash
 
-source "${UTILS}/lib/printfc.sh"
+source "${HOME}/.local/lib/bash/printfc.sh"
 
 declare -A l_cmds=(
     ["zip"]="unzip -l {:compressed:}"
@@ -56,7 +56,7 @@ declare -A c_cmds=(
     ["lzh"]="lha a {:compressed:} {:decomp:}"
 )
 
-function tared() {
+function main() {
   local _local_mode='e'
   local _auto_run=false
   local _just_print=false
@@ -183,4 +183,5 @@ function tared() {
     return "${_exit_code}"
   fi
 }
+
 main "${@}" || exit "${?}"

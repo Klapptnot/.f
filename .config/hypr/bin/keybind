@@ -77,9 +77,10 @@ function show_window {
   IFS=' ' read -r WIDTH HEIGHT SCALE < <(hyprctl -j monitors |
     jq -rM '.[] | select(.focused==true) | [ (.width|tostring), (.height|tostring), (.scale|tostring) ] | join(" ")')
 
+  # https://community.unix.com/t/how-to-get-the-ceiling-value-for-floating-numbers
   # Calculate width and height based on percentages and monitor resolution
-  WIDTH=$(bc <<<"${WIDTH}/${SCALE}")
-  HEIGHT=$(bc <<<"${HEIGHT}/${SCALE}")
+  WIDTH=$(awk -v w="${WIDTH}" -v s="${SCALE}" '{ print w/s }' <<<"" | awk '{printf("%d\n",$0+=$0<0?0:0.9)}')
+  HEIGHT=$(awk -v h="${HEIGHT}" -v s="${SCALE}" '{ print h/s }' <<<"" | awk '{printf("%d\n",$0+=$0<0?0:0.9)}')
 
   # Set maximum width and height
   local MAX_WIDTH=1200

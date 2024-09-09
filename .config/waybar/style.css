@@ -21,6 +21,7 @@ window#waybar {
 #cava,
 #mpris,
 #workspaces button,
+#custom-updates,
 #custom-weather,
 #custom-notification,
 #custom-launcher,
@@ -218,13 +219,18 @@ window.empty #window {
   background: #1b1b2b;
 } */
 
+#custom-updates {
+  /* Launcher font icon size */
+  background: #89dceb;
+  color: #161320;
+}
+
 #custom-launcher {
   /* Launcher font icon size */
   font-size: 20px;
   background: #89dceb;
   color: #161320;
 }
-
 #custom-notification {
   font-size: 16px;
   padding: 0px 13px 0px 8px;

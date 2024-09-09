@@ -9,7 +9,10 @@ $env.mirko = ([$env.HOME, ".config", "mirkop.yaml"] | path join)
 
 # Have a default config
 if not ($env.mirko | path exists) {
-  cp ([$nu.default-config-dir, "mirkop.yaml"] | path join) $env.mirko
+  open ([$nu.default-config-dir, "mirkop.yaml"] | path join) |
+    update str.user $env.USER |
+    update str.host (uname).nodename |
+    to yaml | save -f $env.mirko
 }
 
 # Contains strings, thresholds, colors, etc.
@@ -156,6 +159,6 @@ $env.PROMPT_COMMAND = { left_prompt_command_ }
 $env.PROMPT_COMMAND_RIGHT = { right_prompt_command_ }
 $env.PROMPT_INDICATOR = { $env.mirko.str.char }
 
-$env.TRANSIENT_PROMPT_COMMAND = {|| "🚀 " }
+$env.TRANSIENT_PROMPT_COMMAND = {|| "󱓞 " }
 $env.TRANSIENT_PROMPT_INDICATOR = {|| $env.mirko.str.char }
 # $env.TRANSIENT_PROMPT_COMMAND_RIGHT = {|| "⏎" }

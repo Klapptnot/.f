@@ -38,6 +38,11 @@ packages = [
   "playerctl"
   "hyprlock"
   "hyprpaper"
+  "hypridle"
   "tumbler"
   "fastfetch"
+  "slurp"
+  "grim"
+  "yad"
+  "loupe"
 ]

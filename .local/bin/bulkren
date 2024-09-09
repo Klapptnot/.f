@@ -2,12 +2,13 @@
 
 # shellcheck disable=SC1091
 source "${HOME}/.local/lib/bash/rsum.sh"
+source "${HOME}/.local/lib/bash/barg.sh"
 
 function main {
-  barg.parse "${@}" << BARG
+  barg.parse "${@}" << BARG || { echo "Command need args" && exit 1; }
     #[progname='bulkren']
     @req f/files[vec[str]] => files || F/folder[str] => folder
-    @opt s/suffix[str] => suffix p/prefix[vec[bool]] => prefix
+    @opt s/suffix[str] => suffix p/prefix[str] => prefix
     @opt format[str] |> "{rand}.{ext}" => format
     @opt r/replace[str] => replace_str
     @opt D/dry[bool] => dry_run

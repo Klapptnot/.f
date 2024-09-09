@@ -88,7 +88,8 @@ function barg.parse() {
     local __ign__="${7}" # Ignore command line value and set default if available
 
     if [[ "${__typ__}" == "vec[bool]" ]]; then
-      barg.exit "Invalid value on line ${__line__}" "" "A vector of bool is not a valid data type" 17
+      echo "${__typ__}"
+      barg.exit "Invalid data type in '${__pat__}'" "A vector of bool is not a valid data type" 17
     fi
 
     # To test whether a variable is defined

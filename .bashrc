@@ -1,6 +1,6 @@
 # shellcheck disable=SC2148
 # If not running interactively, don't do anything
-[[ "${-}" =~ 'i' ]] || return
+[[ "${-}" == *i* ]] || return
 
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
@@ -105,7 +105,7 @@ function prompt {
   local _s="${?}"
 
   local last_cmd_status=""
-  (( "${_s}" > 0 )) && last_cmd_status="\033[38;05;01m[${_s}]\033[00m"
+  (( "${_s}" > 0 )) && last_cmd_status="\[\033[38;05;01m\][${_s}]\[\033[00m\]"
   # A fish-like pwd
   local short_cwd="$(short_pwd)"
 
@@ -115,13 +115,13 @@ function prompt {
   # Add a \n if needed
   IFS=' ' read -r cROW cCOL < <(curpos 2>/dev/null)
   local pPS1=""
-  (("${cCOL}" != 0)) && pPS1="\033[38;5;242m⏎\033[0m\n"
+  (("${cCOL}" != 0)) && pPS1="\[\033[38;5;242m\]⏎\[\033[0m\]\n"
 
   # jobs &>/dev/null
   # local NUM_JOBS=0
   # for job in $(jobs -p); do [[ $job ]] && ((NUM_JOBS++)); done
   # Update the prompt string
-  pPS1+="\033[38;2;235;100;52mbash\033[00m\033[38;2;255;255;255m::\033[00m\033[38;2;155;92;237m\u\033[00m:\033[38;2;4;201;172m${short_cwd}\033[00m${last_cmd_status}${delim@E} "
+  pPS1+="\[\033[38;2;235;100;52m\]bash\[\033[00m\033[38;2;255;255;255m\]::\[\033[00m\033[38;2;155;92;237m\]\[\u\]\[\033[00m\]:\[\033[38;2;4;201;172m\]${short_cwd}\[\033[00m\]${last_cmd_status}${delim@E} "
   PS1="${pPS1}"
 }
 

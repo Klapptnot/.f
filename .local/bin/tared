@@ -1,4 +1,5 @@
 #! /bin/env bash
+# shellcheck disable=SC2155,SC1091
 
 source "${HOME}/.local/lib/bash/printfc.sh"
 
@@ -144,7 +145,7 @@ function main() {
     return 2
   fi
   local decomp="${all[*]}"
-  local theoretical_out_dir="$(realpath ${all[0]})"
+  local theoretical_out_dir="$(realpath "${all[0]}")"
 
   if ${invrt_cmd}; then
     cmd="${cmd/\{:compressed:\}/${decomp}}"

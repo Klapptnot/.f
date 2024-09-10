@@ -1,18 +1,18 @@
 #! /bin/env bash
+# shellcheck disable=SC1091,SC2154
 
-# shellcheck disable=SC1091
 source "${HOME}/.local/lib/bash/rsum.sh"
 source "${HOME}/.local/lib/bash/barg.sh"
 
 function main {
   barg.parse "${@}" << BARG || { echo "Command need args" && exit 1; }
     #[progname='bulkren']
-    @req f/files[vec[str]] => files || F/folder[str] => folder
-    @opt s/suffix[str] => suffix p/prefix[str] => prefix
-    @opt format[str] |> "{rand}.{ext}" => format
-    @opt r/replace[str] => replace_str
-    @opt D/dry[bool] => dry_run
-    @opt I/ignore-folders[bool] => ignore_folders
+    ! f/files[vec[str]] => files || F/folder[str] => folder
+    s/suffix[str] => suffix p/prefix[str] => prefix
+    format[str] |> "{rand}.{ext}" => format
+    r/replace[str] => replace_str
+    D/dry[bool] => dry_run
+    I/ignore-folders[bool] => ignore_folders
 BARG
 
   do-bulk-rename

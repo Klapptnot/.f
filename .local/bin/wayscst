@@ -1,4 +1,5 @@
 #! /bin/env bash
+# shellcheck disable=SC2155,SC2059
 
 function main {
   local SS_FOLDER="$(xdg-user-dir PICTURES)/Screenshots"

@@ -1,4 +1,3 @@
 .config/nushell/history*
-.local/lib/bash/shml.sh
 .gitconfig
 **/_*

@@ -13,7 +13,6 @@ fi
 function barg.parse() {
   local argv=("${@}")
   [ "${#argv[@]}" -eq 0 ] && return 1
-  local BARG_EXTRAS_BEFORE=("${argv[@]}")
   # Expand the joint arguments
   function barg.normalize_args() {
     for ((i = 0; i < ${#argv[@]}; i++)); do
@@ -360,23 +359,26 @@ function barg.parse() {
   local __flt_regex__='^(-?[0-9]{1,3}(_[0-9]{3})+\.([0-9]{3}(_[0-9]{1,3})*|[0-9]{1,3})|-?[0-9]+\.[0-9]+)$'
   local __opt_regex__='(,|#\[)\ *([A-Za-z_][_A-Za-z0-9]+?)=|"(([^"\\]|\\.)*)"\]?|'\''(([^'\''\\]|\\.)*)'\''\]?'
   # shellcheck disable=SC1003
-  local __def_regex__='\s*(\|\||&&|<>)?(@[a-z]{3})?\s*([A-Za-z0-9!?@#_.:<>]?/?[A-Za-z0-9!?@#_.:<>\-]+\[(str|float|int|num|bool|vec\[(str|float|int|num|bool)\])\]|\{((\s*[A-Za-z0-9!?@#_.:<>]?/?[A-Za-z0-9!?@#_.:<>\-]+\s*=>\s*("((\\"|[^"])*?)"|'\''((\\'\''|[^'\''])*?)'\'')\s*)+)\})\s*(\|>\s*("((\\"|[^"])*?)"|'\''((\\'\''|[^'\''])*?)'\''))?\s*=>\s*([a-zA-Z][a-zA-Z0-9_]*)'
+  local __def_regex__='\s*(\|\||&&|<>)?\s*(!)?\s*(@[a-zA-Z0-9\-_]+)?\s*([A-Za-z0-9!?@#_.:<>]?/?[A-Za-z0-9!?@#_.:<>\-]+\[(str|float|int|num|bool|vec\[(str|float|int|num|bool)\])\]|\{((\s*[A-Za-z0-9!?@#_.:<>]?/?[A-Za-z0-9!?@#_.:<>\-]+\s*=>\s*("((\\"|[^"])*?)"|'\''((\\'\''|[^'\''])*?)'\'')\s*)+)\})\s*(\|>\s*("((\\"|[^"])*?)"|'\''((\\'\''|[^'\''])*?)'\''))?\s*=>\s*([a-zA-Z][a-zA-Z0-9_]*)' #(\s*("((\\"|[^"])*?)"|'\''((\\'\''|[^'\''])*?)'\''))?'
   # shellcheck disable=SC1003
   local __swi_regex__='\s*(([A-Za-z0-9!?@#_.:<>])/([A-Za-z0-9!?@#_.:<>\-]+)\s*=>\s*("((\\"|[^"])*?)"|'\''((\\'\''|[^'\''])*?)'\''))\s*'
 
   local __line__=1
   declare -A __barg_opts__=(
-    [colored]=true
-    [output]=true
-    [stderr]=true
-    [exit]=true
-    [reqextras]=false
-    [emptycheck]=false
-    [progname]='BARG'
-    [errvar]=null
-    [extras]=null
+    [colored]=true     # Enable colored output (default: true)
+    [output]=true      # Print output to the console (default: true)
+    [stderr]=true      # Redirect output to standard error (default: true)
+    [exit]=true        # Exit the script on error (instead of returning an error code)
+    [reqextras]=false  # Treat positional arguments as required (default: false)
+    [subcmdr]=false    # Require a subcommand to be specified (default: false)
+    [subcmds]=''       # Comma-separated list of valid subcommands (default: empty)
+    [emptycheck]=false # Allow required values to be zero-length (default: false)
+    [progname]='BARG'  # Program name to use in error messages (default: 'BARG')
+    [errvar]=null      # Variable name to store error data in (default: null)
+    [extras]=null      # Collect positional parameters (default: null)
   )
   barg.normalize_args # Normalize joint arguments, from '-abc' to '-a -b -c'
+  local BARG_EXTRAS_BEFORE=("${argv[@]}")
   declare -A _argv_table
   for ((i = 0; i < ${#argv[@]}; i++)); do
     # ignore values
@@ -421,14 +423,23 @@ function barg.parse() {
       unset STR
       continue
     fi
-    [[ "${line}" == '#'* ]] && continue
+    [[ "${line}" == '//'* ]] && continue
     STR+="${line}"$'\n'
   done
 
+  BARG_SUBCOMMAND=""
+  # Try to get the possible sub command
+  if [ -n "${__barg_opts__[subcmds]}" ] && [[ "${__barg_opts__[subcmds]//,/\ }" == *"${argv[0]}"* ]]; then
+    BARG_SUBCOMMAND="${argv[0]}"
+  fi
+  if [ "${__barg_opts__[subcmdr]}" == "true" ] && [ -n "${__barg_opts__[subcmds]}" ] && [ -z "${BARG_SUBCOMMAND}" ]; then
+    barg.exit "Missing subcommand, expected one of ${__barg_opts__[subcmds]//,/,\ }" "A subcommand is required, but none was provided" 21
+  fi
+
   local __ignore__=false
+  local __grpsts__=''
   local __status__=''
-  local __curlvl__="@opt"
-  local __curopr__=""
+  local __required__=false
   local last=""
   local __last_sig=""
   local __defer_error=()
@@ -436,22 +447,35 @@ function barg.parse() {
     if [[ "${STR}" =~ ${__def_regex__} ]]; then
       STR="${STR/#"${BASH_REMATCH[0]}"/}"
     else
+      # If a required has no args, check first if a opr will be used with it
+      if [ "${#__defer_error}" -gt 0 ] && [ -z "${log_opr}" ]; then
+        barg.exit "${__defer_error[@]}"
+      fi
       break
     fi
 
     if [ "${BASH_REMATCH[0]}" == "${last}" ]; then
-      barg.exit "Invalid syntax: Somewhere before ${last}" "You may forget some quote?" 67
+      barg.exit "Invalid syntax: Somewhere before ${last}" "Not able to continue reading statements" 67
     fi
     last="${BASH_REMATCH[0]}"
 
-    local log_opr="${BASH_REMATCH[1]}"                       #  1 ?-> Operation (||, &&, <>)
-    local arg_lvl="${BASH_REMATCH[2]}"                       #  2 ?-> Arg type (@req, @opt)
-    local arg_pat="${BASH_REMATCH[3]}"                       #  3 |-> Pattern
-    local arg_type="${BASH_REMATCH[4]}"                      #  4 |-> Data type
-    local vec_type="${BASH_REMATCH[5]}"                      #  5 ?-> Vec of
-    local switch_pat="${BASH_REMATCH[6]}"                    #  6 ?-> Switch options
-    local def_val="${BASH_REMATCH[15]:-${BASH_REMATCH[17]}}" # 11 ?-> Default value
-    local var_name="${BASH_REMATCH[19]}"                     # 15 |-> Variable name
+    local log_opr="${BASH_REMATCH[1]}"                        # ?-> Operation (||, &&, <>)
+    local arg_lvl="${BASH_REMATCH[2]}"                        # ?-> Is required?????
+    local arg_par="${BASH_REMATCH[3]}"                        # ?-> Arg father (sub command)
+    local arg_pat="${BASH_REMATCH[4]}"                        # |-> Pattern
+    local arg_type="${BASH_REMATCH[5]}"                       # |-> Data type
+    local vec_type="${BASH_REMATCH[6]}"                       # ?-> Vec of
+    local switch_pat="${BASH_REMATCH[7]}"                     # ?-> Switch options
+    local def_val="${BASH_REMATCH[16]:-${BASH_REMATCH[18]}}"  # ?-> Default value
+    local var_name="${BASH_REMATCH[20]}"                      # |-> Variable name
+    # local def_desc="${BASH_REMATCH[23]:-${BASH_REMATCH[25]}}" # ?-> Def description
+
+    local subcmd_prop="${arg_par:1}"
+
+    # skip options for a distinct sub command
+    if [ -n "${subcmd_prop}" ] && [ "${subcmd_prop}" != "${BARG_SUBCOMMAND}" ]; then
+      continue
+    fi
 
     # If a @req has no args, check first if a opr will be used with it
     if [ "${#__defer_error}" -gt 0 ] && [ -z "${log_opr}" ]; then
@@ -459,22 +483,23 @@ function barg.parse() {
     fi
     __defer_error=()
 
-    if [ -n "${log_opr}" ]; then
-      __curopr__="${log_opr}"
-      __ignore__=false
-    fi
-    if [ -n "${arg_lvl}" ]; then
-      __curlvl__="${arg_lvl}"
-      __ignore__=false
-      __curopr__=""
-    fi
+    [ "${arg_lvl}" == "!" ] && __required__=true
 
     if [[ " ${__ilegal_var_names__[*]} " == *" ${var_name} "* ]]; then
       barg.exit "Ilegal name: ${var_name}" "'${var_name}' is an reserved variable name." 78
     fi
 
-    if [ "${__curopr__}" == "<>" ] && ! ${__status__}; then
-      __ignore__=true
+    if [ "${log_opr}" == "<>" ]; then
+      if [ -z "${__status__}" ]; then
+        barg.exit "Ilegal operation: Unparented <>" "The <> was used without a parent definition" 43
+      fi
+      if [ -z "${__grpsts__}" ]; then
+        __grpsts__=${__status__}
+      fi
+      ${__grpsts__} && __ignore__=false || __ignore__=true
+    else
+      __ignore__=false
+      __grpsts__=''
     fi
 
     local def_set=false
@@ -484,8 +509,8 @@ function barg.parse() {
       last_run=true
     [ ${?} == 2 ] && def_set=true
 
-    # Default values are not useful in @req
-    if [ "${__curlvl__}" == "@req" ] && ${def_set}; then
+    # Default values are not useful in required
+    if ${__required__} && ${def_set}; then
       def_set=false
       last_run=false
       unset "${var_name}"
@@ -503,11 +528,11 @@ function barg.parse() {
         local signat="\x1b[38;5;50m-${_na%/*}\x1b[0m\x1b[38;5;60m/\x1b[0m\x1b[38;5;50m--${_na#*/}\x1b[0m"
       fi
     else
-      signat="\x1b[38;5;50m{...switch<${var_name}>}\x1b[0m (see help)"
+      signat="\x1b[38;5;50m{...switch<${var_name}>}\x1b[0m"
     fi
 
     if [ -n "${__status__}" ]; then
-      if [ "${__curlvl__}" == "@req" ]; then
+      if ${__required__}; then
         if [ "${log_opr}" == "&&" ]; then
           if ! [[ ${__status__} && ${last_run} ]]; then
             barg.exit "Failed AND operation: Not enough arguments" "${signat} requires ${__last_sig}" 111
@@ -535,6 +560,8 @@ function barg.parse() {
           fi
         fi
       fi
+    elif [ -z "${!var_name@A}" ]; then
+      __defer_error=("Missing arguments: ${signat} needed" "All required arguments must exist" 113)
     fi
 
     __status__=${last_run}

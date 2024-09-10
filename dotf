@@ -1,0 +1,242 @@
+#! /bin/env bash
+# Installation script
+# shellcheck disable=SC1091
+source ./.local/lib/bash/barg.sh || exit
+source ./.local/lib/bash/printfc.sh || exit
+source ./.local/lib/bash/logger.sh || exit
+
+function main {
+  MEPATH="$(realpath "${0}")"
+  MELOC="$(dirname "${MEPATH}")"
+  MENAME="$(basename "${MEPATH}")"
+
+  barg.parse "${@}" << BARG || {
+  #[progname="DOTF", subcmdr='true']
+  #[subcmds="install,uninstall,help,config"]
+  @install {
+    h/help => "help"
+    r/reset => "reset"
+    u/update => "update"
+  } |> "normal" => INSTALL_MODE
+  @install s/shell[str] |> "nushell" => INSTALL_SHELL
+  f/force[bool] => FORCE_OPERATION
+BARG
+    echo "See ${MENAME} --help"
+    exit 1
+  }
+
+  ${FORCE_OPERATION} && log i "Any operation can be forced"
+
+  ignore=()
+  pacman_pkgs=()
+  yay_pkgs=()
+  nfolders=()
+
+  # Installation config
+  source "${MELOC}/.conf.sh"
+
+  case "${BARG_SUBCOMMAND}" in
+    install)
+      if [[ "${INSTALL_MODE}" =~ ^(reset|update)$ ]]; then
+        printfc '{fgc.87}All local changes will be discarded, continue anyways?{r} [Yn]: '
+        read -r -n 1 REPLY
+        echo
+        if ! [[ "${REPLY}" =~ ^(Y|y)$ ]]; then
+          log i "Cancelled by user"
+          exit
+        fi
+      fi
+      do_install ;;
+    uninstall) do_uninstall ;;
+    config) edit_config ;;
+    help) do_help ;;
+  esac
+}
+
+function do_help {
+  local help=(
+    '{fgc.87}dotf{r} - A simple script to manage dotfiles\n\n'
+    '\x1b[4mUsage:\x1b[24m\n'
+    '  {fgc.84}dotf{r} <{fgc.219}subcommand{r}> [{fgc.96}options{r}]\n\n'
+    '  install [{fgc.96}options{r}]  - Install all dotfiles\n'
+    '  uninstall          - Uninstall all dotfiles\n'
+    '  config             - Open the configuration file (neovim)\n'
+    '  help               - Show this message and exit\n'
+    '  version            - Show version and exit\n\n'
+    '\x1b[4mNotes:\x1b[24m\n'
+    'The script will automatically detect your shell and configure it accordingly.\n'
+    'You can customize the installation process by editing the config file.\n\n'
+    '\x1b[4mSupported shells:\x1b[24m\n'
+    '  bash, nushell, fish, zsh\n'
+    '\x1b[4mSupported DEs:\x1b[24m\n'
+    '  Hyprland\n'
+  )
+  local help_install=(
+    '\x1b[4mUsage:\x1b[24m\n'
+    '  {fgc.84}dotf{r} {fgc.219}install{r} [{fgc.96}options{r}]\n\n'
+    '  install [{fgc.96}options{r}]  - Install all dotfiles\n'
+    '    -h, --help              Show this message and exit\n'
+    '    -r, --reset             Reset the dotfiles installation\n'
+    '    -u, --update            Update the dotfiles\n'
+    '    -s, --shell <pkg>       The desired shell to install (default: nushell)\n'
+  )
+
+  if [ "${1}" == "install" ]; then
+    printfc "${help_install[*]}"
+  else
+    printfc "${help[*]}"
+  fi
+  exit
+}
+
+function do_symlink_tree {
+  local source="${1}"
+  local target="${2}"
+
+  if [[ ! -d "${target}" ]]; then
+    mkdir -p "${target}"
+  fi
+
+  local find_args=(! -path "'${source}'")
+  # Generate ignore for find
+  for it in "${ignore[@]}"; do
+    find_args+=(! -path "'${source}/${it}'")
+  done
+
+  eval "find ${source} ${find_args[*]} -type d" | while read -r line; do
+    local f="${target}/${line#"${source}"/}"
+    if [ ! -d "${f}" ]; then
+      mkdir -p "${f}"
+    fi
+  done
+
+  eval "find ${source} ${find_args[*]} -type f" | while read -r line; do
+    local f="${target}/${line#"${source}"/}"
+    if [ ! -e "${f}" ]; then
+      ln -s "${line}" "${f}"
+    elif ${FORCE_OPERATION}; then
+      if [ -L "${f}" ]; then unlink "${f:?}"; else rm -fr "${f:?}"; fi
+      ln -s "${line}" "${f}"
+    fi
+  done
+}
+
+function do_install {
+  if [ "${INSTALL_MODE}" == "help" ]; then
+    do_help install
+  fi
+
+  if [ "${INSTALL_MODE}" == "update" ]; then
+    cd "${MELOC}" || exit
+    if ! has_new_commits; then
+      log i "Already up to date"
+      return
+    fi
+    log w "All local changes will be discarded"
+    git restore "${MELOC}" &>/dev/null &&
+      git pull --force &>/dev/null &&
+      log i "Successfully pulled new changes"
+
+    # Source config for updates
+    source "${MELOC}/.conf.sh"
+  elif [ "${INSTALL_MODE}" == "reset" ]; then
+    log w "All local changes were discarded"
+    cd "${MELOC}" || exit
+    git restore "${MELOC}"
+    return
+  fi
+
+  log i "Installing packages with pacman"
+  # Install packages
+  sudo pacman -S --noconfirm --needed "${pacman_pkgs[@]}"
+
+  # Install Yet Another Yogurt
+  ! command -v yay > /dev/null && {
+    log i "Yay is not installed, installing"
+    local here="${PWD}"
+    local yay_folder
+    yay_folder="$(mktemp --directory)"
+    git clone https://aur.archlinux.org/yay.git "${yay_folder}" &&
+      cd "${yay_folder}" &&
+      makepkg -si
+    cd "${here}" || exit
+    rm -rf "${yay_folder:?Path expected}"
+  }
+
+  log i "Installing AUR packages with yay"
+  # Install yay packages
+  yay -S --answerclean All --answerdiff None --noconfirm --needed "${yay_pkgs[@]}"
+
+  log i "Started linking process"
+
+  # Generate ignore list with updated packages
+  gen_ignore_list
+
+  # Make symlinks to files
+  do_symlink_tree "${MELOC}" "${HOME}"
+
+  # Create needed folders
+  for f in "${nfolders[@]}"; do
+    mkdir -p "${f}"
+  done
+
+  # Run post install commands
+  post_install
+
+  log i "Installation process finished"
+}
+
+function do_uninstall {
+  # Unlink files linked to this folder and remove
+  # folders that are left empty after unlink process
+
+  log i "Uninstallation Started"
+  local folders=()
+
+  mapfile -t link < <(find "${HOME}" -type l)
+  mapfile -t targ < <(realpath -LP "${link[@]}")
+  for ((i = 0; i < ${#link[@]}; i++)); do
+    [[ "${targ[i]}" != "${MELOC}"* ]] && continue
+    unlink "${link[i]}"
+    folders+=("${link[i]}")
+  done
+  ((${#folders[@]} == 0)) && return
+
+  mapfile -t folders < <(dirname "${folders[@]}" | uniq | sort -r | uniq)
+
+  local to_remove=()
+  for f in "${folders[@]}"; do
+    [[ "${f}" =~ ^${HOME}/?(\.config|\.local)?$ ]] && continue
+    to_remove+=("${f}")
+  done
+
+  # Remove folders, will remove empty folders and
+  # ignore errors, `--preserve-root` just in case
+  local res
+  if res=$(rm --preserve-root -df "${to_remove[@]}" 2>&1 | sed "s/^.*'\(.*\)'.*$/\1/g"); then
+    mapfile -t not_rm <<< "${res}"
+    log w "Some folders (${#not_rm[@]}) have untracked files. Not removed"
+  else
+    echo "Something wrong happenned while removing the folders"
+  fi
+
+  log i "Uninstallation process finished"
+}
+
+# shellcheck disable=SC2155
+function has_new_commits {
+  local remote=$(git rev-parse --abbrev-ref --symbolic-full-name '@{u}')
+  local local_head=$(git rev-parse HEAD)
+  local remote_head=$(git rev-parse "${remote}")
+
+  if [ "${local_head}" == "${remote_head}" ]; then
+    return 1
+  fi
+
+  local merge_base=$(git merge-base "${remote_head}" "${local_head}")
+  local new_commits=$(git rev-list --count "${merge_base}".."${remote_head}")
+
+  (( new_commits > 0 )) && return 0 || return 1
+}
+
+main "${@}"

@@ -21,7 +21,7 @@ function main {
   @install s/shell[str] |> "nushell" => INSTALL_SHELL
   f/force[bool] => FORCE_OPERATION
 BARG
-    echo "See ${MENAME} --help"
+    echo "See ${MENAME} help"
     exit 1
   }
 
@@ -48,7 +48,13 @@ BARG
       fi
       do_install ;;
     uninstall) do_uninstall ;;
-    config) edit_config ;;
+    config)
+      if ! command -v nvim &> /dev/null; then
+        log e "Neovim not installed or not in PATH"
+        exit
+      fi
+      nvim "${MELOC}/.conf.sh"
+    ;;
     help) do_help ;;
   esac
 }
@@ -78,7 +84,6 @@ function do_help {
     '    -h, --help              Show this message and exit\n'
     '    -r, --reset             Reset the dotfiles installation\n'
     '    -u, --update            Update the dotfiles\n'
-    '    -s, --shell <pkg>       The desired shell to install (default: nushell)\n'
   )
 
   if [ "${1}" == "install" ]; then

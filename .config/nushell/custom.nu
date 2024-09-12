@@ -22,3 +22,6 @@ $env.PATH = ([
 source functions.nu
 source mirkop.nu
 source goto.nu
+
+alias git = git --no-pager
+

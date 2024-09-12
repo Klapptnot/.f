@@ -2,6 +2,8 @@
 
 function log {
   local level="${1,,}"
+  local show_verbose_info=true
+  ((${#level} > 1)) && show_verbose_info=false
   level="${level:0:1}"
   local format="${2}"
   shift 2
@@ -30,5 +32,9 @@ function log {
   printf -v message "${format}" "${@}"
 
   # Output the log message
-  printf '%b[%s] %s: %s\x1b[0m\n' "${color}" "$(date +%Y-%m-%d_%H:%M:%S)" "${level^^}" "${message}"
+  if ${show_verbose_info}; then
+    printf '%b%s\x1b[0m\n' "${color}" "${message}"
+  else
+    printf '%b[%s] %s: %s\x1b[0m\n' "${color}" "$(date +%Y-%m-%d_%H:%M:%S)" "${level^^}" "${message}"
+  fi
 }

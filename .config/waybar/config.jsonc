@@ -333,9 +333,10 @@
     "on-click-right": "killall rofi"
   },
   "custom/updates": {
-    "format": "{} Update(s)",
-    "exec": "yay -Qu | wc -l",
-    "exec-if": "test $(yay -Qu | wc -l) -gt 0",
+    "format": "{}",
+    "return-type": "json",
+    "exec": "~/.config/hypr/bin/updates.sh",
+    "exec-if": "~/.config/hypr/bin/updates.sh show",
     "interval": 15,
     "on-click": "kitty -e yay -Syu && notify-send 'The system has been updated'"
   },

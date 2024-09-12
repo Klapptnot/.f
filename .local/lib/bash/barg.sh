@@ -431,6 +431,7 @@ function barg.parse() {
   # Try to get the possible sub command
   if [ -n "${__barg_opts__[subcmds]}" ] && [[ "${__barg_opts__[subcmds]//,/\ }" == *"${argv[0]}"* ]]; then
     BARG_SUBCOMMAND="${argv[0]}"
+    BARG_EXTRAS_BEFORE[0]="" # Let it empty to remove it from extras
   fi
   if [ "${__barg_opts__[subcmdr]}" == "true" ] && [ -n "${__barg_opts__[subcmds]}" ] && [ -z "${BARG_SUBCOMMAND}" ]; then
     barg.exit "Missing subcommand, expected one of ${__barg_opts__[subcmds]//,/,\ }" "A subcommand is required, but none was provided" 21

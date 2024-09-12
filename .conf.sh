@@ -23,6 +23,7 @@ pacman_pkgs=(
   git
   github-cli
   grim
+  gucharmap
   htop
   hypridle
   hyprland
@@ -44,6 +45,7 @@ pacman_pkgs=(
   swaync
   thunar
   ttf-cascadia-code-nerd
+  ttf-joypixels
   tumbler
   vivid
   vlc
@@ -86,8 +88,8 @@ function gen_ignore_list {
   command -v swaync > /dev/null   || ignore+=(".config/swaync*")
   command -v waybar > /dev/null   || ignore+=(".config/waybar*")
   command -v wlogout > /dev/null  || ignore+=(".config/wlogout*")
+  command -v kitty > /dev/null    || ignore+=(".config/kitty*")
   # Shell
-  command -v kitty > /dev/null || ignore+=(".config/kitty*")
   command -v nu > /dev/null    || ignore+=(".config/nushell*")
   command -v fish > /dev/null  || ignore+=(".config/fish*")
   command -v zsh > /dev/null   || ignore+=(".zshrc")

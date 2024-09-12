@@ -12,7 +12,7 @@ function main {
 
   barg.parse "${@}" << BARG || {
   #[progname="DOTF", subcmdr='true']
-  #[subcmds="install,uninstall,help,config"]
+  #[subcmds="install uninstall help config"]
   @install {
     h/help => "help"
     r/reset => "reset"

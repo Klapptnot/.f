@@ -15,7 +15,7 @@ function main {
   ((${#updates[@]} > 1)) && pslsa="(s)"
 
   printf -v lines '%s\\n' "${updates[@]}"
-  printf '{"text": "%s Update%s", "tooltip":"%s"}' "${#updates[@]}" "${pslsa}" "${lines}"
+  printf '{"text": "%s Update%s", "tooltip":"%s"}' "${#updates[@]}" "${pslsa}" "${lines%%\\n}"
 }
 
 main "${@}"

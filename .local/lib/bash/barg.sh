@@ -183,7 +183,6 @@ function barg.parse() {
           fi
           ;;
         '-'*)
-          local err_str="${argv[*]:(index - 1):(index + 1)}"
           barg.exit "Param-like value" "Value for '${argv[(index - 1)]}' looks like an option/flag. Use '--- ${argv[index]}' to bypass" 18
           ;;
         *)
@@ -431,17 +430,20 @@ function barg.parse() {
   local BARG_SUBCOMMAND_NEEDS_EXTRAS=true
   # Try to get the possible sub command
   if [ -n "${__barg_opts__[subcmds]}" ]; then
-    local subcommands="${__barg_opts__[subcmds]//\ \=/ }"
-    if [[ " ${subcommands} " == *" ${argv[0]} "* ]]; then
+    # shellcheck disable=SC2206
+    local subcommands=(${__barg_opts__[subcmds]})
+    : "${subcommands[*]/#=}"
+    if [[ " ${_} " == *" ${argv[0]} "* ]]; then
     [[ " ${__barg_opts__[subcmds]} " == *" =${argv[0]} "* ]] && BARG_SUBCOMMAND_NEEDS_EXTRAS=false
       BARG_SUBCOMMAND="${argv[0]}"
       BARG_EXTRAS_BEFORE[0]="" # Let it empty to remove it from extras
     fi
   fi
   if [ "${__barg_opts__[subcmdr]}" == "true" ] && [ -n "${__barg_opts__[subcmds]}" ] && [ -z "${BARG_SUBCOMMAND}" ]; then
-    local subcommands="${__barg_opts__[subcmds]//\ \=/ }"
-    subcommands="${subcommands//\ /,\ }"
-    barg.exit "Missing subcommand" "A subcommand is required, one of ${subcommands% *} or ${subcommands##* }" 21
+    # shellcheck disable=SC2206
+    local subcommands=(${__barg_opts__[subcmds]})
+    : "${subcommands[*]/#=}" && : "${_//\ /,\ }"
+    barg.exit "Missing subcommand" "A subcommand is required, one of ${_% *} or ${_##* }" 21
   fi
 
   local __ignore__=false

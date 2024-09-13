@@ -579,7 +579,9 @@ function barg.parse() {
         fi
       fi
     elif [ -z "${!var_name@A}" ]; then
-      __defer_error=("Missing required arguments" "${signat} is a required argument" 113)
+      if ${__required__} && ! ${last_run}; then
+        __defer_error=("Missing required arguments" "${signat} is a required argument" 113)
+      fi
     fi
 
     __status__=${last_run}

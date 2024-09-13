@@ -10,10 +10,14 @@
 
 # shellcheck disable=SC1090
 source ~/.local/lib/bash/rsum.sh
+source ~/.local/lib/bash/barg.sh
 
 function main {
-  local what="${1:?Need something do: \{hwman,artup,artdown,title,artist,album,player,elapsed\}}"
-  shift 1
+  barg.parse "${@}" << BARG || _ "${null:?Need something to do}"
+  #[progname='medialock']
+  #[subcmdr='true', subcmds='=artup =artdown =hwman metadata']
+  #[extras='PARAM', reqextras='true']
+BARG
 
   # Icon is the action to be made, not the status, except stop
   declare -A states=(
@@ -23,26 +27,41 @@ function main {
   )
   MEDIA_ART_CACHE_LOC=~/.cache/hyprland/medialock.cache
 
-  if [ "${what}" == "artup" ]; then
+  if [ "${BARG_SUBCOMMAND}" == "artup" ]; then
     test -f "${MEDIA_ART_CACHE_LOC}" && rm "${MEDIA_ART_CACHE_LOC}" 2> /dev/null
     touch "${MEDIA_ART_CACHE_LOC}"
     media-art-cache &> /dev/null &
     return
-  elif [ "${what}" == "artup" ]; then
+  elif [ "${BARG_SUBCOMMAND}" == "artdown" ]; then
     test -f "${MEDIA_ART_CACHE_LOC}" && rm "${MEDIA_ART_CACHE_LOC}" 2> /dev/null
     return
-  elif [ "${what}" == "hwman" ]; then
+  elif [ "${BARG_SUBCOMMAND}" == "hwman" ]; then
     hyprlock-mw-source-manager &> /dev/null &
     return
   fi
 
+  # If subcommand is `metadata`
+
+  local res
+  local what="${PARAM[0]}"
   local format_it='\{\{([a-z_]+)\}\}'
   while [[ "${what}" =~ ${format_it} ]]; do
     IFS=$'\n' read -r res < <(media-metadata-get "${BASH_REMATCH[1]}")
     what="${what//"${BASH_REMATCH[0]}"/"${res}"}"
   done
 
-  printf '%s' "${what}"
+  if [ -n "${res}" ]; then
+    printf '%b' "${what}"
+    return
+  fi
+
+  local res_list=()
+  for what in "${PARAM[@]}"; do
+    if res=$(media-metadata-get "${what}"); then
+      res_list+=("${res}")
+    fi
+  done
+  printf '%s\n' "${res_list[@]}"
 }
 
 function media-art-cache {
@@ -119,6 +138,9 @@ function media-metadata-get {
       else
         printf '%s' "${METAINFO,,}"
       fi
+      ;;
+    *)
+      return 1
       ;;
   esac
 }

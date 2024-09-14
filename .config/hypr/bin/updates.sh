@@ -5,11 +5,12 @@ function main {
     mapfile -t updates < <(yay -Qu | column -t | sed 's/^\([^ ]*\)/<b>\1<\/b>/g')
   elif command -v pacman &>/dev/null; then
     mapfile -t updates < <(pacman -Qu | column -t | sed 's/^\([^ ]*\)/<b>\1<\/b>/g')
-  else
-    [ "${1}" == 'show' ] && exit 1
-    exit
   fi
-  [ "${1}" == 'show' ] && exit
+
+  if [ "${1}" == 'show' ]; then
+    ((${#updates[@]}>0))
+    exit ${?}
+  fi
 
   local pslsa=""
   ((${#updates[@]} > 1)) && pslsa="(s)"

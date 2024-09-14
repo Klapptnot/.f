@@ -599,23 +599,18 @@ function barg.parse() {
     fi
   fi
 
+  local extras_count=0
+  local grbg="${__barg_opts__[extras]}"
   for item in "${BARG_EXTRAS_BEFORE[@]}"; do
     if [[ -n "${item}" ]]; then
-      declare -a "BARG_EXTRAS+=(\"${item}\")"
+      declare -ag "${grbg}+=(\"${item//\"/\\\"}\")"
+      ((extras_count++))
     fi
   done
 
-  if ${__barg_opts__[reqextras]} && [ "${#BARG_EXTRAS[@]}" -eq 0 ]; then
+  if ${__barg_opts__[reqextras]} && ((extras_count < 1)); then
     if [ -z "${BARG_SUBCOMMAND}" ] || [ -n "${BARG_SUBCOMMAND}" ] && ${BARG_SUBCOMMAND_NEEDS_EXTRAS}; then
       barg.exit "Missing arguments" "positional arguments are required" 120
     fi
-  fi
-
-  local grbg="${__barg_opts__[extras]}"
-  if [ 'null' != "${grbg:-null}" ]; then
-    # shellcheck disable=SC2145
-    declare -ga "${grbg}=(${BARG_EXTRAS[*]@Q})"
-  else
-    declare -ga BARG_EXTRAS=("${BARG_EXTRAS[@]}")
   fi
 }

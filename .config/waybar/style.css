@@ -247,6 +247,7 @@ window.empty #window {
   color: #f28fad;
 }
 
+#mpris,
 #custom-playerctl {
   /* {icon} name - artist */
   background: #161320;

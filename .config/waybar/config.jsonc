@@ -12,10 +12,10 @@
   "modules-right": [
     "tray",
     "custom/notification",
-    "custom/playerctl",
+    "mpris",
     "custom/media",
     "group/network-grp",
-    "backlight",
+    // "backlight",
     "group/audio-grp",
     "clock",
     "group/battery-grp",
@@ -70,14 +70,14 @@
   "mpris": {
     "format": "{player_icon} {status_icon} {dynamic}",
     "interval": 1,
-    "dynamic-len": 40,
-    "max-length": 32,
+    "dynamic-len": 3200,
+    "max-length": 36,
     "status-icons": {
-      "playing": "",
-      "paused": "",
+      "playing": "",
+      "paused": "",
       "stopped": ""
     },
-    "player_icons": {
+    "player-icons": {
       "chromium": "",
       "spotify": " "
     },
@@ -94,8 +94,8 @@
     "format-bluetooth-muted": "   Muted",
     "on-click": "pamixer -t",
     "on-click-right": "pavucontrol",
-    "on-scroll-up": "pamixer -i 5",
-    "on-scroll-down": "pamixer -d 5",
+    "on-scroll-up": "pamixer -i 2",
+    "on-scroll-down": "pamixer -d 2",
     "scroll-step": 5,
     "format-icons": {
       "headphone": "",
@@ -117,8 +117,8 @@
     "format-source": "󰍬 {volume}%",
     "format-source-muted": "󰍭 Muted",
     "on-click": "pamixer --default-source -t",
-    "on-scroll-up": "pamixer --default-source -i 5",
-    "on-scroll-down": "pamixer --default-source -d 5",
+    "on-scroll-up": "pamixer --default-source -i 2",
+    "on-scroll-down": "pamixer --default-source -d 2",
     "scroll-step": 5,
     "smooth-scrolling-threshold": 1
   },
@@ -141,8 +141,8 @@
       ]
     },
     "on-click": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
-    "on-scroll-up": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+",
-    "on-scroll-down": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"
+    "on-scroll-up": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 2%+",
+    "on-scroll-down": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 2%-"
   },
   "hyprland/window": {
     "format": "{}",
@@ -177,7 +177,7 @@
     "format-disconnected": "󰤮 N/A",
     "tooltip-format": "{ipaddr} => {bandwidthTotalBytes} ({signalStrength}%)",
     "max-width": 32,
-    "on-click": "~/.config/hypr/bin/rofim.sh wifi"
+    "on-click": "~/.config/hypr/bin/launch rofi-wifi"
   },
   "backlight": {
     "tooltip": false,
@@ -200,8 +200,8 @@
       "",
       ""
     ],
-    "on-scroll-up": "brightness set 5%+",
-    "on-scroll-down": "brightness set 5%-",
+    "on-scroll-up": "brightnessctl set 5%+",
+    "on-scroll-down": "brightnessctl set 5%-",
     "smooth-scrolling-threshold": 1
   },
   "battery": {
@@ -301,9 +301,9 @@
     "children-class": "motherboard-item",
     "modules": [
       "cpu",
-      "memory",
-      "temperature"
-      // "disk"
+      "memory"
+      // "temperature", // For some reason, this does not work for me, idc
+      // "disk" # I don't need this
     ]
   },
   "group/audio-grp": {
@@ -338,7 +338,7 @@
     "exec": "~/.config/hypr/bin/updates.sh",
     "exec-if": "~/.config/hypr/bin/updates.sh show",
     "interval": 15,
-    "on-click": "kitty -e yay -Syu && notify-send 'The system has been updated'"
+    "on-click": "kitty -e yay -Syyu && notify-send 'The system has been updated'"
   },
   "custom/playerctl": {
     "format": "<span>{icon}{}</span>",
@@ -348,7 +348,7 @@
     },
     "return-type": "json",
     "max-length": 32,
-    "exec": "playerctl -a metadata --format '{\"text\": \"{{markup_escape(title)}} ~ {{artist}}\", \"tooltip\": \"{{playerName}} : {{markup_escape(title)}}\", \"alt\": \"{{status}}\", \"class\": \"{{status}}\"}' -F",
+    "exec": "~/.config/hypr/bin/medialock waybar",
     "on-click": "playerctl play-pause",
     "on-scroll-up": "playerctl next",
     "on-scroll-down": "playerctl previous",

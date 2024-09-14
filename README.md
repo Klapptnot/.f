@@ -2,19 +2,16 @@
 
 <p align="center">
   <b>Simple dotfiles for a minimal productive workflow</b>
+</p>
+
+<p align="center">
   <img src="https://raw.githubusercontent.com/catppuccin/catppuccin/main/assets/palette/macchiato.png" width="400" />
 </p>
 
 <p align="center">
-  <a href="https://github.com/Klapptnot/dotf/stargazers">
-    <img src="https://img.shields.io/github/stars/Klapptnot/dotf?style=for-the-badge&color=cba6f7" alt="GitHub Stars" />
-  </a>
-  <a href="https://github.com/Klapptnot/dotf/network/members">
-    <img src="https://img.shields.io/github/forks/Klapptnot/dotf?style=for-the-badge&color=f38ba8" alt="GitHub Forks" />
-  </a>
-  <a href="https://github.com/Klapptnot/dotf/commits">
-    <img src="https://img.shields.io/github/last-commit/Klapptnot/dotf?style=for-the-badge&color=eba0ac" alt="GitHub Last Commit" />
-    </a>
+  <a href="https://github.com/Klapptnot/dotf/stargazers"><img src="https://img.shields.io/github/stars/Klapptnot/dotf?style=for-the-badge&color=cba6f7" alt="GitHub Stars" /></a>
+  <a href="https://github.com/Klapptnot/dotf/network/members"><img src="https://img.shields.io/github/forks/Klapptnot/dotf?style=for-the-badge&color=f38ba8" alt="GitHub Forks" /></a>
+  <a href="https://github.com/Klapptnot/dotf/commits"><img src="https://img.shields.io/github/last-commit/Klapptnot/dotf?style=for-the-badge&color=eba0ac" alt="GitHub Last Commit" /></a>
 </p>
 
 Table of Contents

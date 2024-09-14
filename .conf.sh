@@ -80,6 +80,7 @@ function post_install {
 
 function gen_ignore_list {
   ignore=(
+    "README.md"
     "dotf"
     ".conf.sh"
     "misc*"

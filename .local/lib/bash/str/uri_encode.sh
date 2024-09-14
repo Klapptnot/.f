@@ -1,0 +1,16 @@
+function str.uri_encode {
+  local input=''
+  input="$(cat -)"
+
+  local encoded=""
+  local LC_ALL=C # support unicode = loop bytes, not characters
+  for ((i = 0; i < ${#input}; i++)); do
+    # Python's urllib.parse.quote leaves `/` without encoding
+    if [[ "${input:i:1}" =~ ^[a-zA-Z0-9.~_-]$ ]]; then
+      printf -v encoded "%s%s" "${encoded}" "${input:i:1}"
+    else
+      printf -v encoded "%s%%%02X" "${encoded}" "'${input:i:1}"
+    fi
+  done
+  printf '%s' "${encoded}"
+}

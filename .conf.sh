@@ -22,6 +22,8 @@ pacman_pkgs=(
   fzf
   git
   github-cli
+  gnome-control-center
+  gnome-settings-daemon
   grim
   gucharmap
   htop
@@ -68,6 +70,10 @@ nfolders=(
 )
 
 function post_install {
+  [ -e "${HOME}/.geoinfo" ] || {
+    [ -z "${USER_GEOINFO}" ] && log w "No geographic info given, leaving empty"
+    echo "${USER_GEOINFO}" > "${HOME}/.geoinfo"
+  }
   CARAPACE_BRIDGES='zsh,fish,bash,inshellisense' carapace _carapace nushell > ~/.cache/carapace/init.nu
   bat cache --build &>/dev/null
 }

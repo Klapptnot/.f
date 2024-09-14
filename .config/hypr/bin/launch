@@ -10,15 +10,15 @@
 # Interesting... it's our duty as Minecraft players
 # to abuse this mechanic.
 
-source ~/.local/lib/bash/strtoys.sh
+source ~/.local/lib/bash/str/strip.sh
 source ~/.local/lib/bash/rsum.sh
 source ~/.local/lib/bash/logger.sh
 
 function main {
-  local mode="${1:?A mode is needed: \{runner, clipboard, emoji, wifi, bluetooth\}}"
+  local mode="${1:?A launch app/mode is needed}"
   shift 1
 
-  command -v rofi &> /dev/null || {
+  [[ "${mode}" == 'rofi-'* ]] && ! command -v rofi &> /dev/null && {
     log e "Rofi not installed or not in PATH" >&2
     exit
   }
@@ -29,10 +29,10 @@ function main {
 
   killall rofi &> /dev/null
   case "${mode}" in
-    runner)
-      rofi -show drun -theme ~/.config/rofi/drun.rasi
+    rofi-runner)
+      rofi -show drun -theme ~/.config/rofi/drun.rasi || exit
       ;;
-    clipboard)
+    rofi-clipboard)
       cliphist list |
         sed 's/\([0-9]*\)\t\(.*\)/\2\r\1/g' | # The \t is ugly
         rofi -dmenu -p '   Clip ' -theme ~/.config/rofi/clipboard.rasi |
@@ -40,19 +40,22 @@ function main {
         cliphist decode |
         wl-copy
       ;;
-    emoji)
+    rofi-emoji)
       python3 ~/.config/hypr/bin/emoji.py list |
         rofi -dmenu -p ' 󰱨 Emoji ' -theme ~/.config/rofi/emoji.rasi |
         python3 ~/.config/hypr/bin/emoji.py decode |
         wl-copy
       ;;
-    wifi)
+    rofi-wifi)
       while true; do
         rofi-wifi-menu-do || break
       done
       ;;
-    bluetooth)
+    rofi-bluetooth)
       return
+      ;;
+    gnome-control-center)
+      XDG_CURRENT_DESKTOP=GNOME XDG_SESSION_DESKTOP=gnome gnome-control-center &
       ;;
   esac
 }
@@ -77,7 +80,7 @@ function rofi-wifi-menu-populate {
   mapfile ACTIVEs_P < <(nmcli --fields ACTIVE device wifi list)
 
   for ((i = 1; i < ${#ACTIVEs_P[@]}; i++)); do
-    [[ "$(str.strip "${ACTIVEs_P[i]}")" == 'yes' ]] && {
+    [[ "$(str.strip <<<"${ACTIVEs_P[i]}")" == 'yes' ]] && {
       active_wifi="${i}"
       break
     }
@@ -89,11 +92,11 @@ function rofi-wifi-menu-populate {
   local rofi_menu_str_alt=""
   local rofi_menu_alt=()
   for ((i = 1; i < ${#SSIDs_F[@]}; i++)); do
-    SSIDs_F[i]="$(str.strip "${SSIDs_F[i]}")"
-    BSSIDs_F[i]="$(str.strip "${BSSIDs_F[i]}")"
-    SECURITYs_F[i]="$(str.strip "${SECURITYs_F[i]}")"
-    BARSs_P[i]="$(str.strip "${BARSs_P[i]}")"
-    DEVICEs_P[i]="$(str.strip "${DEVICEs_P[i]}")"
+    SSIDs_F[i]="$(str.strip <<<"${SSIDs_F[i]}")"
+    BSSIDs_F[i]="$(str.strip <<<"${BSSIDs_F[i]}")"
+    SECURITYs_F[i]="$(str.strip <<<"${SECURITYs_F[i]}")"
+    BARSs_P[i]="$(str.strip <<<"${BARSs_P[i]}")"
+    DEVICEs_P[i]="$(str.strip <<<"${DEVICEs_P[i]}")"
     test "${active_wifi}" == "${i}" && DEVICEs_P[i]="${DEVICEs_P[i]} ***"
     printf -v rofi_menu_str '  %-16s  %s  %s  %s\rconnect_to %d' "${SSIDs_F[i]}" \
       "${SECURITYs_F[i]}" \

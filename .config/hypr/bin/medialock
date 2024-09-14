@@ -11,12 +11,15 @@
 # shellcheck disable=SC1090
 source ~/.local/lib/bash/rsum.sh
 source ~/.local/lib/bash/barg.sh
+source ~/.local/lib/bash/str/markup_escape.sh
+source ~/.local/lib/bash/str/uri_encode.sh
 
 function main {
   barg.parse "${@}" << BARG || _ "${null:?Need something to do}"
   #[progname='medialock']
-  #[subcmdr='true', subcmds='=artup =artdown =hwman metadata']
+  #[subcmdr='true', subcmds='=artup =artdown =hwman =waybar metadata']
   #[extras='PARAM', reqextras='true']
+  @metadata m/markup[bool] => MARKUP_ESCAPE || u/uri[bool] => URI_ESCAPE
 BARG
 
   # Icon is the action to be made, not the status, except stop
@@ -38,13 +41,17 @@ BARG
   elif [ "${BARG_SUBCOMMAND}" == "hwman" ]; then
     hyprlock-mw-source-manager &> /dev/null &
     return
+  elif [ "${BARG_SUBCOMMAND}" == "waybar" ]; then
+    PARAM[0]='{"text": "{{title}} ~ {{artist}}", "tooltip": "Player: {{playerName}} => {{title}}", "alt": "{{statusicon}} {{elapsed}} - {{duration}}", "class": "{{status}}"}'
+    MARKUP_ESCAPE=true
+    URI_ESCAPE=false
   fi
 
   # If subcommand is `metadata`
 
   local res
   local what="${PARAM[0]}"
-  local format_it='\{\{([a-z_]+)\}\}'
+  local format_it='\{\{([a-zA-Z_]+)\}\}'
   while [[ "${what}" =~ ${format_it} ]]; do
     IFS=$'\n' read -r res < <(media-metadata-get "${BASH_REMATCH[1]}")
     what="${what//"${BASH_REMATCH[0]}"/"${res}"}"
@@ -87,33 +94,25 @@ function media-metadata-get {
   local METAINFO="none"
   case "${what}" in
     'title' | 'artist' | 'album' | 'playerName')
-      read -r METAINFO < <(playerctl -f "{{${what}}}" metadata)
-      if ((${#METAINFO} > 25)); then
-        METAINFO="${METAINFO:0:24}…"
-      fi
-      printf '%s' "${METAINFO}"
+      read -r METAINFO < <(playerctl -f "{{trunc(${what}, 24)}}" metadata)
       ;;
     'duration'*)
       read -r METAINFO < <(playerctl -f "{{mpris:length}}" metadata)
       METAINFO="$((METAINFO / 1000000))" # Now it's in seconds
 
-      if [[ "${what}" == *"sec" ]]; then
-        printf '%d' "${METAINFO}"
-      else
+      if [[ ! "${what}" == *"sec" ]]; then
         local MINS="$((METAINFO / 60))"
         local SECS="$((METAINFO % 60))"
-        printf '%d:%02d' "${MINS}" "${SECS}"
+        printf -v METAINFO '%d:%02d' "${MINS}" "${SECS}"
       fi
       ;;
     'elapsed'*)
       read -r METAINFO < <(playerctl position)
       METAINFO="${METAINFO%%.*}" # Now it's only seconds
-      if [[ "${what}" == *"sec" ]]; then
-        printf '%d' "${METAINFO}"
-      else
+      if [[ ! "${what}" == *"sec" ]]; then
         local MINS="$((METAINFO / 60))"
         local SECS="$((METAINFO % 60))"
-        printf '%d:%02d' "${MINS}" "${SECS}"
+        read -r METAINFO < <(printf '%d:%02d' "${MINS}" "${SECS}")
       fi
       ;;
     'progress'*)
@@ -125,24 +124,34 @@ function media-metadata-get {
       if [[ "${what}" == *"bar" ]]; then
         ELAPSED="$((ELAPSED / 3))"
         local ELAPSEDR="$((33 - ELAPSED))"
-        printf "%${ELAPSED}s" | tr ' ' '-' | printf -- "$(cat -)%${ELAPSEDR}s"
+        IFS=$'\n' read -r METAINFO < <(
+          printf "%${ELAPSED}s" |
+            tr ' ' '-' |
+            printf -- "$(cat -)%${ELAPSEDR}s"
+        )
       else
-        printf '%s' "${ELAPSED}"
+        METAINFO="${ELAPSED}"
       fi
       ;;
     'status'*)
       read -r METAINFO < <(playerctl status)
       if [[ "${what}" == *"icon" ]]; then
         # Icon is the action to be made, not the status, except stop
-        printf '%s' "${states[${METAINFO,,}]}"
+        METAINFO="${states[${METAINFO,,}]}"
       else
-        printf '%s' "${METAINFO,,}"
+        METAINFO="${METAINFO,,}"
       fi
       ;;
     *)
       return 1
       ;;
   esac
+  if ${MARKUP_ESCAPE}; then
+    read -r METAINFO < <(str.markup_escape <<<"${METAINFO}")
+  elif ${URI_ESCAPE}; then
+    read -r METAINFO < <(str.uri_encode <<<"${METAINFO}")
+  fi
+  printf '%s' "${METAINFO}"
 }
 
 function hyprlock-mw-source-manager {

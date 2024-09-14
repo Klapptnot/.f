@@ -301,6 +301,7 @@ function do_uninstall {
 
 # shellcheck disable=SC2155
 function git_version_gen {
+  git fetch &>/dev/null
   read -r remote < <(git rev-parse --abbrev-ref --symbolic-full-name '@{u}')
 
   read -r local_c < <(git rev-list --count HEAD)

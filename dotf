@@ -1,6 +1,32 @@
 #! /bin/env bash
 # Installation script
 # shellcheck disable=SC1091
+
+# When using the one-line from GitHub (or source <this>)
+if [[ "${BASH_SOURCE[0]}" != "${0}" ]]; then
+  if ((BASH_VERSINFO[0] < 5)); then
+    printf '%s\n' "For bash 4 or less, clone the repo and run the script normally"
+    exit 1
+  fi
+  if [ -d "${HOME}/dotf" ]; then
+    if [ -e "${HOME}/dotf" ]; then
+      printf '%s\n' "A regular file named \`dotf\` is located in home folder"
+    else
+      printf '%s\n' "Probably already downloaded, check your home folder"
+    fi
+    exit 1
+  fi
+  if ! command -v git &> /dev/null; then
+    printf '%s\n' "\`git\` is not installed, install git and try again" >&2
+    exit 1
+  fi
+  printf '%s\n' "Getting files"
+  git clone --depth=1 https://github.com/Klapptnot/dotf.git "${HOME}/dotf"
+  printf '%s\n' "Starting install"
+  set -- install
+  BASH_ARGV0="${HOME}/dotf/dotf"
+fi
+
 source ./.local/lib/bash/barg.sh || exit
 source ./.local/lib/bash/printfc.sh || exit
 source ./.local/lib/bash/logger.sh || exit
@@ -10,18 +36,21 @@ function main {
   MELOC="$(dirname "${MEPATH}")"
   MENAME="$(basename "${MEPATH}")"
 
+  cd "${MELOC}" || exit 1
+
   barg.parse "${@}" << BARG || {
   #[progname="DOTF", subcmdr='true']
-  #[subcmds="install uninstall help config"]
+  #[subcmds="install uninstall help config version"]
   @install {
     h/help => "help"
     r/reset => "reset"
     u/update => "update"
   } |> "normal" => INSTALL_MODE
-  @install s/shell[str] |> "nushell" => INSTALL_SHELL
+  @install g/geoinf[str] => USER_GEOINFO
+  @install I/no-pkgs[bool] => NO_INSTALL_PKGS
   f/force[bool] => FORCE_OPERATION
 BARG
-    echo "See ${MENAME} help"
+    printf '%s\n' "See help, run \`${MENAME} help\`"
     exit 1
   }
 
@@ -46,7 +75,8 @@ BARG
           exit
         fi
       fi
-      do_install ;;
+      do_install
+      ;;
     uninstall) do_uninstall ;;
     config)
       if ! command -v nvim &> /dev/null; then
@@ -54,8 +84,20 @@ BARG
         exit
       fi
       nvim "${MELOC}/.conf.sh"
-    ;;
+      ;;
     help) do_help ;;
+    version)
+      {
+        read -r new_commits
+        read -r remote_version
+        read -r local_version
+      } < <(git_version_gen)
+
+      printf '%s %s\n' "Klapptnot/dotf" "${local_version}"
+      if ((new_commits > 0)); then
+        printf '\n%s\n' "Updates available (${remote_version}), to update run \`${MENAME} install --update\`"
+      fi
+      ;;
   esac
 }
 
@@ -68,9 +110,9 @@ function do_help {
     '  uninstall          - Uninstall all dotfiles\n'
     '  config             - Open the configuration file (neovim)\n'
     '  help               - Show this message and exit\n'
-    '  version            - Show version and exit\n\n'
+    '  version            - Show version, check updates and exit\n\n'
     '\x1b[4mNotes:\x1b[24m\n'
-    'The script will automatically detect your shell and configure it accordingly.\n'
+    'The script will detect the installed applications and configure them accordingly.\n'
     'You can customize the installation process by editing the config file.\n\n'
     '\x1b[4mSupported shells:\x1b[24m\n'
     '  bash, nushell, fish, zsh\n'
@@ -84,6 +126,11 @@ function do_help {
     '    -h, --help              Show this message and exit\n'
     '    -r, --reset             Reset the dotfiles installation\n'
     '    -u, --update            Update the dotfiles\n'
+    '    -g, --geoinf <loc>      Your city and country name, for weather info\n'
+    '    -I, --no-pkgs           Skip packages installation process\n\n'
+    '\x1b[4mNotes:\x1b[24m\n'
+    'Run `''dotf install -I` to update linked files after manual package additions.\n'
+    'Use `''-f` to force linking, replacing existing files with links in the config path.'
   )
 
   if [ "${1}" == "install" ]; then
@@ -92,6 +139,23 @@ function do_help {
     printfc "${help[*]}"
   fi
   exit
+}
+
+function do_symlink_cleaning {
+  local source="${1}"
+  local target="${2}"
+
+  mapfile -t broken_links < <(find "${target}" -type l ! -exec test -e {} ';' -print)
+  mapfile -t linked_to < <(realpath -LP "${broken_links[@]}")
+
+  local cleaned=()
+  for ((i = 0; i < ${#broken_links[@]}; i++)); do
+    [[ "${linked_to[i]}" != "${MELOC}"* ]] && continue
+    unlink "${broken_links[i]}"
+    cleaned+=("${broken_links[i]}")
+  done
+
+  ((${#cleaned[@]} > 0)) && log i 'Cleaned (%n) broken links' "${#cleaned[@]}"
 }
 
 function do_symlink_tree {
@@ -117,12 +181,12 @@ function do_symlink_tree {
 
   eval "find ${source} ${find_args[*]} -type f" | while read -r line; do
     local f="${target}/${line#"${source}"/}"
-    if [ ! -e "${f}" ]; then
-      ln -s "${line}" "${f}"
-    elif ${FORCE_OPERATION}; then
-      if [ -L "${f}" ]; then unlink "${f:?}"; else rm -fr "${f:?}"; fi
-      ln -s "${line}" "${f}"
+    if [ -e "${f}" ]; then
+      if [ -L "${f}" ]; then
+        unlink "${f:?}"
+      else ${FORCE_OPERATION} && rm -fr "${f:?}"; fi
     fi
+    ln -s "${line}" "${f}"
   done
 }
 
@@ -133,15 +197,14 @@ function do_install {
 
   if [ "${INSTALL_MODE}" == "update" ]; then
     cd "${MELOC}" || exit
-    if ! has_new_commits; then
+    if ! git_version_gen > /dev/null; then
       log i "Already up to date"
       return
     fi
     log w "All local changes will be discarded"
-    git restore "${MELOC}" &>/dev/null &&
-      git pull --force &>/dev/null &&
+    git restore "${MELOC}" &> /dev/null &&
+      git pull --force &> /dev/null &&
       log i "Successfully pulled new changes"
-
     # Source config for updates
     source "${MELOC}/.conf.sh"
   elif [ "${INSTALL_MODE}" == "reset" ]; then
@@ -151,26 +214,30 @@ function do_install {
     return
   fi
 
-  log i "Installing packages with pacman"
-  # Install packages
-  sudo pacman -S --noconfirm --needed "${pacman_pkgs[@]}"
+  ${NO_INSTALL_PKGS} && log i "User rejected packages installation"
 
-  # Install Yet Another Yogurt
-  ! command -v yay > /dev/null && {
-    log i "Yay is not installed, installing"
-    local here="${PWD}"
-    local yay_folder
-    yay_folder="$(mktemp --directory)"
-    git clone https://aur.archlinux.org/yay.git "${yay_folder}" &&
-      cd "${yay_folder}" &&
-      makepkg -si
-    cd "${here}" || exit
-    rm -rf "${yay_folder:?Path expected}"
-  }
+  if ! ${NO_INSTALL_PKGS}; then
+    log i "Installing packages with pacman"
+    # Install packages
+    sudo pacman -Syy --noconfirm --needed "${pacman_pkgs[@]}"
 
-  log i "Installing AUR packages with yay"
-  # Install yay packages
-  yay -S --answerclean All --answerdiff None --noconfirm --needed "${yay_pkgs[@]}"
+    # Install Yet Another Yogurt
+    ! command -v yay > /dev/null && {
+      log i "Yay is not installed, installing"
+      local here="${PWD}"
+      local yay_folder
+      yay_folder="$(mktemp --directory)"
+      git clone https://aur.archlinux.org/yay.git "${yay_folder}" &&
+        cd "${yay_folder}" &&
+        makepkg -si
+      cd "${here}" || exit
+      rm -rf "${yay_folder:?Path expected}"
+    }
+
+    log i "Installing AUR packages with yay"
+    # Install yay packages
+    yay -Syy --answerclean All --answerdiff None --noconfirm --needed "${yay_pkgs[@]}"
+  fi
 
   log i "Started linking process"
 
@@ -179,6 +246,10 @@ function do_install {
 
   # Make symlinks to files
   do_symlink_tree "${MELOC}" "${HOME}"
+
+  # Clean posible outdated links
+  [ "${INSTALL_MODE}" == "update" ] && log i "Cleaning broken links"
+  do_symlink_cleaning "${MELOC}" "${HOME}"
 
   # Create needed folders
   for f in "${nfolders[@]}"; do
@@ -229,19 +300,19 @@ function do_uninstall {
 }
 
 # shellcheck disable=SC2155
-function has_new_commits {
-  local remote=$(git rev-parse --abbrev-ref --symbolic-full-name '@{u}')
-  local local_head=$(git rev-parse HEAD)
-  local remote_head=$(git rev-parse "${remote}")
+function git_version_gen {
+  read -r remote < <(git rev-parse --abbrev-ref --symbolic-full-name '@{u}')
 
-  if [ "${local_head}" == "${remote_head}" ]; then
-    return 1
-  fi
+  read -r local_c < <(git rev-list --count HEAD)
+  read -r local_h < <(git rev-parse HEAD)
+  read -r remote_c < <(git rev-list --count "${remote}")
+  read -r remote_h < <(git rev-parse "${remote}")
 
-  local merge_base=$(git merge-base "${remote_head}" "${local_head}")
-  local new_commits=$(git rev-list --count "${merge_base}".."${remote_head}")
+  read -r merge_base < <(git merge-base "${remote_h}" "${local_h}")
+  read -r new_commits < <(git rev-list --count "${merge_base}".."${remote_h}")
 
-  (( new_commits > 0 )) && return 0 || return 1
+  printf '%d\n%s\n%s\n' "${new_commits}" "${remote_c}-${remote_h:0:7}" "${local_c}-${local_h:0:7}"
+  ((new_commits > 0)) && return 0 || return 1
 }
 
 main "${@}"

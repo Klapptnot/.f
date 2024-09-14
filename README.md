@@ -75,16 +75,14 @@ Previews
 
 <details>
 <summary><b>Screenshots</b></summary>
-
-![hyprlock](https://i.imgur.com/2ACDsEj.png)
-![fzf in kitty](https://i.imgur.com/PFnPoCB.png)
-![keybind](https://i.imgur.com/ozqrHBk.png)
-![keybind in neovim](https://i.imgur.com/dhun9pF.png)
-![zen browser(beef)](https://i.imgur.com/UUM3C9u.png)
-![gt tool](https://i.imgur.com/rW92qWS.png)
-![basic wifi menu](https://i.imgur.com/2loyHFa.png)
-![wlogout](https://i.imgur.com/x6uY77h.jpeg)
-
+<img alt="Hyprlock" src="https://i.imgur.com/2ACDsEj.png" />
+<img alt="FZF in Kitty" src="https://i.imgur.com/PFnPoCB.png" />
+<img alt="Keybind" src="https://i.imgur.com/ozqrHBk.png" />
+<img alt="Keybind in Neovim" src="https://i.imgur.com/dhun9pF.png" />
+<img alt="Zen Browser (Beef)" src="https://i.imgur.com/UUM3C9u.png" />
+<img alt="GT Tool" src="https://i.imgur.com/rW92qWS.png" />
+<img alt="Basic WiFi Menu" src="https://i.imgur.com/2loyHFa.png" />
+<img alt="Wlogout" src="https://i.imgur.com/x6uY77h.jpeg" />
 </details>
 
 

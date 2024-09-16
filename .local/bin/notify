@@ -8,30 +8,27 @@ function main {
   barg.parse "${@}" << EOF
   #[progname='notify']
   #[extras='PARAMS', reqextras='true']
-  #[subcmds="send =list =read =help"]
-  {
-    b/both => "both"
-    n/ntfy => "ntfy"
-  } |> "dbus" => NOTIFICATION_HANDLER
-  @send {
-    c/critical => "max"
-    h/high => "high"
-    l/low => "low"
-    m/min => "min"
-  } |> "default" => NOTIFICATION_PRIORITY
+  #[subcmds="send =list =help"]
 
-  // dbus exclusive
+  @send h/handler [
+    "dbus" "ntfy" "both"
+  ] => NOTIFICATION_HANDLER
+
+  @send p/priority [
+    "def" "max" "high" "low" "min"
+  ] => NOTIFICATION_PRIORITY
+
+  @send t/tags[vec[str]] => NOTIFICATION_TAGS
+  @send a/action[vec[str]] => NOTIFICATION_ACTIONS
+
+  # dbus exclusive
   @send n/app-name[str] |> "NotifyCLI" => NOTIFICATION_APP_NAME
   @send i/icon[str] |> "notification-active" => NOTIFICATION_ICON
   @send I/id[int] |> "0" => NOTIFICATION_ID
   @send e/expire[int] |> "-1" => NOTIFICATION_EXPIRE_TIME
   @send d/delete-action[str] => NOTIFICATION_ACTION_DEL
 
-  // both
-  @send t/tags[vec[str]] => NOTIFICATION_TAGS
-  @send a/action[vec[str]] => NOTIFICATION_ACTIONS
-
-  // nfty exclusive
+  # nfty exclusive
   @send A/attach[str] => NOTIFICATION_ATTACHMENT
   @send E/email[str] => NOTIFICATION_EMAIL
   @send D/defer[str] => NOTIFICATION_DEFER
@@ -49,7 +46,7 @@ EOF
       fi
       ;;
     list) true ;;
-    read) true ;;
+    help) show_help ;;
   esac
 }
 
@@ -68,7 +65,7 @@ function send.ntfy {
   case "${NOTIFICATION_PRIORITY}" in
     "max") priority=5 ;;
     "high") priority=4 ;;
-    "default") priority=3 ;;
+    "def") priority=3 ;;
     "low") priority=2 ;;
     "min") priority=1 ;;
   esac
@@ -117,7 +114,10 @@ function send.ntfy {
   )
 
   [ -n "${attached}" ] && http_data+=("Attach: ${attached}")
-  [ -n "${mime_type}" ] && http_data+=("Content-Type: ${mime-type}")
+  [ -n "${mime_type}" ] && {
+    http_data+=("Content-Type: ${mime-type}")
+    http_data+=("Message: ${notification_body}")
+  }
   [ -n "${attached_filename}" ] && http_data+=("Filename: ${attached_filename}")
   [ -n "${NOTIFICATION_EMAIL}" ] && http_data+=("Email: ${NOTIFICATION_EMAIL}")
   [ -n "${NOTIFICATION_CLICK}" ] && http_data+=("Click: ${NOTIFICATION_CLICK}")
@@ -241,6 +241,54 @@ function dbus.notification_eventloop {
   done < <(sed -nu 's/^.*org\.freedesktop\.Notifications\.\([A-Za-z]\+\)\ (\(.*\))$/\1 \2/p' "${fd}")
 
   rm "${fd}"
+}
+
+function show_help {
+    local help_lines=(
+    "\x1b[1;34mnotify\x1b[0m: Sends notifications to dbus and the ntfy.sh service"
+    ""
+    "\x1b[1;34mUsage:\x1b[0m"
+    "  notify send [options] <title> [<body>...]"
+    "  notify list [options]"
+    "  notify help"
+    ""
+    "\x1b[1;34mSubcommands:\x1b[0m"
+    "  send ...    Send a notification"
+    "  list ...    List available notifications"
+    "  help        Show this help message and exit"
+    ""
+    "\x1b[1;34mNotification handler options:\x1b[0m"
+    "  -h, --handler <str>    Use <str> notification handler"
+    "                         One of dbus, ntfy or both"
+    "  -p, --priority <str>   Set notification priority to max"
+    "                         From max, high, def, low or min"
+    ""
+    "\x1b[1;34mSend subcommand options:\x1b[0m"
+    "  -t, --tags <vec[str]>    Set notification tags"
+    "  -a, --action <vec[str]>  Set notification actions"
+    ""
+    "\x1b[1;34mDbus handler exclusive options:\x1b[0m"
+    "  -n, --app-name <str>  Set notification app name (default: NotifyCLI)"
+    "  -i, --icon <str>      Set notification icon (default: notification-active)"
+    "  -I, --id <int>        Set notification ID (default: 0)"
+    "  -e, --expire <int>    Set notification expire time (default: -1)"
+    "  -d, --delete <str>    Set notification delete action"
+    ""
+    "\x1b[1;34mNtfy handler exclusive options:\x1b[0m"
+    "  -A, --attach <str>  Set notification attachment, URL or file path"
+    "  -E, --email <str>   Send email to <str>"
+    "  -D, --defer <str>   Send notification at <str> time"
+    "  -C, --click <str>   Set notification click action"
+    ""
+    "\x1b[1;34mList subcommand options:\x1b[0m"
+    "  -j, --json  Output notifications list in JSON format"
+    ""
+    "\x1b[1;34mExamples:\x1b[0m"
+    "  notify send -h both 'Hello World' 'This is a test notification'"
+    "  notify list"
+  )
+
+  printf '%b\n' "${help_lines[@]}"
 }
 
 main "${@}"

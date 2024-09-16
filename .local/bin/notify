@@ -1,0 +1,246 @@
+#! /bin/env bash
+
+source ~/.local/lib/bash/barg.sh
+source ~/.local/lib/bash/rsum.sh
+source ~/.local/lib/bash/logger.sh
+
+function main {
+  barg.parse "${@}" << EOF
+  #[progname='notify']
+  #[extras='PARAMS', reqextras='true']
+  #[subcmds="send =list =read =help"]
+  {
+    b/both => "both"
+    n/ntfy => "ntfy"
+  } |> "dbus" => NOTIFICATION_HANDLER
+  @send {
+    c/critical => "max"
+    h/high => "high"
+    l/low => "low"
+    m/min => "min"
+  } |> "default" => NOTIFICATION_PRIORITY
+
+  // dbus exclusive
+  @send n/app-name[str] |> "NotifyCLI" => NOTIFICATION_APP_NAME
+  @send i/icon[str] |> "notification-active" => NOTIFICATION_ICON
+  @send I/id[int] |> "0" => NOTIFICATION_ID
+  @send e/expire[int] |> "-1" => NOTIFICATION_EXPIRE_TIME
+  @send d/delete-action[str] => NOTIFICATION_ACTION_DEL
+
+  // both
+  @send t/tags[vec[str]] => NOTIFICATION_TAGS
+  @send a/action[vec[str]] => NOTIFICATION_ACTIONS
+
+  // nfty exclusive
+  @send A/attach[str] => NOTIFICATION_ATTACHMENT
+  @send E/email[str] => NOTIFICATION_EMAIL
+  @send D/defer[str] => NOTIFICATION_DEFER
+  @send C/click-action[str] => NOTIFICATION_CLICK
+
+  @list j/json[bool] => JSON_OUTPUT
+EOF
+  case "${BARG_SUBCOMMAND}" in
+    send)
+      if [ "${NOTIFICATION_HANDLER}" == "both" ]; then
+        send.dbus
+        send.ntfy
+      else
+        send."${NOTIFICATION_HANDLER}"
+      fi
+      ;;
+    list) true ;;
+    read) true ;;
+  esac
+}
+
+function send.ntfy {
+  [ ! -e "${HOME}/.notify.conf" ] && {
+    log e "Config file not found"
+    exit
+  }
+  {
+    read -r topic
+  } < "${HOME}/.notify.conf"
+
+  local notification_title="${PARAMS[0]}"
+
+  local priority=3
+  case "${NOTIFICATION_PRIORITY}" in
+    "max") priority=5 ;;
+    "high") priority=4 ;;
+    "default") priority=3 ;;
+    "low") priority=2 ;;
+    "min") priority=1 ;;
+  esac
+
+  : "$(
+    IFS=$'\n'
+    echo -n "${PARAMS[*]:1}"
+  )"
+  local notification_body="${_@E}"
+
+  : "$(
+    IFS=,
+    echo -n "${NOTIFICATION_TAGS[*]}"
+  )"
+  local tags="${_}"
+
+  : "$(
+    IFS=';'
+    echo -n "${NOTIFICATION_ACTIONS[*]}"
+  )"
+  local actions="${_}"
+
+  local content_length="${#notification_body}"
+  local http_method="POST"
+
+  local attached attached_filename
+  if [ -n "${NOTIFICATION_ATTACHMENT}" ]; then
+    if [ ! -e "${NOTIFICATION_ATTACHMENT}" ]; then
+      attached="${NOTIFICATION_ATTACHMENT}"
+    else
+      read -r mime_type < <(file -b --mime-type "${NOTIFICATION_ATTACHMENT}")
+      attached_filename="$(basename "${NOTIFICATION_ATTACHMENT}")"
+      content_length="$(stat -c%s "${NOTIFICATION_ATTACHMENT}")"
+      http_method="PUT"
+    fi
+  fi
+
+  local http_data=(
+    "${http_method} /${topic} HTTP/1.1"
+    "Host: ntfy.sh"
+    "User-Agent: klapptnot/notify bash"
+    "Title: ${notification_title}"
+    "Priority: ${priority}"
+    "Content-Length: ${content_length}"
+    "Markdown: yes"
+  )
+
+  [ -n "${attached}" ] && http_data+=("Attach: ${attached}")
+  [ -n "${mime_type}" ] && http_data+=("Content-Type: ${mime-type}")
+  [ -n "${attached_filename}" ] && http_data+=("Filename: ${attached_filename}")
+  [ -n "${NOTIFICATION_EMAIL}" ] && http_data+=("Email: ${NOTIFICATION_EMAIL}")
+  [ -n "${NOTIFICATION_CLICK}" ] && http_data+=("Click: ${NOTIFICATION_CLICK}")
+  [ -n "${actions}" ] && http_data+=("Actions: ${actions}")
+
+  [ -n "${tags}" ] && http_data+=("Tags: ${tags}")
+  [ -n "${NOTIFICATION_DEFER}" ] && http_data+=("At: ${NOTIFICATION_DEFER}")
+
+  http_data+=(
+    "Connection: close"
+    ""
+  )
+  printf -v HTTP_REQUEST '%b\r\n' "${http_data[@]}"
+  [ -z "${mime_type@A}" ] && printf -v HTTP_REQUEST '%s%s' "${HTTP_REQUEST}" "${notification_body}"
+
+  # Open connection
+  if ! exec 3<> /dev/tcp/ntfy.sh/80; then
+    log e "Connection failed"; exit
+  fi
+
+  printf '%s' "${HTTP_REQUEST}" >&3
+  [ -n "${mime_type@A}" ] && cat "${NOTIFICATION_ATTACHMENT}" >&3
+  printf '%s' "$(cat <&3)" &>/dev/null # I dont want that now, a while read loop here
+
+  # Close connection
+  if exec 3>&-; then
+    log i "Notification send (ntfy.sh)"
+  else
+    log e "Notification not send (ntfy.sh)"
+  fi
+}
+
+function send.dbus {
+  local notification_title="${PARAMS[0]}"
+  : "$(
+    IFS=$'\n'
+    echo -n "${PARAMS[*]:1}"
+  )"
+  local notification_body="${_@E}"
+
+  local actions_commands=()
+  for i in "${!NOTIFICATION_ACTIONS[@]}"; do
+    IFS=':' read -r label command <<< "${NOTIFICATION_ACTIONS[i]}"
+    read -r random < <(rsum)
+    NOTIFICATION_ACTIONS[i]="\"${random}=${i}\",\"${label}\""
+    actions_commands+=("${command}")
+  done
+  : "$(
+    IFS=,
+    echo -n "${NOTIFICATION_ACTIONS[*]}"
+  )"
+  local actions_str="[${_}]"
+
+  local data=()
+  case "${NOTIFICATION_PRIORITY}" in
+    "high" | "max") data[0]=2 ;;
+    "low" | "min") data[0]=0 ;;
+    *) data[0]=1 ;;
+  esac
+  data[0]="\"urgency\": <byte ${data[0]}>"
+
+  IFS=',' : "{${data[*]}}"
+  local data_dict="${_}"
+
+  read -r notif_id < <(
+    gdbus call --session \
+      --dest org.freedesktop.Notifications \
+      --object-path /org/freedesktop/Notifications \
+      --method org.freedesktop.Notifications.Notify \
+      -- \
+      "${NOTIFICATION_APP_NAME}" \
+      "${NOTIFICATION_ID}" \
+      "${NOTIFICATION_ICON}" \
+      "${notification_title}" \
+      "${notification_body}" \
+      "${actions_str}" \
+      "${data_dict}" \
+      "int32 ${NOTIFICATION_EXPIRE_TIME}" | sed -n 's/^(uint32 \([0-9]\+\),.*$/\1/p'
+  )
+  if [ -n "${notif_id}" ]; then
+    log i "Notification send (dbus)"
+  else
+    log e "Notification send (dbus)"
+    return
+  fi
+
+  if ((${#actions_commands[@]} > 0)); then
+    log i "Initialized callback daemon"
+    dbus.notification_eventloop "${notif_id}" "${actions_commands[@]}" &
+  fi
+}
+
+function dbus.notification_eventloop {
+  local notif_id="${1}"
+  shift 1
+  local commands=("${@}")
+  read -r fd < <(mktemp -u)
+  mkfifo "${fd}"
+
+  gdbus monitor --session \
+    --dest org.freedesktop.Notifications \
+    --object-path /org/freedesktop/Notifications > "${fd}" &
+  local pid="${!}"
+
+  local invoked=false
+  while IFS=', ' read -r event _ id data; do
+    [ "${id}" != "${notif_id}" ] && continue
+    case "${event}" in
+      ActionInvoked)
+        invoked=true
+        IFS='=' read -r _ i
+        bash -c "${commands[i]}" &> /dev/null &
+        ;;
+      NotificationClosed)
+        if ! ${invoked} && [ -n "${NOTIFICATION_ACTION_DEL}" ]; then
+          bash -c "${NOTIFICATION_ACTION_DEL}" &> /dev/null &
+        fi
+        kill "${pid}"
+        ;;
+    esac
+  done < <(sed -nu 's/^.*org\.freedesktop\.Notifications\.\([A-Za-z]\+\)\ (\(.*\))$/\1 \2/p' "${fd}")
+
+  rm "${fd}"
+}
+
+main "${@}"

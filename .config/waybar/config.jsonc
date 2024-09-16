@@ -79,6 +79,7 @@
     },
     "player-icons": {
       "chromium": "",
+      "firefox": "󰈹",
       "spotify": " "
     },
     "dynamic-order": [

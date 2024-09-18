@@ -157,23 +157,24 @@ function media-metadata-get {
 function hyprlock-mw-source-manager {
   local csrc_str='^# source = ~/\.config/hypr/conf\.d/medialock\.conf$'
   local usrc_str='^source = ~/\.config/hypr/conf\.d/medialock\.conf$'
+  local toggle_file="${HOME}/.cache/hyprland/medialock.conf"
   while true; do
     read -r media_session_status < <(playerctl status 2> >(sed 's/^/[playerctl::stderr] /' >&2))
     if
       [ "${media_session_status}" != "Stopped" ] &&
         [ -n "${media_session_status}" ] &&
-        grep -qP "${csrc_str}" ~/.config/hypr/hyprlock.conf
+        grep -qP "${csrc_str}" "${toggle_file}"
     then
       # Uncomment source, reload
-      sed -i '/^#__medialock__/{n; s/^# //; }' ~/.config/hypr/hyprlock.conf
+      sed -i '/^#__medialock__/{n; s/^# //; }' "${toggle_file}"
       pgrep -x 'hyprlock' &> /dev/null && pkill -SIGUSR2 hyprlock
     elif
       [ -z "${media_session_status}" ] ||
         [ "${media_session_status}" == "Stopped" ] &&
-        grep -qP "${usrc_str}" ~/.config/hypr/hyprlock.conf
+        grep -qP "${usrc_str}" "${toggle_file}"
     then
       # Comment source, reload
-      sed -i '/^#__medialock__/{n; s/^\([^#]\)/# \1/; }' ~/.config/hypr/hyprlock.conf
+      sed -i '/^#__medialock__/{n; s/^\([^#]\)/# \1/; }' "${toggle_file}"
       pgrep -x 'hyprlock' &> /dev/null && pkill -SIGUSR2 hyprlock
     fi
     sleep 1

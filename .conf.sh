@@ -64,7 +64,7 @@ yay_pkgs=(
   wlogout
 )
 
-nfolders=(
+needed_folders=(
   "${HOME}/.cache/hyprland"
   "${HOME}/.cache/carapace"
 )
@@ -74,8 +74,22 @@ function post_install {
     [ -z "${USER_GEOINFO}" ] && log w "No geographic info given, leaving empty"
     echo "${USER_GEOINFO}" > "${HOME}/.geoinfo"
   }
-  CARAPACE_BRIDGES='zsh,fish,bash,inshellisense' carapace _carapace nushell > ~/.cache/carapace/init.nu
-  bat cache --build &>/dev/null
+
+  command -v hyperlock &>/dev/null && {
+    # Toggle file for medialock
+    local m_f_c=(
+      "#__medialock__"
+      "source = ~/.config/hypr/conf.d/medialock.conf"
+    )
+    printf '%s\n' "${m_f_c[@]}" > ~/.cache/hyprland/medialock.conf
+  }
+
+  command -v carapace &>/dev/null && {
+    command -v fish &>/dev/null && carapace _carapace fish > ~/.cache/carapace/init.fish
+    command -v zsh  &>/dev/null && carapace _carapace zsh  > ~/.cache/carapace/init.zsh
+    command -v bash &>/dev/null && carapace _carapace bash > ~/.cache/carapace/init.bash
+  }
+  command -v bat &>/dev/null && bat cache --build &>/dev/null
 }
 
 function gen_ignore_list {

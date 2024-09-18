@@ -59,7 +59,7 @@ BARG
   ignore=()
   pacman_pkgs=()
   yay_pkgs=()
-  nfolders=()
+  needed_folders=()
 
   # Installation config
   source "${MELOC}/.conf.sh"
@@ -155,7 +155,7 @@ function do_symlink_cleaning {
     cleaned+=("${broken_links[i]}")
   done
 
-  ((${#cleaned[@]} > 0)) && log i 'Cleaned (%n) broken links' "${#cleaned[@]}"
+  ((${#cleaned[@]} > 0)) && log i 'Cleaned (%s) broken links' "${#cleaned[@]}"
 }
 
 function do_symlink_tree {
@@ -252,7 +252,7 @@ function do_install {
   do_symlink_cleaning "${MELOC}" "${HOME}"
 
   # Create needed folders
-  for f in "${nfolders[@]}"; do
+  for f in "${needed_folders[@]}"; do
     mkdir -p "${f}"
   done
 

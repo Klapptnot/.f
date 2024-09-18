@@ -100,7 +100,3 @@ $env.NU_PLUGIN_DIRS = [
 
 # To load from a custom file you can use:
 source ($nu.default-config-dir | path join 'custom.nu')
-
-if not ("~/.cache/carapace" | path exists) { mkdir ~/.cache/carapace }
-CARAPACE_BRIDGES='zsh,fish,bash,inshellisense' carapace _carapace nushell | save --force ~/.cache/carapace/init.nu
-source ~/.cache/carapace/init.nu

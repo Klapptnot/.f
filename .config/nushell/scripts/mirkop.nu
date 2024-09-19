@@ -137,14 +137,18 @@ def right_prompt_command_ [] {
     $"(ansi rb)[($env.LAST_EXIT_CODE)]"
   } else { "" }
 
-  let git_path = (git rev-parse --show-toplevel e> $env.NULL_DEV)
+  let git_path = (git rev-parse --show-toplevel | complete | get stdout)
   let col = $env.mirko.color.git
 
   let git_info = match [(($git_path | str length) > 0), (do_collapse_)] {
     [true, true] => $"($col.a)(git branch --show-current)($col.s)",
     [true, false] => {
       let data = git_status_info $git_path
-      $"($col.a)($data.f)($col.s)@($col.a)($data.b)($col.s) => ($col.i)+($col.a)($data.i)($col.s)/($col.d)-($col.a)($data.d) \(($data.u)($col.s)@($col.a)($data.U) ●\)"
+      [
+        $"($col.a)($data.f)($col.s)@($col.a)($data.b)($col.s) =>",         # <files>@<branch>
+        $" ($col.i)+($col.a)($data.i)($col.s)/($col.d)-($col.a)($data.d)", # +<additions>/-<deletions>
+        $" \(($data.u)($col.s)@($col.a)($data.U) ●\)"                      # <untracked_files>@<untracked_folders>
+      ] | str join
     },
     _ => ""
   }

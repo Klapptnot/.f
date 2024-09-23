@@ -23,12 +23,12 @@ function get_short_pwd {
 
 function curpos() {
   # based on a script from http://invisible-island.net/xterm/xterm.faq.html
-  exec < /dev/tty
+  exec </dev/tty
   oldstty=$(stty -g)
   stty raw -echo min 0
   # on my system, the following line can be replaced by the line below it
-  printf "\033[6n" > /dev/tty
-  [ "${TERM}" == "xterm" ] && tput u7 > /dev/tty # when TERM=xterm (and relatives)
+  printf "\033[6n" >/dev/tty
+  [ "${TERM}" == "xterm" ] && tput u7 >/dev/tty # when TERM=xterm (and relatives)
   IFS=';' read -r -d R -a pos
   stty "${oldstty}"
   row="${pos[0]:2}" # strip off the esc-[
@@ -38,8 +38,8 @@ function curpos() {
 }
 
 function get_cwd_color {
-  if command -v cksum &> /dev/null; then
-    read -r s < <(pwd -P | cksum | cut -d' ' -f1 | printf '%-6x' "$(< /dev/stdin)" | tr ' ' '0' | head -c 6)
+  if command -v cksum &>/dev/null; then
+    read -r s < <(pwd -P | cksum | cut -d' ' -f1 | printf '%-6x' "$(</dev/stdin)" | tr ' ' '0' | head -c 6)
     local r=$((16#${s:0:2}))
     local g=$((16#${s:2:2}))
     local b=$((16#${s:4:2}))
@@ -61,7 +61,7 @@ function get_cwd_color {
 
 function load_prompt_config {
   function hex_to_shell {
-    read -r s < /dev/stdin
+    read -r s </dev/stdin
 
     local r=$((16#${s:1:2}))
     local g=$((16#${s:3:2}))
@@ -136,9 +136,10 @@ function generate_mirkop_ps1_prompt {
   # Set the string for exit status indicator
   local last_exit_code="${?}"
 
-  IFS=' ' read -r _cROW cCOL < <(curpos 2> /dev/null)
+  IFS=' ' read -r _cROW cCOL < <(curpos 2>/dev/null)
+  (("${cCOL}" != 0)) && printf "\x1b[38;5;242m⏎\x1b[0m\n"
+
   local prompt_parts=()
-  (("${cCOL}" != 0)) && prompt_parts+=("\[\033[38;5;242m\]⏎\[\033[0m\]\n")
 
   read -r pwd_color < <(get_cwd_color)
   read -r short_cwd < <(get_short_pwd)

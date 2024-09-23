@@ -9,10 +9,10 @@
 # image of the current playing media
 
 # shellcheck disable=SC1090
-source ~/.local/lib/bash/rsum.sh
-source ~/.local/lib/bash/barg.sh
-source ~/.local/lib/bash/str/markup_escape.sh
-source ~/.local/lib/bash/str/uri_encode.sh
+source ~/.config/bash/lib/rsum.sh
+source ~/.config/bash/lib/barg.sh
+source ~/.config/bash/lib/str/markup_escape.sh
+source ~/.config/bash/lib/str/uri_encode.sh
 
 function main {
   barg.parse "${@}" << BARG || _ "${null:?Need something to do}"

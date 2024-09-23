@@ -1,8 +1,8 @@
 #! /bin/env bash
 # shellcheck disable=SC1091,SC2154
 
-source "${HOME}/.local/lib/bash/rsum.sh"
-source "${HOME}/.local/lib/bash/barg.sh"
+source "${HOME}/.config/bash/lib/rsum.sh"
+source "${HOME}/.config/bash/lib/barg.sh"
 
 function main {
   barg.parse "${@}" << BARG || { echo "Command need args" && exit 1; }

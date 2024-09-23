@@ -10,9 +10,9 @@
 # Interesting... it's our duty as Minecraft players
 # to abuse this mechanic.
 
-source ~/.local/lib/bash/str/strip.sh
-source ~/.local/lib/bash/rsum.sh
-source ~/.local/lib/bash/logger.sh
+source ~/.config/bash/lib/str/strip.sh
+source ~/.config/bash/lib/rsum.sh
+source ~/.config/bash/lib/logger.sh
 
 function main {
   local mode="${1:?A launch app/mode is needed}"

@@ -1,8 +1,8 @@
 #! /bin/env bash
 
-source ~/.local/lib/bash/barg.sh
-source ~/.local/lib/bash/rsum.sh
-source ~/.local/lib/bash/logger.sh
+source ~/.config/bash/lib/barg.sh
+source ~/.config/bash/lib/rsum.sh
+source ~/.config/bash/lib/logger.sh
 
 function main {
   barg.parse "${@}" << EOF

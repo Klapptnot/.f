@@ -3,7 +3,7 @@ def __open_nvim_fzf_file [] {
     FZF_DEFAULT_COMMAND='fd --type file --follow --hidden --exclude .git' fzf
     --prompt 'File: ' --pointer '=>' --marker '==' -m
     --preview-window '65%' --preview-label 'Preview'
-    --preview 'bat {}'
+    --preview 'bat {}' | complete
   )
-  if $f != '' { nvim $f }
+  if $f.stdout != '' { nvim ($f.stdout | str trim) }
 }

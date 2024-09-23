@@ -12,8 +12,8 @@ function spinner.start() {
     printf "\x1b[0K%b\x1b[0G" "\x1b[38;5;${__rng__//\ /}m${__chars__[i]}\x1b[00m ${__hint__}"
     ((i++))
     if ((i >= n)); then
-                        i=0
-                             __rng__=$(od -An -N1 -tu1 /dev/urandom)
+      i=0
+      __rng__=$(od -An -N1 -tu1 /dev/urandom)
     fi
     sleep 0.008
   done

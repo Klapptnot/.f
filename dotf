@@ -27,9 +27,9 @@ if [[ "${BASH_SOURCE[0]}" != "${0}" ]]; then
   BASH_ARGV0="${HOME}/dotf/dotf"
 fi
 
-source ./.local/lib/bash/barg.sh || exit
-source ./.local/lib/bash/printfc.sh || exit
-source ./.local/lib/bash/logger.sh || exit
+source ./.config/bash/lib/barg.sh || exit
+source ./.config/bash/lib/printfc.sh || exit
+source ./.config/bash/lib/logger.sh || exit
 
 function main {
   MEPATH="$(realpath "${0}")"
@@ -146,13 +146,18 @@ function do_symlink_cleaning {
   local target="${2}"
 
   mapfile -t broken_links < <(find "${target}" -type l ! -exec test -e {} ';' -print)
-  mapfile -t linked_to < <(realpath -LP "${broken_links[@]}")
+  local linked_to=()
+  for l in "${!broken_links[@]}"; do
+    read -r linked_to_ < <(realpath -LP "${broken_links[l]}" 2> /dev/null)
+    linked_to[l]="${linked_to_}"
+  done
 
   local cleaned=()
   for ((i = 0; i < ${#broken_links[@]}; i++)); do
-    [[ "${linked_to[i]}" != "${MELOC}"* ]] && continue
-    unlink "${broken_links[i]}"
-    cleaned+=("${broken_links[i]}")
+    if [ -z "${linked_to[i]}" ] || [[ "${linked_to[i]}" == "${MELOC}"* ]]; then
+      unlink "${broken_links[i]}"
+      cleaned+=("${broken_links[i]}")
+    fi
   done
 
   ((${#cleaned[@]} > 0)) && log i 'Cleaned (%s) broken links' "${#cleaned[@]}"
@@ -244,12 +249,11 @@ function do_install {
   # Generate ignore list with updated packages
   gen_ignore_list
 
+  # Clean posible outdated links
+  do_symlink_cleaning "${MELOC}" "${HOME}"
+
   # Make symlinks to files
   do_symlink_tree "${MELOC}" "${HOME}"
-
-  # Clean posible outdated links
-  [ "${INSTALL_MODE}" == "update" ] && log i "Cleaning broken links"
-  do_symlink_cleaning "${MELOC}" "${HOME}"
 
   # Create needed folders
   for f in "${needed_folders[@]}"; do
@@ -301,7 +305,7 @@ function do_uninstall {
 
 # shellcheck disable=SC2155
 function git_version_gen {
-  git fetch &>/dev/null
+  git fetch &> /dev/null
   read -r remote < <(git rev-parse --abbrev-ref --symbolic-full-name '@{u}')
 
   read -r local_c < <(git rev-list --count HEAD)

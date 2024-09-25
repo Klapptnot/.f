@@ -44,9 +44,9 @@ def path-shorten [path: string] -> string {
     if $part.index == $parts_count {
         $part.item
     } else if ($part.item | str starts-with ".") {
-        ($part.item | str substring 0..2)
-    } else {
         ($part.item | str substring 0..1)
+    } else {
+        ($part.item | str substring 0..0)
     }
   } | str join (char path_sep)
 }

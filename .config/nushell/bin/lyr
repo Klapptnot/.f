@@ -27,7 +27,7 @@ def get-mxm-urls [query: string, tries: int, timeout: int] {
       $body = $res.body
       break
     }
-    log warning $'[HTTP] Status code ($res.status)'
+    log debug $'[HTTP] Status code ($res.status)'
   }
 
   if $body == "" {
@@ -37,12 +37,12 @@ def get-mxm-urls [query: string, tries: int, timeout: int] {
     }
   }
 
-  let urls = ($body | grep -Po '(?<=><a jsname="UWckNb" href=")[^ ]*(?=" data-jsarwt="1")' | lines)
+  let urls = ($body | grep -Po '(?<=><a jsname="UWckNb" href=")[^ ]*(?=")' | lines)
   let desc = ($body | grep -Po '(?<=<br><h3 class="LC20lb MBeuO DKV0Md">)[^<]*(?=<)' | lines)
 
   if ($urls | length) == 0 {
     error make {
-      msg: "Data in response not found, please try again",
+      msg: "Data not found in response, please try again",
       span: (metadata $query).span
     }
   }
@@ -189,6 +189,7 @@ export def main [
 (ansi --escape '38;2;255;169;140m')RELEASED  : (ansi --escape '38;2;255;232;184m')($track.released)
 (ansi --escape '38;2;255;169;140m')SPOTIFY   : (ansi --escape '38;2;255;232;184m')($track.spotify)
 (ansi --escape '38;2;255;169;140m')MUSIXMATCH: (ansi --escape '38;2;255;232;184m')($track.musixmatch)
+
 (ansi --escape '38;2;255;169;140m')LYRICS(ansi reset)\n"
 
   if not $track.has_lyrics {
@@ -209,5 +210,5 @@ export def main [
     print "\n"
   }
 
-  print $"Copyright -> ($track.lyrics_copyright)"
+  print -n $"Copyright -> ($track.lyrics_copyright)"
 }

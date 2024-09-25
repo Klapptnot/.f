@@ -1,0 +1,67 @@
+configuration {
+  font: "CaskaydiaCove Nerd Font 14";
+  show-icons: false;
+  hide-scrollbar: true;
+  sidebar-mode: true;
+  fake-trasparency: true;
+}
+
+@theme "colors"
+
+window {
+  trasparency: "real";
+  height: 50%;
+  border: 2px;
+  border-radius: 8px;
+  background-color: @background;
+  location: center;
+}
+
+mainbox {
+  background-color: @background;
+}
+
+inputbar {
+  children: [entry];
+  background-color: @trasparent;
+  border-radius: 3px 3px 0px 0px;
+  border-color: @border;
+  border: 0px 0px 2px 0px;
+  padding: 12px 5px 8px 5px;
+}
+
+entry {
+  padding: 6px 16px 6px 16px;
+  text-color: @foreground;
+  border-radius: 5px;
+  background-color: @trasparent;
+  placeholder: "   Clipboard";
+}
+
+textbox-prompt-colon {
+  expand: false;
+  str: ":";
+}
+
+listview {
+  margin: 10px;
+  columns: 1;
+  background-color: @trasparent;
+}
+
+element {
+  padding: 6px;
+  background-color: @trasparent;
+  text-color: @foreground;
+}
+
+element-text {
+  background-color: inherit;
+  text-color: inherit;
+}
+
+element selected {
+  background-color: @selected;
+  border-radius: 5px;
+  text-color: @selected-fg;
+}

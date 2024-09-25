@@ -1,0 +1,51 @@
+configuration {
+  font: "Plus Jakarta Sans 14";
+  disable-history: false;
+  hide-scrollbar: true;
+  fake-trasparency: true;
+  show-icons: false;
+}
+
+@theme "colors"
+
+window {
+  trasparency: "real";
+  height: 30%;
+  border: 2px;
+  border-color: @border;
+  border-radius: 8px;
+  background-color: @trasparent;
+  location: center;
+}
+
+mainbox {
+  background-color: @background;
+}
+
+inputbar {
+  enabled: false;
+}
+
+listview {
+  border: 0px;
+  margin: 5px;
+  columns: 12;
+  background-color: @trasparent;
+}
+
+element {
+  background-color: @trasparent;
+  text-color: @foreground;
+  padding: 0px;
+}
+
+element-text {
+  background-color: inherit;
+  text-color: inherit;
+}
+
+element selected {
+  background-color: @selected;
+  border-radius: 5px;
+  text-color: @background;
+}

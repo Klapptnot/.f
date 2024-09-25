@@ -1,0 +1,78 @@
+configuration {
+  font: "CaskaydiaCove Nerd Font 14";
+  show-icons: false;
+  icon-theme: "Papirus-Dark";
+  disable-history: false;
+  hide-scrollbar: true;
+  fake-trasparency: true;
+}
+
+@theme "colors"
+
+window {
+  trasparency: "real";
+  height: 65%;
+  width: 35%;
+  border: 2px;
+  border-radius: 8px;
+  background-color: @background;
+  location: center;
+}
+
+mainbox {
+  background-color: @background;
+}
+
+inputbar {
+  children: [entry];
+  background-color: @trasparent;
+  border-radius: 3px 3px 0px 0px;
+  border-color: @border;
+  border: 0px 0px 2px 0px;
+  padding: 8px 5px 8px 5px;
+}
+
+entry {
+  padding: 6px 16px 6px 16px;
+  text-color: @foreground;
+  border-radius: 5px;
+  background-color: @trasparent;
+  placeholder: "  Search";
+}
+
+textbox-prompt-colon {
+  expand: false;
+  str: ":";
+}
+
+listview {
+  margin: 5px 20px 0px 20px;
+  columns: 1;
+  background-color: @trasparent;
+}
+
+element {
+  padding: 3px;
+  background-color: @trasparent;
+  text-color: @foreground;
+}
+
+element-text,
+element-icon {
+  background-color: inherit;
+  text-color: inherit;
+}
+
+element-icon {
+  size: 25px;
+}
+
+element selected {
+  background-color: @selected;
+  border-radius: 5px;
+  text-color: @selected-fg;
+}
+
+mode-switcher {
+  enabled: false;
+}

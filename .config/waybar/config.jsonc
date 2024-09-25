@@ -3,8 +3,7 @@
   "modules-left": [
     "group/motherboard",
     "custom/weather",
-    "hyprland/workspaces",
-    "custom/updates"
+    "hyprland/workspaces"
   ],
   "modules-center": [
     "hyprland/window"
@@ -211,6 +210,7 @@
       "warning": 30,
       "critical": 20
     },
+    "interval": 2,
     "format": "{icon} {capacity}%",
     "format-charging": " {icon} {capacity}%",
     "format-plugged": " {icon} {capacity}%",

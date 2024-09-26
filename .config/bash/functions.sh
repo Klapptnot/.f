@@ -13,16 +13,16 @@ function fzf_get_file {
   printf '%s' "${file}"
 }
 
-function fnvim {
+function __fzf_nvim_open_file {
   local file
   if file=$(fzf_get_file); then
     nvim "${file}"
   fi
 }
 
-function fgfc {
+function __fzf_cat_file {
   local file
-  if file=$(fzf_get_file); then
+  if file=$(__fzf_open_file_nvim); then
     gfc "${file}" "${@}"
   fi
 }

@@ -53,7 +53,7 @@ if ! shopt -oq posix; then
 fi
 
 PS1='[\u@\h \W]\$ '
-FZF_DEFAULT_COMMAND='fd --type file --follow --hidden --exclude .git'
+export FZF_DEFAULT_COMMAND='fd --type file --follow --hidden --exclude .git'
 
 # In case of rustup
 [ -f ~/.cargo/env ] && source ~/.cargo/env
@@ -61,10 +61,12 @@ FZF_DEFAULT_COMMAND='fd --type file --follow --hidden --exclude .git'
 [ -f ~/.config/bash/goto.sh ] && source ~/.config/bash/goto.sh
 # Change prompt
 [ -f ~/.config/bash/mirkop.sh ] && source ~/.config/bash/mirkop.sh
+# Load util functions
+[ -f ~/.config/bash/functions.sh ] && source ~/.config/bash/functions.sh
 
 alias gt='goto'
 alias git='git --no-pager'
 
 bind -x '"\C-l": clear'
-bind -x '"\C-o": fnvim'
-bind -x '"\C-u": fgfc'
+bind -x '"\C-o": __fzf_nvim_open_file'
+bind -x '"\C-u": __fzf_cat_file'

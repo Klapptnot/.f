@@ -1,4 +1,10 @@
 #! /bin/env bash
+
+
+# Simple YAML value reader, currently only useful
+# for YAML files with 2 spaces for indentation
+# NO SUPPORT FOR SETS, TAGS, SCALARS, etc.
+# ONLY KEY-VALUE, for arrays, strings and integers
 function yq.sh {
   local path="${1}"
   local file="${2}"
@@ -21,31 +27,57 @@ function yq.sh {
   local v=''
   local cai=-1
   local pop_2=false
-  for line in "${lines[@]}"; do
+  local multiline=false
+  local multiline_fold=false
+  local multiline_strp=s
+  local multiline_str=""
+  local multiline_key=""
+  local line mmode smode #imode
+  local indent=2
+  for i in "${!lines[@]}"; do
+    line="${lines[i]}"
     case "${line}" in
-      '' | '#'* | '---') continue ;;
+      '#'* | '---') continue ;;
+      '') ${multiline} || continue ;;
     esac
-    IFS=':' read -r key val <<< "${line}"
-    k="${key#"${key%%[![:space:]]*}"}"
-    v="${val#*[[:space:]]}"
+    if ${multiline} && [ "${line}" != "" ]; then
+      if [ -n "${multiline_str}" ]; then
+        ${multiline_fold} && multiline_str+=" " || multiline_str+=$'\n'
+      fi
+
+      multiline_str+="${line:$((ci + indent)):${#line}}"
+      continue
+    elif ${multiline}; then
+      multiline=false
+      k="${multiline_key}"
+      v="${multiline_str}"
+      ${multiline_strp} && v="${v%"${v##*[![:space:]\n]}"}"
+      ${multiline_fold} && v="${v%"${v##*[![:space:]\n]}"}"
+      multiline_str=''
+      multiline_key=''
+    else
+      IFS=':' read -r key val <<< "${line}"
+      k="${key#"${key%%[![:space:]]*}"}"
+      # v="${val#*[[:space:]]}"
+      v="${val:1}"
+    fi
 
     : "${key%%[![:space:]]*}"
     ci="${#_}"
 
     if [[ "${k}" == '- '* ]]; then
-      # echo ARRAY on "${line}" ======= ${cai}
       if [ -n "${v}" ]; then
         # list of objects
         # - key1: "value1"
         #   key2: "value2"
-        ((ci = ci + 2))
-        k="${k:2}"
+        ((ci = ci + indent))
+        k="${k:${indent}}"
         pop_2=true
       else
         # Plain array
         # - "value1"
         # - "value2"
-        v="${k:2}"
+        v="${k:${indent}}"
         k=''
       fi
 
@@ -63,12 +95,25 @@ function yq.sh {
         fpa+=("${last_index}")
         last_index=''
       fi
+    elif [[ "${v}" == '|'* ]] || [[ "${v}" == '>'* ]]; then
+      # [>|][-+]?[0-9]*
+      mmode="${v:0:1}" # |>
+      smode="${v:1:1}" # -+
+      # imode="${v:2}"   # 0-9
+      multiline_key="${k}"
+      multiline=true
+
+      multiline_fold=false
+      [ "${mmode}" == ">" ] && multiline_fold=true
+
+      multiline_strp=false
+      [ "${smode}" == "-" ] && multiline_strp=true
     fi
 
     # going a level less
     if ((last_ci > ci)); then
-      # echo "POP ${last_ci} -> ${ci} ${key}"
-      ((pa = ci / 2))
+      # POP
+      ((pa = ci / indent))
       last_ci=${ci}
       # replace current
       fpa=("${fpa[@]:0:${pa}}")
@@ -76,16 +121,20 @@ function yq.sh {
       cai=-1
       pop_2=false
     elif ((last_ci < ci)); then
-      # echo "ADD ${last_ci} -> ${ci} ${key}"
+      # ADD
       last_ci=${ci}
       [ -n "${k}" ] && fpa+=("${k}")
     else
-      if ((cai < 0)) || ${pop_2}; then
-        # echo "REP ${last_ci} -> ${ci} ${key}"
-        (("${#fpa[@]}" > 0)) && unset 'fpa[-1]'
-        [ -n "${k}" ] && fpa+=("${k}")
+      # REP
+      if [ -n "${line}" ]; then
+        if ((cai < 0)) || ${pop_2}; then
+          (("${#fpa[@]}" > 0)) && unset 'fpa[-1]'
+          [ -n "${k}" ] && fpa+=("${k}")
+        fi
       fi
     fi
+
+    ${multiline} && continue
 
     if [ "${fpa[*]}" == "${dpa[*]}" ]; then
       case "${v}" in
@@ -95,6 +144,11 @@ function yq.sh {
       break
     fi
   done
+  if [ -n "${multiline_str}" ]; then
+    if [ "${fpa[*]}" == "${dpa[*]}" ]; then
+      printf '%s' "${multiline_str}"
+    fi
+  fi
 }
 
 if [ "${BASH_SOURCE[0]}" == "${0}" ]; then

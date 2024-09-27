@@ -1,6 +1,5 @@
 @import url("theme.css");
 
-
 * {
   border: none;
   font-family: "CaskaydiaCove Nerd Font";
@@ -67,62 +66,6 @@ window#waybar {
   padding-left: 10px;
   padding-right: 10px;
   border-radius: 15px;
-}
-
-#window {
-  background: #202020;
-  color: #fdc5c5;
-}
-
-tooltip {
-	color: #cba6f7;
-	background: #1e0430;
-	border-radius: 10px;
-	border: 1px solid @borders;
-  margin: 0px;
-  padding: 0px;
-}
-tooltip > * {
-  margin: 0px;
-  padding: 0px;
-}
-
-window.empty #window {
-  background: transparent;
-  color: transparent;
-  border: none;
-}
-
-#workspaces {
-  /* parent has padding: 0 to just be a background */
-  /* background: #bd93f9; */
-  padding-left: 0px;
-  padding-right: 0px;
-  border-radius: 15px;
-  font-weight: 600;
-  margin: 1px;
-  transition: none;
-}
-#workspaces button {
-  margin: 0px;
-  background: #161320;
-  color: #ab78f3;
-  padding: 0px 5px 0px 5px;
-}
-#workspaces button.active {
-  padding-left: 8px;
-  padding-right: 8px;
-  color: #8419f0;
-}
-#workspaces button.focused {
-  background: #a6adc8;
-  color: #eba0ac;
-}
-#workspaces button.urgent {
-  color: #a6e3a1;
-}
-#workspaces button:hover:not(.active) {
-  color: #cdd6f4;
 }
 
 #network-grp {
@@ -197,6 +140,63 @@ window.empty #window {
   to {
     background: #b5e8e0;
   }
+}
+
+#window {
+  background: #1e1e2e;
+  color: #fdc5c5;
+}
+
+window.empty #window {
+  background: transparent;
+  color: transparent;
+  border: none;
+}
+
+tooltip {
+	color: #cba6f7;
+	background: #1e1e2e;
+	border-radius: 10px;
+	border: 1px solid @borders;
+  margin: 0px;
+  padding: 0px;
+}
+
+tooltip > * {
+  margin: 0px;
+  padding: 0px;
+}
+
+#workspaces {
+  /* parent has padding: 0 to just be a background */
+  /* background: #bd93f9; */
+  padding-left: 0px;
+  padding-right: 0px;
+  border-radius: 15px;
+  font-weight: 600;
+  margin: 1px;
+  transition: none;
+}
+#workspaces button {
+  margin: 0px;
+  background: #161320;
+  color: #ab78f3;
+  padding: 0px 5px 0px 5px;
+}
+#workspaces button.active {
+  padding-left: 8px;
+  padding-right: 8px;
+  color: #8419f0;
+}
+#workspaces button.focused {
+  background: #a6adc8;
+  color: #eba0ac;
+}
+#workspaces button.urgent {
+  color: #a6e3a1;
+}
+#workspaces button:hover:not(.active) {
+  color: #cdd6f4;
 }
 
 #backlight {

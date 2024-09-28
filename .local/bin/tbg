@@ -177,7 +177,7 @@ class Database:
 def generate_unique_name(min_length: int = 3, max_length: int = 8):
     length = random.randint(min_length, max_length)
 
-    return "".join(random.choices("aeiou" + ascii_lowercase + "aeiou", k=length))
+    return "".join(random.choices("aeiouaeiou" + ascii_lowercase + "aeiou", k=length))
 
 
 def get_process_status(pid: int) -> _TBG_status:
@@ -216,164 +216,6 @@ def get_process_status(pid: int) -> _TBG_status:
     return "<none>"
 
 
-def start_command(command: list[str] | str):
-    """The command to start the process. If it's a string, it will be split by space.
-
-    Returns:
-        A tuple containing the PID and the command as a list.
-    """
-    if isinstance(command, str):
-        command = command.split()
-
-    process = subprocess.Popen(
-        command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=True
-    )
-    pid = process.pid
-
-    return pid, command
-
-
-def stop_process(pid: int):
-    """
-    Stops the process with the given PID.
-
-    Args:
-        pid (int): The PID of the process to stop.
-    """
-    try:
-        parent = psutil.Process(pid)
-        children = parent.children(recursive=True)
-
-        for child in children:
-            child.kill()
-
-        parent.kill()
-
-    except psutil.NoSuchProcess:
-        pass
-
-    try:
-        os.kill(pid, signal.SIGTERM)
-    except ProcessLookupError:
-        pass
-
-
-def get_process_memory_usage(pid: int):
-    """
-    Returns the memory usage of the process with the given PID.
-
-    Args:
-        pid (int): The PID of the process.
-
-    Returns:
-        The memory usage in bytes.
-    """
-    process = psutil.Process(pid)
-    return process.memory_info().rss
-
-
-def get_process_cpu_percent(pid: int, interval: float = 1.0):
-    """
-    Returns the CPU percentage of the process with the given PID.
-
-    Args:
-        pid (int): The PID of the process.
-        interval (float): The interval in seconds to measure the CPU usage.
-
-    Returns:
-        The CPU percentage as a float.
-    """
-    process = psutil.Process(pid)
-    return process.cpu_percent(interval=interval)
-
-
-def get_process_username(pid: int):
-    """
-    Returns the username of the process with the given PID.
-
-    Args:
-        pid (int): The PID of the process.
-
-    Returns:
-        The username as a string.
-    """
-    try:
-        process = psutil.Process(pid)
-        return process.username()
-    except psutil.NoSuchProcess:
-        return "Unknown"
-
-
-def get_process_create_time(pid: int):
-    """
-    Returns the creation time of the process with the given PID.
-
-    Args:
-        pid (int): The PID of the process.
-
-    Returns:
-        The creation time as a float.
-    """
-    process = psutil.Process(pid)
-    return process.create_time()
-
-
-def get_process_cmdline(pid: int):
-    """
-    Returns the command line of the process with the given PID.
-
-    Args:
-        pid (int): The PID of the process.
-
-    Returns:
-        The command line as a list of strings.
-    """
-    process = psutil.Process(pid)
-    return process.cmdline()
-
-
-def get_process_exe(pid: int):
-    """
-    Returns the executable path of the process with the given PID.
-
-    Args:
-        pid (int): The PID of the process.
-
-    Returns:
-        The executable path as a string.
-    """
-    process = psutil.Process(pid)
-    return process.exe()
-
-
-def get_process_cwd(pid: int):
-    """
-    Returns the current working directory of the process with the given PID.
-
-    Args:
-        pid (int): The PID of the process.
-
-    Returns:
-        The current working directory as a string.
-    """
-    process = psutil.Process(pid)
-    return process.cwd()
-
-
-def get_process_open_files(pid: int):
-    """
-    Returns the open files of the process with the given PID.
-
-    Args:
-        pid (int): The PID of the process.
-
-    Returns:
-        A list of open files.
-    """
-    process = psutil.Process(pid)
-    return process.open_files()
-
-
 def is_process_running(pid: int) -> bool:
     try:
         os.kill(pid, 0)  # Sending signal 0 to check if process exists
@@ -384,14 +226,6 @@ def is_process_running(pid: int) -> bool:
 
 
 def start_process(command: list[str] | str) -> tuple[int, str, str]:
-    """
-    Starts the specified process in the background and stores the PID.
-
-    Args:
-        process_command (str): The command to execute as a background process.
-        pid_file (str): The path to the temporary file to store the PID.
-    """
-
     cmds = "".join(command)
     output = hashlib.sha256(
         "".join(random.sample(cmds, len(cmds))).encode("utf-8")

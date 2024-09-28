@@ -148,11 +148,11 @@ function main() {
   local theoretical_out_dir="$(realpath "${all[0]}")"
 
   if ${invrt_cmd}; then
-    cmd="${cmd/\{:compressed:\}/${decomp}}"
-    cmd="${cmd/\{:decomp:\}/${compressed}}"
+    cmd="${cmd/\{:compressed:\}/${decomp@Q}}"
+    cmd="${cmd/\{:decomp:\}/${compressed@Q}}"
   else
-    cmd="${cmd/\{:decomp:\}/${decomp}}"
-    cmd="${cmd/\{:compressed:\}/${compressed}}"
+    cmd="${cmd/\{:decomp:\}/${decomp@Q}}"
+    cmd="${cmd/\{:compressed:\}/${compressed@Q}}"
   fi
 
   if ${_just_print}; then
@@ -175,7 +175,7 @@ function main() {
     printf '\n'
   fi
   local _exit_code=0
-  if ${cmd}; then
+  if eval "${cmd}"; then
     printfc '{fgc.87}Command executed successfully!{r}\n'
     return 0
   else

@@ -1,8 +1,10 @@
-function str.strip {
-  local string=''
-  string="$(cat -)"
-  [ "${1}" != "start" ] && string="${string%"${string##*[![:space:]\n]}"}"
-  [ "${1}" != "end" ]   && string="${string#"${string%%[![:space:]\n]*}"}"
-  printf "%s" "${string}"
+#! /bin/env bash
+
+str.strip() {
+  local s=''
+  s="$(< /dev/stdin)"
+  [ "${1}" != "start" ] && s="${s%"${s##*[![:space:]\n]}"}"
+  [ "${1}" != "end" ]   && s="${s#"${s%%[![:space:]\n]*}"}"
+  printf "%s" "${s}"
 }
 

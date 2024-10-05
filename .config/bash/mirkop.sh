@@ -1,7 +1,7 @@
 #! /bin/env bash
 
 # shellcheck disable=SC2120
-function get_short_pwd {
+get_short_pwd() {
   local short_pwd_s=""
   local old_pwd="${PWD}"
   if [[ "${PWD}" == "${HOME}"* ]]; then
@@ -21,14 +21,14 @@ function get_short_pwd {
   printf '%b' "${short_pwd_s}"
 }
 
-function curpos() {
+curpos() {
   # based on a script from http://invisible-island.net/xterm/xterm.faq.html
-  exec </dev/tty
+  exec < /dev/tty
   oldstty=$(stty -g)
   stty raw -echo min 0
   # on my system, the following line can be replaced by the line below it
-  printf "\033[6n" >/dev/tty
-  [ "${TERM}" == "xterm" ] && tput u7 >/dev/tty # when TERM=xterm (and relatives)
+  printf "\033[6n" > /dev/tty
+  [ "${TERM}" == "xterm" ] && tput u7 > /dev/tty # when TERM=xterm (and relatives)
   IFS=';' read -r -d R -a pos
   stty "${oldstty}"
   row="${pos[0]:2}" # strip off the ESC[
@@ -36,9 +36,9 @@ function curpos() {
   printf "%s;%s" "${row}" "${col}"
 }
 
-function get_cwd_color {
-  if command -v cksum &>/dev/null; then
-    read -r s < <(pwd -P | cksum | cut -d' ' -f1 | printf '%-6x' "$(</dev/stdin)" | tr ' ' '0' | head -c 6)
+get_cwd_color() {
+  if command -v cksum &> /dev/null; then
+    read -r s < <(pwd -P | cksum | cut -d' ' -f1 | printf '%-6x' "$(< /dev/stdin)" | tr ' ' '0' | head -c 6)
     local r=$((16#${s:0:2}))
     local g=$((16#${s:2:2}))
     local b=$((16#${s:4:2}))
@@ -58,9 +58,9 @@ function get_cwd_color {
   fi
 }
 
-function load_prompt_config {
+load_prompt_config() {
   function hex_to_shell {
-    read -r s </dev/stdin
+    read -r s < /dev/stdin
 
     local r=$((16#${s:1:2}))
     local g=$((16#${s:3:2}))
@@ -105,11 +105,11 @@ function load_prompt_config {
   )
 }
 
-function print_prompt_right {
+print_prompt_right() {
   local rprompt_parts=()
   local comp=0
 
-  jobs &>/dev/null # Prevent from printing finished jobs after command
+  jobs &> /dev/null # Prevent from printing finished jobs after command
   read -r num_jobs < <(jobs -r | wc -l)
 
   if ((num_jobs > 1)); then
@@ -131,11 +131,11 @@ function print_prompt_right {
   printf "%$((COLUMNS + comp))s\x1b[0G" "${rprompt_string}"
 }
 
-function generate_mirkop_ps1_prompt {
+generate_mirkop_ps1_prompt() {
   # Set the string for exit status indicator
   local last_exit_code="${?}"
 
-  IFS=';' read -r _ col < <(curpos 2>/dev/null)
+  IFS=';' read -r _ col < <(curpos 2> /dev/null)
   ((col > 1)) && printf "\x1b[38;5;242m⏎\x1b[0m\n"
 
   local prompt_parts=()

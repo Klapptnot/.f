@@ -1,6 +1,8 @@
-function str.uri_encode {
+#! /bin/env bash
+
+str.uri_encode() {
   local input=''
-  input="$(cat -)"
+  input="$(< /dev/stdin)"
 
   local encoded=""
   local LC_ALL=C # support unicode = loop bytes, not characters

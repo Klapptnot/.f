@@ -1,11 +1,10 @@
 #! /bin/env bash
 
-
 # Simple YAML value reader, currently only useful
 # for YAML files with 2 spaces for indentation
 # NO SUPPORT FOR SETS, TAGS, SCALARS, etc.
 # ONLY KEY-VALUE, for arrays, strings and integers
-function yq.sh {
+yq.sh() {
   local path="${1}"
   local file="${2}"
 

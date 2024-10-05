@@ -11,7 +11,7 @@
 # The commands shared on this post will kill all windows from the same PID
 # So, this closes windows and processes
 
-function main {
+main() {
   local opr="${1}"
   shift 1
 
@@ -23,17 +23,18 @@ function main {
   "${opr}"
 }
 
-function close-others {
+close-others() {
   while read -r window; do
     hyprctl dispatch closewindow "${window}"
-  done < <(jq -rM --null-input \
-    --argjson c "$(hyprctl clients -j)" \
-    --argjson w "$(hyprctl activeworkspace -j)" \
-    '$c[] | select(.workspace.id == $w.id) | select(.focusHistoryID != 0) | "address:" + .address'
+  done < <(
+    jq -rM --null-input \
+      --argjson c "$(hyprctl clients -j)" \
+      --argjson w "$(hyprctl activeworkspace -j)" \
+      '$c[] | select(.workspace.id == $w.id) | select(.focusHistoryID != 0) | "address:" + .address'
   )
 }
 
-function kill-others {
+kill-others() {
   jq -rM --null-input \
     --argjson c "$(hyprctl clients -j)" \
     --argjson w "$(hyprctl activeworkspace -j)" \
@@ -41,7 +42,7 @@ function kill-others {
     xargs kill
 }
 
-function close-current {
+close-current() {
   jq --null-input \
     --argjson c "$(hyprctl clients -j)" \
     --argjson w "$(hyprctl activeworkspace -j)" \
@@ -49,7 +50,7 @@ function close-current {
     xargs hyprctl dispatch closewindow
 }
 
-function kill-current {
+kill-current() {
   jq --null-input \
     --argjson c "$(hyprctl clients -j)" \
     --argjson w "$(hyprctl activeworkspace -j)" \

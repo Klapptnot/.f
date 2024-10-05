@@ -31,7 +31,7 @@ source ./.config/bash/lib/barg.sh || exit
 source ./.config/bash/lib/printfc.sh || exit
 source ./.config/bash/lib/logger.sh || exit
 
-function main {
+main() {
   MEPATH="$(realpath "${0}")"
   MELOC="$(dirname "${MEPATH}")"
   MENAME="$(basename "${MEPATH}")"
@@ -101,7 +101,7 @@ BARG
   esac
 }
 
-function do_help {
+do_help() {
   local help=(
     '{fgc.87}dotf{r} - A simple script to manage dotfiles\n\n'
     '\x1b[4mUsage:\x1b[24m\n'
@@ -141,7 +141,7 @@ function do_help {
   exit
 }
 
-function do_symlink_cleaning {
+do_symlink_cleaning() {
   local source="${1}"
   local target="${2}"
 
@@ -163,7 +163,7 @@ function do_symlink_cleaning {
   ((${#cleaned[@]} > 0)) && log i 'Cleaned (%s) broken links' "${#cleaned[@]}"
 }
 
-function do_symlink_tree {
+do_symlink_tree() {
   local source="${1}"
   local target="${2}"
 
@@ -195,7 +195,7 @@ function do_symlink_tree {
   done
 }
 
-function do_install {
+do_install() {
   if [ "${INSTALL_MODE}" == "help" ]; then
     do_help install
   fi
@@ -266,7 +266,7 @@ function do_install {
   log i "Installation process finished"
 }
 
-function do_uninstall {
+do_uninstall() {
   # Unlink files linked to this folder and remove
   # folders that are left empty after unlink process
 
@@ -304,7 +304,7 @@ function do_uninstall {
 }
 
 # shellcheck disable=SC2155
-function git_version_gen {
+git_version_gen() {
   git fetch &> /dev/null
   read -r remote < <(git rev-parse --abbrev-ref --symbolic-full-name '@{u}')
 

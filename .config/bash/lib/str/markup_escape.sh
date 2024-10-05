@@ -1,5 +1,7 @@
-function str.markup_escape {
-  : "$(cat -)"
+#! /bin/env bash
+
+str.markup_escape() {
+  : "$(< /dev/stdin)"
   local input="${_}"
 
   local encoded=""

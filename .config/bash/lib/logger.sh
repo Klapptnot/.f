@@ -1,4 +1,4 @@
-#!/bin/bash
+#! /bin/env bash
 
 declare -rA LOGGER_LOG_COLORS=(
   ['d']='\x1b[32m'
@@ -24,7 +24,7 @@ declare -rA LOGGER_LEVEL_NUMS=(
 
 LOGGER_LEVEL="${LOGGER_LEVEL:-e}"
 
-function log {
+log() {
   local level="${1,,}"
   local show_verbose_info=true
   ((${#level} > 1)) && show_verbose_info=false

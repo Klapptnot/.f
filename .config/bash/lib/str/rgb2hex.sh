@@ -1,7 +1,10 @@
-function str.rgb2hex {
+#! /bin/env bash
+
+str.rgb2hex() {
   # Accept 'rgb(244,23,90)' color
   # local rgb="${1:4}" && rgb="${rgb%?}"
-  local rgb="${1:4:${#1}-2}"
+  : "$(< /dev/stdin)"
+  local rgb="${_:4:${#_}-2}"
   # This works as long as printf will print the result
   # instead of just exiting with a stderr message
   # shellcheck disable=SC2086

@@ -1,4 +1,5 @@
 #!/bin/env bash
+
 # |>----|>----|>----|><-><|----<|----<|----<|
 # |>    from Klapptnot's Hyprland setup    <|
 # |>   https://github.com/Klapptnot/dotf   <|
@@ -15,9 +16,59 @@ source ~/.config/bash/lib/yq.sh
 source ~/.config/bash/lib/rsum.sh
 source ~/.config/bash/lib/logger.sh
 
-function o+e_handler {
+main() {
+  local mode="${1:?A launch app/mode is needed}"
+  shift 1
+
+  ROFI_HOME=''
+  [[ "${mode}" == 'rofi-'* ]] && {
+    ! command -v rofi &> /dev/null && {
+      log e "Rofi not installed or not in PATH" >&2
+      exit
+    }
+    ROFI_HOME="$(get-rofi-home)"
+  }
+
+  function no_tlf {
+    printf '%s' "${2:0:(${#2} - 1)}"
+  }
+
+  killall rofi &> /dev/null
+  case "${mode}" in
+    rofi-runner)
+      rofi -show drun -theme "${ROFI_HOME}/drun.rasi" || exit
+      ;;
+    rofi-clipboard)
+      cliphist list |
+        sed 's/\([0-9]*\)\t\(.*\)/\2\r\1/g' | # The \t is ugly
+        rofi -dmenu -p '   Clip ' -theme "${ROFI_HOME}/clipboard.rasi" |
+        sed 's/\(.*\)\r\([0-9]*\)/\2\t\1/g' |
+        cliphist decode |
+        wl-copy
+      ;;
+    rofi-emoji)
+      python3 ~/.config/hypr/bin/emoji.py list |
+        rofi -dmenu -p ' 󰱨 Emoji ' -theme "${ROFI_HOME}/emoji.rasi" |
+        python3 ~/.config/hypr/bin/emoji.py decode |
+        wl-copy
+      ;;
+    rofi-wifi)
+      while true; do
+        rofi-wifi-menu-do || break
+      done
+      ;;
+    rofi-bluetooth)
+      return
+      ;;
+    gnome-control-center)
+      XDG_CURRENT_DESKTOP=GNOME XDG_SESSION_DESKTOP=gnome gnome-control-center &
+      ;;
+  esac
+}
+
+oe_handler() {
   "${@}" 2> "${epPipe}" | {
-    local o="$(cat -)"
+    local o="$(< /dev/stdin)"
     test -n "${o}" && log i "${o}"
   } &
   read -ra err < "${epPipe}"
@@ -26,7 +77,7 @@ function o+e_handler {
   }
 }
 
-function rofi-wifi-menu-populate {
+rofi-wifi-menu-populate() {
   mapfile BSSIDs_F < <(nmcli --fields BSSID device wifi list)
   mapfile SSIDs_F < <(nmcli --fields SSID device wifi list)
   mapfile SECURITYs_F < <(nmcli --fields SECURITY device wifi list)
@@ -77,7 +128,7 @@ function rofi-wifi-menu-populate {
   )
 }
 
-function rofi-wifi-menu-do {
+rofi-wifi-menu-do() {
   local opPipe="/tmp/rwmdo_$(rsum)"
   local epPipe="/tmp/rwmde_$(rsum)"
   mkfifo "${opPipe}"
@@ -121,7 +172,7 @@ function rofi-wifi-menu-do {
         return
       }
       log i "connect to ${SSIDs_F[arg1]}"
-      o+e_handler nmcli device wifi connect "${BSSIDs_F[arg1]}"
+      oe_handler nmcli device wifi connect "${BSSIDs_F[arg1]}"
       rm "${opPipe}" "${epPipe}" &> /dev/null
       return 1
       ;;
@@ -140,7 +191,7 @@ function rofi-wifi-menu-do {
         return
       }
       log i "connect to ${SSIDs_F[arg1]}"
-      o+e_handler nmcli device wifi connect "${BSSIDs_F[arg1]}" password "${password}"
+      oe_handler nmcli device wifi connect "${BSSIDs_F[arg1]}" password "${password}"
       rm "${opPipe}" "${epPipe}" &> /dev/null
       return 1
       ;;
@@ -151,15 +202,15 @@ function rofi-wifi-menu-do {
       ;;
     'disconnect_active')
       log i 'disconneting from WiFi'
-      o+e_handler nmcli connection down id "${SSIDs_F[arg1]}"
+      oe_handler nmcli connection down id "${SSIDs_F[arg1]}"
       ;;
     'enable_wifi')
       log i "toggle WiFi on"
-      o+e_handler nmcli radio wifi on
+      oe_handler nmcli radio wifi on
       ;;
     'disable_wifi')
       log i "toggle WiFi off"
-      o+e_handler nmcli radio wifi off
+      oe_handler nmcli radio wifi off
       ;;
     *)
       log e 'No valid operation was selected'
@@ -170,7 +221,7 @@ function rofi-wifi-menu-do {
   return 0
 }
 
-function get-rofi-home {
+get-rofi-home() {
   IFS=$'\n\t' read -r rofi_home < <(yq.sh .rofi.theme ~/.config/.dotf.yaml)
 
   ROFI_HOME="${rofi_home//\ /\\\ }"
@@ -179,56 +230,6 @@ function get-rofi-home {
   fi
 
   printf '%s/.config/rofi/theme/%s' "${HOME}" "${ROFI_HOME}"
-}
-
-function main {
-  local mode="${1:?A launch app/mode is needed}"
-  shift 1
-
-  ROFI_HOME=''
-  [[ "${mode}" == 'rofi-'* ]] && {
-    ! command -v rofi &> /dev/null && {
-      log e "Rofi not installed or not in PATH" >&2
-      exit
-    }
-    ROFI_HOME="$(get-rofi-home)"
-  }
-
-  function no_tlf {
-    printf '%s' "${2:0:(${#2} - 1)}"
-  }
-
-  killall rofi &> /dev/null
-  case "${mode}" in
-    rofi-runner)
-      rofi -show drun -theme "${ROFI_HOME}/drun.rasi" || exit
-      ;;
-    rofi-clipboard)
-      cliphist list |
-        sed 's/\([0-9]*\)\t\(.*\)/\2\r\1/g' | # The \t is ugly
-        rofi -dmenu -p '   Clip ' -theme "${ROFI_HOME}/clipboard.rasi" |
-        sed 's/\(.*\)\r\([0-9]*\)/\2\t\1/g' |
-        cliphist decode |
-        wl-copy
-      ;;
-    rofi-emoji)
-      python3 ~/.config/hypr/bin/emoji.py list |
-        rofi -dmenu -p ' 󰱨 Emoji ' -theme "${ROFI_HOME}/emoji.rasi" |
-        python3 ~/.config/hypr/bin/emoji.py decode |
-        wl-copy
-      ;;
-    rofi-wifi)
-      while true; do
-        rofi-wifi-menu-do || break
-      done
-      ;;
-    rofi-bluetooth)
-      return
-      ;;
-    gnome-control-center)
-      XDG_CURRENT_DESKTOP=GNOME XDG_SESSION_DESKTOP=gnome gnome-control-center &
-      ;;
-  esac
 }
 
 main "${@}"

@@ -1,6 +1,6 @@
-#!/bin/bash
+#! /bin/env bash
 
-function printfc() {
+printfc() {
   local __format_str__="${1}"
   local __color_code__='\x1b[00m' # Default is reset
   while [[ ${__format_str__} =~ \{((f|b)gc.00|r|rst)\} ]]; do

@@ -1,6 +1,6 @@
 #! /bin/env bash
 
-function main() {
+main() {
   local format_it='\{\{([a-z_]+)\}\}'
   local what="${1:-"{{icon}} {{capacity}}% {{status}}"}"
 
@@ -12,7 +12,7 @@ function main() {
   printf '%s\n' "${what}"
 }
 
-function battery-data-get() {
+battery-data-get() {
   local key="${1}"
   case "${key}" in
     'capacity')
@@ -23,19 +23,19 @@ function battery-data-get() {
       cat /sys/class/power_supply/BAT*/status
       ;;
     'icon')
-      read -r status </sys/class/power_supply/BAT*/status
+      read -r status < /sys/class/power_supply/BAT*/status
       [ "${status}" == "Charging" ] && printf '' && return
-      read -r charge </sys/class/power_supply/BAT*/capacity
-      (( charge > 90 )) && printf '󰁹' && return
-      (( charge > 80 )) && printf '󰂂' && return
-      (( charge > 70 )) && printf '󰂁' && return
-      (( charge > 60 )) && printf '󰂀' && return
-      (( charge > 50 )) && printf '󰁿' && return
-      (( charge > 40 )) && printf '󰁾' && return
-      (( charge > 30 )) && printf '󰁽' && return
-      (( charge > 20 )) && printf '󰁼' && return
-      (( charge > 10 )) && printf '󰁻' && return
-      (( charge > 00 )) && printf '󰁺' && return
+      read -r charge < /sys/class/power_supply/BAT*/capacity
+      ((charge > 90)) && printf '󰁹' && return
+      ((charge > 80)) && printf '󰂂' && return
+      ((charge > 70)) && printf '󰂁' && return
+      ((charge > 60)) && printf '󰂀' && return
+      ((charge > 50)) && printf '󰁿' && return
+      ((charge > 40)) && printf '󰁾' && return
+      ((charge > 30)) && printf '󰁽' && return
+      ((charge > 20)) && printf '󰁼' && return
+      ((charge > 10)) && printf '󰁻' && return
+      ((charge > 00)) && printf '󰁺' && return
       ;;
     'name')
       cat /sys/class/power_supply/BAT*/model_name

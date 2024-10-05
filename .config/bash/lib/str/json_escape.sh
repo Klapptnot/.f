@@ -1,5 +1,7 @@
-function str.json_escape {
-  : "$(cat -)"
+#! /bin/env bash
+
+str.json_escape() {
+  : "$(< /dev/stdin)"
   : "${_//\\/\\\\}"   # escape backslashes
   : "${_//\"/\\\"}"   # escape double quotes
   : "${_//\//\\\/}"   # escape forward slashes

@@ -1,8 +1,10 @@
-function str.hex2rgb {
+#! /bin/env bash
+
+str.hex2rgb() {
   # Accepts '#784dFF' or '784dFF' colors
-  set -- "$(cat -)"
   local hex
+  hex="$(< /dev/stdin)"
   # Remove # from start, if there is one
-  if [[ "${1}" == "#"* ]]; then hex=${1:1}; else hex=${1}; fi
+  [[ "${hex}" == "#"* ]] && hex=${hex:1}
   printf "rgb(%d,%d,%d)" "0x${hex:0:2}" "0x${hex:2:2}" "0x${hex:4:2}"
 }

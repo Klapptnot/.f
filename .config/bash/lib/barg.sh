@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /bin/env bash
 
 # Barg - Bash ARGuments parser
 # ============================
@@ -10,11 +10,11 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   exit 1
 fi
 
-function barg.parse() {
+barg.parse() {
   local argv=("${@}")
   [ "${#argv[@]}" -eq 0 ] && return 1
   # Expand the joint arguments
-  function barg.normalize_args() {
+  barg.normalize_args() {
     for ((i = 0; i < ${#argv[@]}; i++)); do
       #* Joint parameters
       # Example 1:
@@ -68,7 +68,7 @@ function barg.parse() {
     done
   }
 
-  function barg.set_indices_to_empty() {
+  barg.set_indices_to_empty() {
     for index in "${@}"; do
       if ((index >= 0 && index < ${#BARG_EXTRAS_BEFORE[@]})); then
         BARG_EXTRAS_BEFORE[index]=""
@@ -77,7 +77,7 @@ function barg.parse() {
   }
 
   # barg.define "${arg_pat}" "${var_name}" "${def_val}" "${arg_type}" "${vec_type}" "${switch_pat}" "${__ignore__}"
-  function barg.define() {
+  barg.define() {
     local __pat__="${1}" # short/long[...]
     local __var__="${2}" # VARIABLE (variable name)
     local __val__="${3}" # Variable default value
@@ -331,7 +331,7 @@ function barg.parse() {
 
   # barg.exit <error type> <error desc>
   # shellcheck disable=SC2154
-  function barg.exit() {
+  barg.exit() {
     local ecolor=${__barg_colors[err]}
     local stderr=${__barg_opts__[stderr]}
     local output=${__barg_opts__[output]}

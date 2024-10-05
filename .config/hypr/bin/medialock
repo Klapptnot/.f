@@ -14,7 +14,7 @@ source ~/.config/bash/lib/barg.sh
 source ~/.config/bash/lib/str/markup_escape.sh
 source ~/.config/bash/lib/str/uri_encode.sh
 
-function main {
+main() {
   barg.parse "${@}" << BARG || _ "${null:?Need something to do}"
   #[progname='medialock']
   #[subcmdr='true', subcmds='=artup =artdown =hwman =waybar metadata']
@@ -71,7 +71,7 @@ BARG
   printf '%s\n' "${res_list[@]}"
 }
 
-function media-art-cache {
+media-art-cache() {
   local last=""
   local medI=""
   while [ -f "${MEDIA_ART_CACHE_LOC}" ]; do
@@ -89,7 +89,7 @@ function media-art-cache {
   done
 }
 
-function media-metadata-get {
+media-metadata-get() {
   local what="${1}"
   local METAINFO="none"
   case "${what}" in
@@ -127,7 +127,7 @@ function media-metadata-get {
         IFS=$'\n' read -r METAINFO < <(
           printf "%${ELAPSED}s" |
             tr ' ' '-' |
-            printf -- "$(cat -)%${ELAPSEDR}s"
+            printf -- "$(< /dev/stdin)%${ELAPSEDR}s"
         )
       else
         METAINFO="${ELAPSED}"
@@ -147,14 +147,14 @@ function media-metadata-get {
       ;;
   esac
   if ${MARKUP_ESCAPE}; then
-    read -r METAINFO < <(str.markup_escape <<<"${METAINFO}")
+    read -r METAINFO < <(str.markup_escape <<< "${METAINFO}")
   elif ${URI_ESCAPE}; then
-    read -r METAINFO < <(str.uri_encode <<<"${METAINFO}")
+    read -r METAINFO < <(str.uri_encode <<< "${METAINFO}")
   fi
   printf '%s' "${METAINFO}"
 }
 
-function hyprlock-mw-source-manager {
+hyprlock-mw-source-manager() {
   local csrc_str='^# source = ~/\.config/hypr/conf\.d/medialock\.conf$'
   local usrc_str='^source = ~/\.config/hypr/conf\.d/medialock\.conf$'
   local toggle_file="${HOME}/.cache/hyprland/medialock.conf"

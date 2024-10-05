@@ -31,10 +31,9 @@ function curpos() {
   [ "${TERM}" == "xterm" ] && tput u7 >/dev/tty # when TERM=xterm (and relatives)
   IFS=';' read -r -d R -a pos
   stty "${oldstty}"
-  row="${pos[0]:2}" # strip off the esc-[
+  row="${pos[0]:2}" # strip off the ESC[
   col="${pos[1]}"
-  # change from one-based to zero based so they work with: tput cup $row $col
-  printf "%s %s" "$((row - 1))" "$((col - 1))"
+  printf "%s;%s" "${row}" "${col}"
 }
 
 function get_cwd_color {
@@ -136,8 +135,8 @@ function generate_mirkop_ps1_prompt {
   # Set the string for exit status indicator
   local last_exit_code="${?}"
 
-  IFS=' ' read -r _cROW cCOL < <(curpos 2>/dev/null)
-  (("${cCOL}" != 0)) && printf "\x1b[38;5;242m⏎\x1b[0m\n"
+  IFS=';' read -r _ col < <(curpos 2>/dev/null)
+  ((col > 1)) && printf "\x1b[38;5;242m⏎\x1b[0m\n"
 
   local prompt_parts=()
 

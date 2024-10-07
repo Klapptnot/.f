@@ -3,7 +3,7 @@
   * based on nothing but look
 */
 
-@define-color wb-bg transparent;
+@define-color waybarbg transparent;
 @define-color black   #161619;
 @define-color white   #ede4ff;
 @define-color gray    #a5adc8;
@@ -27,5 +27,58 @@
 @define-color color14 #bd93f9;
 @define-color color15 #abe9b3;
 
-@define-color borders @color4;
+/* All borders */
+@define-color borders  transparent;
+/* background normal */
+@define-color backgnd  #161620;
+/* background hover */
+@define-color backgho  #203030;
+/* tooltip text */
+@define-color tooltip  @color6;
+/* window info */
+@define-color win-inf  @color9;
+/* notifications tray */
+@define-color nottray  #898beb;
+/* updates tray */
+@define-color updatet  #e8a2af;
+/* tray icons */
+@define-color trayic   #b5e8e0;
+/* clock and day info */
+@define-color clock    #abe9b3;
+/* audio group */
+@define-color audio    #fae3b0;
+/* network group */
+@define-color network  #bd93f9;
+/* backlight info */
+@define-color backlgt  #f8bd96;
+/* motherboard stats */
+@define-color mot-sts  #96cdfb;
+/* battery normal */
+@define-color bat-nor  #b5e8e0;
+/* battery plugged */
+@define-color bat-plg  #76ddce;
+/* workspaces normal */
+@define-color wp-norm  #ab78f3;
+/* workspaces active */
+@define-color wp-acti  #8419f0;
+/* workspaces focused */
+@define-color wp-focu  #eba0ac;
+/* workspaces urgent */
+@define-color wp-urge  #a6e3a1;
+/* workspaces inactive */
+@define-color wp-inac  #cdd6f4;
+/* playing media info */
+@define-color mediain  #c9cbff;
+/* weather info */
+@define-color weather  #c9cbff;
+/* power menu */
+@define-color powermn  #f28fad;
+/* launcher menu */
+@define-color launchr  #89dceb;
 
+
+@keyframes blink {
+  to {
+    background: #b5e8e0;
+  }
+}

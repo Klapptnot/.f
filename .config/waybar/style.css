@@ -9,7 +9,7 @@
 }
 
 window#waybar {
-  background: @wb-bg;
+  background: @waybarbg;
 }
 
 /* Single elements */
@@ -19,7 +19,7 @@ window#waybar {
 #tray,
 #cava,
 #mpris,
-#workspaces button,
+#workspaces,
 #custom-updates,
 #custom-weather,
 #custom-notification,
@@ -29,9 +29,9 @@ window#waybar {
 #custom-updates,
 #custom-media {
   margin: 1px;
-  padding-left: 10px;
-  padding-right: 10px;
-  border-radius: 15px;
+  padding-left: 7px;
+  padding-right: 7px;
+  border-radius: 8px;
   transition: none;
   border: 1px solid @borders;
 }
@@ -43,7 +43,7 @@ window#waybar {
 #battery-grp
 {
   margin: 1px;
-  border-radius: 15px;
+  border-radius: 8px;
   transition: none;
   border: 1px solid @borders;
 }
@@ -69,8 +69,8 @@ window#waybar {
 }
 
 #network-grp {
-  background: #161320;
-  color: #bd93f9;
+  background: @backgnd;
+  color: @network;
   padding-right: 7px;
 }
 #network-grp > widget:nth-child(2) > #network.nname {
@@ -88,8 +88,8 @@ window#waybar {
 }
 
 #audio-grp {
-  background: #1a1826;
-  color: #fae3b0;
+  background: @backgnd;
+  color: @audio;
   padding-right: 8px;
 }
 #audio-grp > widget:nth-child(2) > #pulseaudio {
@@ -110,52 +110,80 @@ window#waybar {
 }
 
 #motherboard {
-  background: #161320;
-  color: #96cdfb;
+  background: @backgnd;
+  color: @mot-sts;
 }
 #motherboard > widget:not(:nth-child(1)) > label {
   padding-left: 5px;
 }
 
 #battery-grp {
-  background: #161320;
-  color: #b5e8e0;
+  background: @backgnd;
+  color: @bat-nor;
 }
 #battery-grp > widget > #battery.charging,
 #battery-grp > widget > #battery.plugged {
-  color: #76ddce;
+  color: @bat-plg;
 }
 #battery-grp > widget > #battery.critical:not(.charging) {
-  background: #161320;
+  background: @backgnd;
   animation-name: blink;
   animation-duration: 0.5s;
   animation-timing-function: linear;
   animation-iteration-count: infinite;
   animation-direction: alternate;
-  border-radius: 15px;
+  border-radius: 8px;
   padding-right: 10px;
 }
 
-@keyframes blink {
-  to {
-    background: #b5e8e0;
-  }
+#workspaces {
+  padding-left: 0px;
+  padding-right: 0px;
+  font-weight: 600;
+  margin: 1px;
+  transition: none;
+  background: @backgnd;
+}
+#workspaces button {
+  margin: 0px;
+  color: @wp-norm;
+  padding: 0px 5px 0px 5px;
+}
+#workspaces button.active {
+  background: @backgnd;
+  padding-left: 4px;
+  padding-right: 4px;
+  color: @wp-acti;
+}
+#workspaces button.focused {
+  background: @backgho;
+  color: @wp-focu;
+}
+#workspaces button.urgent {
+  color: @wp-urge;
+}
+#workspaces button:hover:not(.active) {
+  color: @wp-inac;
 }
 
+
 #window {
-  background: #1e1e2e;
-  color: #fdc5c5;
+  background: @backgnd;
+  color: @win-inf;
 }
 
 window.empty #window {
   background: transparent;
   color: transparent;
   border: none;
+  margin: 0px;
+  padding-left: 0px;
+  padding-right: 0px;
 }
 
 tooltip {
-	color: #cba6f7;
-	background: #1e1e2e;
+	color: @tooltip;
+	background: @backgnd;
 	border-radius: 10px;
 	border: 1px solid @borders;
   margin: 0px;
@@ -167,75 +195,33 @@ tooltip > * {
   padding: 0px;
 }
 
-#workspaces {
-  /* parent has padding: 0 to just be a background */
-  /* background: #bd93f9; */
-  padding-left: 0px;
-  padding-right: 0px;
-  border-radius: 15px;
-  font-weight: 600;
-  margin: 1px;
-  transition: none;
-}
-#workspaces button {
-  margin: 0px;
-  background: #161320;
-  color: #ab78f3;
-  padding: 0px 5px 0px 5px;
-}
-#workspaces button.active {
-  padding-left: 8px;
-  padding-right: 8px;
-  color: #8419f0;
-}
-#workspaces button.focused {
-  background: #a6adc8;
-  color: #eba0ac;
-}
-#workspaces button.urgent {
-  color: #a6e3a1;
-}
-#workspaces button:hover:not(.active) {
-  color: #cdd6f4;
-}
-
 #backlight {
-  background: #161320;
-  color: #f8bd96;
+  background: @backgnd;
+  color: @backlgt;
 }
 
 #clock {
-  background: #161320;
-  color: #abe9b3;
+  background: @backgnd;
+  color: @clock;
 }
 
 #tray {
-  color: #b5e8e0;
-  background: #161620;
-}
-
-/* #tray > widget:not(:nth-child(1)) {
-  color: #b5e8e0;
-  background: #1b1b2b;
-} */
-
-#custom-updates {
-  /* Launcher font icon size */
-  background: #89dceb;
-  color: #161320;
+  color: @trayic;
+  background: @backgnd;
 }
 
 #custom-launcher {
   /* Launcher font icon size */
   font-size: 20px;
-  background: #89dceb;
-  color: #161320;
+  background: @launchr;
+  color: @backgnd;
 }
+
 #custom-notification {
   font-size: 16px;
   padding: 0px 13px 0px 8px;
-  color: #898beb;
-  background: #161320;
+  color: @nottray;
+  background: @backgnd;
 }
 
 #custom-power {
@@ -243,29 +229,26 @@ tooltip > * {
   font-size: 18px;
   padding-left: 7px;
   padding-right: 0px;
-  background: #161320;
-  color: #f28fad;
+  background: @backgnd;
+  color: @powermn;
 }
 
 #mpris,
+#custom-media,
 #custom-playerctl {
   /* {icon} name - artist */
-  background: #161320;
-  color: #c9cbff;
+  background: @backgnd;
+  color: @mediain;
 }
 
 #custom-weather {
   padding-right: 14px;
-  background: #161320;
-  color: #c9cbff;
+  background: @backgnd;
+  color: @weather;
 }
 
 #custom-updates {
-  background: #161320;
-  color: #e8a2af;
+  background: @backgnd;
+  color: @updatet;
 }
 
-#custom-media {
-  background: #161320;
-  color: #f2cdcd;
-}

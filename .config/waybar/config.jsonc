@@ -6,16 +6,15 @@
   "modules-left": [
     "group/motherboard",
     "custom/weather",
-    "hyprland/workspaces"
-  ],
-  "modules-center": [
+    "hyprland/workspaces",
     "hyprland/window"
   ],
+  "modules-center": [],
   "modules-right": [
+    "mpris",
+    // "custom/media",
     "tray",
     "custom/notification",
-    "mpris",
-    "custom/media",
     "group/network-grp",
     // "backlight",
     "group/audio-grp",

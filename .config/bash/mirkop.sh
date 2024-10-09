@@ -118,7 +118,7 @@ print_prompt_right() {
     rprompt_parts+=("${num_jobs} job ")
   fi
 
-  if [ "${1}" -ne 0 ]; then
+  if ((${1} != 0)); then
     rprompt_parts+=("${MIRKOP_PROMPT_COLORS[4]}[${1}]\x1b[0m ")
     : "${MIRKOP_PROMPT_COLORS[4]}\033[0m"
     : "${_@E}"

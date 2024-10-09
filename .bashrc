@@ -67,6 +67,10 @@ export FZF_DEFAULT_COMMAND='fd --type file --follow --hidden --exclude .git'
 alias gt='goto'
 alias git='git --no-pager'
 
-bind -x '"\C-l": clear'
+if ! clear &> /dev/null; then
+  bind -x '"\C-l": printf '\''\x1b[0H\x1b[2J'\'
+else
+  bind -x '"\C-l": clear'
+fi
 bind -x '"\C-o": __fzf_nvim_open_file'
 bind -x '"\C-u": __fzf_cat_file'

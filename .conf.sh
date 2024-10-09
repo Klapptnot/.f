@@ -102,7 +102,6 @@ function gen_ignore_list {
     ".config/nushell/history*"
   )
 
-  [ -n "${TERMUX_VERSION@A}" ]    || ignore+=(".termux*")
   # Desktop environment
   command -v Hyprland > /dev/null || ignore+=(".config/hypr*")
   command -v rofi > /dev/null     || ignore+=(".config/rofi*")

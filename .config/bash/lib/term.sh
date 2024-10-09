@@ -1,6 +1,6 @@
 #! /bin/env bash
 
-color.from_hex() {
+term.color.from_hex() {
   read -r s < /dev/stdin
   [[ "${s}" == '#'* ]] && s="${s:1}"
   [[ "${s}" =~ ^[a-fA-F0-9]{6}$ ]] && printf '\x1b[0m' && return
@@ -15,31 +15,31 @@ color.from_hex() {
   printf "${format}" "${r}" "${g}" "${b}"
 }
 
-cursor.go_up() {
+term.cursor.go_up() {
   local amount=${1:-1}
   ! [[ ${amount} =~ ^[0-9]+$ ]] && amount=1
   printf "%b" "\x1b[${amount}A"
 }
 
-cursor.go_down() {
+term.cursor.go_down() {
   local amount=${1:-1}
   ! [[ ${amount} =~ ^[0-9]+$ ]] && amount=1
   printf "%b" "\x1b[${amount}B"
 }
 
-cursor.go_right() {
+term.cursor.go_right() {
   local amount=${1:-1}
   ! [[ ${amount} =~ ^[0-9]+$ ]] && amount=1
   printf "%b" "\x1b[${amount}C"
 }
 
-cursor.go_left() {
+term.cursor.go_left() {
   local amount=${1:-1}
   ! [[ ${amount} =~ ^[0-9]+$ ]] && amount=1
   printf "%b" "\x1b[${amount}D"
 }
 
-cursor.go_to() {
+term.cursor.go_to() {
   local l=${1:-1}
   local c=${2:-1}
   ! [[ ${c} =~ ^[0-9]+$ ]] && c=1
@@ -53,56 +53,57 @@ cursos.pos() {
   printf "%s" "${pos}"
 }
 
-cursor.save() { printf '\x1b7'; }
-cursor.back() { printf '\x1b8'; }
-cursor.home() { printf '\x1b[0H'; }
+term.cursor.save() { printf '\x1b7'; }
+term.cursor.back() { printf '\x1b8'; }
+term.cursor.home() { printf '\x1b[0H'; }
 
-cursor.line.end() {
+term.cursor.line.end() {
   read -r _ cols < <(stty size)
   printf '\x1b[%dG' "${cols}";
 }
-cursor.line.home() { printf '\x1b[1G'; }
+term.cursor.line.home() { printf '\x1b[1G'; }
 
-cursor.linefeed() {
+term.cursor.linefeed() {
   local amount=${1:-1}
   ! [[ ${amount} =~ ^[0-9]+$ ]] && amount=1
   printf "%b" "\x1b[${amount}E"
 }
 
-cursor.linebackfeed() {
+term.cursor.linebackfeed() {
   local amount=${1:-1}
   ! [[ ${amount} =~ ^[0-9]+$ ]] && amount=1
   printf "%b" "\x1b[${amount}F"
 }
 
-cursor.hide() { printf '\x1b[?25l'; }
-cursor.show() { printf '\x1b[?25h'; }
+term.cursor.hide() { printf '\x1b[?25l'; }
+term.cursor.show() { printf '\x1b[?25h'; }
 
 term.size() { stty size; }
 
 term.clear_line() { printf '\x1b[0G\x1b[0K'; }
-term.clear_all() { printf '\x1b[0G\x1b[0J'; }
-term.clear_screen() { printf '\x1b[0H\x1b[2J'; }
+term.clear_below() { printf '\x1b[0G\x1b[0J'; }
+term.clear() { printf '\x1b[0H\x1b[2J'; }
+term.clear_all() { printf '\x1b[0H\x1b[3J'; }
 
 term.wrap.on() { printf '\x1b[?7h'; }
 term.wrap.off() { printf '\x1b[?7l'; }
 
-term.bold.on() { printf '\x1b[1m'; }
-term.bold.off() { printf '\x1b[21m'; }
-term.dimmed.on() { printf '\x1b[2m'; }
-term.dimmed.off() { printf '\x1b[22m'; }
-term.italic.on() { printf '\x1b[3m'; }
-term.italic.off() { printf '\x1b[23m'; }
-term.underlined.on() { printf '\x1b[4m'; }
-term.underlined.off() { printf '\x1b[24m'; }
-term.blink.on() { printf '\x1b[5m'; }
-term.blink.off() { printf '\x1b[25m'; }
-term.invert_color.on() { printf '\x1b[7m'; }
-term.invert_color.off() { printf '\x1b[27m'; }
-term.hidden.on() { printf '\x1b[8m'; }
-term.hidden.off() { printf '\x1b[28m'; }
-term.strikethrough.on() { printf '\x1b[9m'; }
-term.strikethrough.off() { printf '\x1b[29m'; }
+term.style.bold.on() { printf '\x1b[1m'; }
+term.style.bold.off() { printf '\x1b[21m'; }
+term.style.dimmed.on() { printf '\x1b[2m'; }
+term.style.dimmed.off() { printf '\x1b[22m'; }
+term.style.italic.on() { printf '\x1b[3m'; }
+term.style.italic.off() { printf '\x1b[23m'; }
+term.style.underlined.on() { printf '\x1b[4m'; }
+term.style.underlined.off() { printf '\x1b[24m'; }
+term.style.blink.on() { printf '\x1b[5m'; }
+term.style.blink.off() { printf '\x1b[25m'; }
+term.style.invert_color.on() { printf '\x1b[7m'; }
+term.style.invert_color.off() { printf '\x1b[27m'; }
+term.style.hidden.on() { printf '\x1b[8m'; }
+term.style.hidden.off() { printf '\x1b[28m'; }
+term.style.strikethrough.on() { printf '\x1b[9m'; }
+term.style.strikethrough.off() { printf '\x1b[29m'; }
 
 term.save() { printf '\e[?1049h'; }
 term.back() { printf '\e[?1049l'; }

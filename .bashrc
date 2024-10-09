@@ -68,7 +68,7 @@ alias gt='goto'
 alias git='git --no-pager'
 
 if ! clear &> /dev/null; then
-  bind -x '"\C-l": printf '\''\x1b[0H\x1b[2J'\'
+  [[ "${TERM}" == 'xterm'* ]] && bind -x '"\C-l": printf '\''\x1b[0H\x1b[3J'\'
 else
   bind -x '"\C-l": clear'
 fi

@@ -23,7 +23,7 @@ goto() {
     shift 1
   elif [[ "${1}" =~ ^-h|--help$ ]]; then
     local help=(
-      '{fgc.87}goto{r} - Alias based fast cd (change dir)\n'
+      '{f87}goto{r} - Alias based fast cd (change dir)\n'
       'Usage: goto <path|alias> [...MODIFIERS]\n'
       '       goto -h|--help\n'
       '       goto -l|--list\n'
@@ -40,14 +40,14 @@ goto() {
     return
   elif [[ "${1}" =~ ^-l|--list$ ]]; then
     if ! [ -f "${HOME}/.config/goto.idx" ]; then
-      printfc '{fgc.85}[INFO]{r} Index file not found, printing default aliases\n'
+      printfc '{f85}[INFO]{r} Index file not found, printing default aliases\n'
       PATH_INDEX_CONTENT=(
-        'cfg &!HOME;/.config'
-        'ubin /usr/bin'
-        'ulib /usr/lib'
-        'uetc /usr/etc'
-        'dtkp &!HOME;/Desktop'
-        'nvcfg &*cfg;/nvim'
+        'cfg   &!HOME;/.config'
+        'ubin  /usr/bin'
+        'ulib  /usr/lib'
+        'uetc  /usr/etc'
+        'dtkp  &!HOME;/Desktop'
+        'nvc   &*cfg;/nvim'
       )
       # shellcheck disable=SC2178
       IFS=$'\n' PATH_INDEX_CONTENT="${PATH_INDEX_CONTENT[*]}"
@@ -55,7 +55,7 @@ goto() {
       printf '%s\n' "${PATH_INDEX_CONTENT}"
       return
     fi
-    printfc '{fgc.85}[INFO]{r} Printing aliases\n%s\n' "$(< "${HOME}/.config/goto.idx")"
+    printfc '{f85}[INFO]{r} Printing aliases\n%s\n' "$(< "${HOME}/.config/goto.idx")"
     return
   fi
 
@@ -70,14 +70,14 @@ goto() {
       'ulib /usr/lib'
       'uetc /usr/etc'
       'dtkp &!HOME;/Desktop'
-      'nvcfg &*cfg;/nvim'
+      'nvc  &*cfg;/nvim'
     )
     # Join by LF
     # shellcheck disable=SC2178
     IFS=$'\n' PATH_INDEX_CONTENT="${PATH_INDEX_CONTENT[*]}"
     # shellcheck disable=SC2178,SC2128
     declare -r PATH_INDEX_CONTENT="${PATH_INDEX_CONTENT}"
-    printfc '{fgc.191}[WARN]{r} Index file no found, default aliases is set\n'
+    printfc '{f191}[WARN]{r} Index file no found, default aliases is set\n'
   fi
 
   # shellcheck disable=SC2128
@@ -93,7 +93,7 @@ goto() {
   local ent_regex='&(\*|!|%)([^;\s]*);'
   local path="${ALIASES[${1}]}"
   if [ -z "${path}" ]; then
-    printfc '{fgc.160}[ERR ]{r} Alias "%s" not found\n' "${1}"
+    printfc '{f160}[ERR ]{r} Alias "%s" not found\n' "${1}"
     return 2
   fi
   local shopt_restore=false
@@ -105,14 +105,14 @@ goto() {
     case "${BASH_REMATCH[1]}" in
       '*')
         if [ -z "${ALIASES[${BASH_REMATCH[2]}]}" ]; then
-          printfc '{fgc.160}[ERR ]{r} Alias "%s" not found\n' "${BASH_REMATCH[2]}"
+          printfc '{f160}[ERR ]{r} Alias "%s" not found\n' "${BASH_REMATCH[2]}"
           return 2
         fi
         path="${path//${BASH_REMATCH[0]}/${ALIASES["${BASH_REMATCH[2]}"]}\/}"
         ;;
       '!')
         if [ -z "${BASH_REMATCH[2]}" ]; then
-          printfc '{fgc.160}[ERR ]{r} Environment variable "%s" inaccessible\n' "${BASH_REMATCH[2]}"
+          printfc '{f160}[ERR ]{r} Environment variable "%s" inaccessible\n' "${BASH_REMATCH[2]}"
           return 3
         fi
         path="${path//${BASH_REMATCH[0]}/${!BASH_REMATCH[2]}\/}"
@@ -120,7 +120,7 @@ goto() {
       '%')
         if [ -z "${modifiers[(${BASH_REMATCH[2]} - 1)]}" ]; then
           # shellcheck disable=SC2004
-          printfc '{fgc.160}[ERR ]{r} Modifiers number "%s" not found\n' "$((${BASH_REMATCH[2]} - 1))"
+          printfc '{f160}[ERR ]{r} Modifiers number "%s" not found\n' "$((${BASH_REMATCH[2]} - 1))"
           return 4
         fi
         path="${path//${BASH_REMATCH[0]}/${modifiers[(${BASH_REMATCH[2]} - 1)]}\/}"
@@ -138,7 +138,7 @@ goto() {
     path="${path}/${modifiers[i]}"
   done
   if ! [ -d "${path}" ]; then
-    printfc '{fgc.160}[ERR ]{r} Folder "%s" does not exist or is not accessible\n' "${path}"
+    printfc '{f160}[ERR ]{r} Folder "%s" does not exist or is not accessible\n' "${path}"
     return 7
   fi
   if ${print_path}; then

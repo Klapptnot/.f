@@ -15,7 +15,7 @@ def get-aliased-paths [] -> table<alias: string[], expand: string[]> {
       'ulib     /usr/lib',
       'uetc     /usr/etc',
       'dtkp     &!HOME;/Desktop',
-      'nvcfg    &*cfg;/nvim'
+      'nvc      &*cfg;/nvim'
     ]
   }
   $def | parse "{alias} {expand}" | str trim

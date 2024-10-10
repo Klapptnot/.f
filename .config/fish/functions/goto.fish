@@ -8,12 +8,12 @@
 # Small utility to go to folders by alias
 
 function goto -d 'Alias based fast cd (change dir)'
-  argparse -x h,l h/help l/list print -- $argv
+  argparse -x h,l h/help l/list p/print -- $argv
   or return 1
 
   if set -q _flag_help
     set -l help \
-      '{fgc.87}goto{r} - Alias based fast cd (change dir)' \
+      '{f87}goto{r} - Alias based fast cd (change dir)' \
       'Usage: goto <path|alias> [...MODIFIERS]' \
       '       goto -h|--help     - Show this message and exit' \
       '       goto -l|--list     - Show the aliases list' \
@@ -30,25 +30,37 @@ function goto -d 'Alias based fast cd (change dir)'
     return
   else if set -q _flag_list
     if not test -f $HOME/.config/goto.idx
-      print '{fgc.85}[INFO]{r} Index file not found, printing default aliases\n'
+      print '{f85}[INFO]{r} Index file not found, printing default aliases\n'
       set -l PATH_INDEX_CONTENT \
         'cfg &!HOME;/.config' \
         'ubin /usr/bin' \
         'ulib /usr/lib' \
         'uetc /usr/etc' \
-        'dtkp &!HOME;/Desktop' \
-        'nvcfg &*cfg;/nvim'
+        'dtkp  &!HOME;/Desktop' \
+        'nvc &*cfg;/nvim'
       print '{}\n' $PATH_INDEX_CONTENT
       return 1
     end
-    # print '{fgc.85}[INFO]{r} Printing aliases\n'
+
     set -l keys (cat $HOME/.config/goto.idx | grep -Po '^\s*\K[^\s]+')
     set -l alias (cat $HOME/.config/goto.idx | grep -Po '(?<=\s)[^\s].*(?=$)')
-    print '\x1b[2m\x1b[3m╭{:─^6}┬{:─^17}┬{:─^37}╮\n│ {:^5}│ {:15} │  {:35}│\n├{:─^6}┼{:─^17}┼{:─^37}┤\x1b[22m\x1b[23m\n' "─" "─" "─" "N*" "alias" "content" "─" "─" "─"
+    set -l keyL 0
+    set -l aliasL 0
     for i in (seq 1 (count $keys))
-      print '\x1b[2m\x1b[3m│{:>5} │ {:15} │  {:35}│\x1b[22m\x1b[23m\n' $i $keys[$i] $alias[$i]
+      test (string length $keys[$i]) -gt $keyL; and set keyL (string length $keys[$i])
+      test (string length $alias[$i]) -gt $aliasL; and set aliasL (string length $alias[$i])
     end
-    print '\x1b[2m\x1b[3m╰{:─^6}┴{:─^17}┴{:─^37}╯\x1b[22m\x1b[23m\n' "─" "─" "─"
+    set keyl2 (math $keyL + 2)
+    set aliasl2 (math $aliasL + 2)
+    set count_k (string length (count $keys))
+    set -f table (print '╭{─^'(math $count_k + 2)'}┬{─^'{$keyl2}'}┬{─^'{$aliasl2}'}╮' "─" "─" "─")
+    set -a table (print '│ {^'{$count_k}'} │ {^'{$keyL}'} │ {^'{$aliasL}'} │' "#" "Alias" "Content")
+    set -a table (print '├{─^'(math $count_k + 2)'}┼{─^'{$keyl2}'}┼{─^'{$aliasl2}'}┤' "─" "─" "─")
+    for i in (seq 1 (count $keys))
+      set -a table (print '│ {'{$count_k}'} │ {'{$keyL}'} │ {'{$aliasL}'} │' $i $keys[$i] $alias[$i])
+    end
+    set -a table (print '╰{─^'(math $count_k + 2)'}┴{─^'{$keyl2}'}┴{─^'{$aliasl2}'}╯' "─" "─" "─")
+    print '\x1b[2m\x1b[3m{}\x1b[22m\x1b[23m\n' $table
     return
   end
   if test -z $argv[1]
@@ -77,8 +89,8 @@ function goto -d 'Alias based fast cd (change dir)'
       'ulib /usr/lib' \
       'uetc /usr/etc' \
       'dtkp &!HOME;/Desktop' \
-      'nvcfg &*cfg;/nvim'
-    print '{fgc.191}[WARN]{r} Index file no found, default aliases are set\n'
+      'nvc &*cfg;/nvim'
+    print '{f191}[WARN]{r} Index file no found, default aliases are set\n'
   end
 
   set -l keys (print '{}\n' $PATH_INDEX_CONTENT | grep -Po '^\s*\K[^\s]+')
@@ -90,7 +102,7 @@ function goto -d 'Alias based fast cd (change dir)'
   if set -l idx (contains -i $argv[1] $keys[1..-1])
     set -f path $alias[$idx]
   else
-    print '{fgc.160}[ERR ]{r} Alias "{}" not found\n' $argv[1]
+    print '{f160}[ERR ]{r} Alias "{}" not found\n' $argv[1]
     return 2
   end
 
@@ -100,19 +112,19 @@ function goto -d 'Alias based fast cd (change dir)'
         if set -l idx (contains -i $rematch[3] $keys)
           set path (string replace --all $rematch[1] $alias[$idx]\/ $path)
         else
-          print '{fgc.160}[ERR ]{r} Alias "{}" not found\n' $rematch[3]
+          print '{f160}[ERR ]{r} Alias "{}" not found\n' $rematch[3]
           return 2
         end
       case '!'
         if set -l var $$rematch[3]
           set path (string replace --all $rematch[1] $var\/ $path)
         else
-          print '{fgc.160}[ERR ]{r} Environment variable "{}" inaccessible\n' $rematch[3]
+          print '{f160}[ERR ]{r} Environment variable "{}" inaccessible\n' $rematch[3]
           return 3
         end
       case '%'
         if test -z $modifiers[$rematch[3]]
-          print '{fgc.160}[ERR ]{r} Modifiers number "{}" not found\n' $rematch[3]
+          print '{f160}[ERR ]{r} Modifiers number "{}" not found\n' $rematch[3]
           return 4
         end
         set path (string replace --all $rematch[1] $modifiers[$rematch[3]]\/ $path)
@@ -129,7 +141,7 @@ function goto -d 'Alias based fast cd (change dir)'
   end
 
   if not test -d $path
-    print '{fgc.160}[ERR ]{r} Folder "{}" does not exist or is not accessible\n' $path
+    print '{f160}[ERR ]{r} Folder "{}" does not exist or is not accessible\n' $path
     return 7
   end
   if set -q _flag_print

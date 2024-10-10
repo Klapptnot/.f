@@ -1,11 +1,11 @@
 #! /bin/env bash
 
-fzf_get_file() {
+_r_fzf_get_file() {
   local file
   file=$(
-    fzf --prompt 'File: ' --pointer '=>' --marker '==' \
+    fzf --prompt 'File: ' --pointer '>' --marker '=' \
       --preview-window '65%' --preview-label 'Preview' \
-      --preview='bat {}'
+      --preview='bat {}' "${PWD}"
   )
   if ! [ -f "${file}" ]; then
     return 1
@@ -15,7 +15,7 @@ fzf_get_file() {
 
 __fzf_nvim_open_file() {
   local file
-  if file=$(fzf_get_file); then
+  if file=$(_r_fzf_get_file); then
     nvim "${file}"
   fi
 }

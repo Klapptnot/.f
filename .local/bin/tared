@@ -4,114 +4,150 @@
 source "${HOME}/.config/bash/lib/printfc.sh"
 
 declare -A l_cmds=(
-    ["zip"]="unzip -l {:compressed:}"
-    ["gz"]="gzip -l {:compressed:}"
-    ["tar"]="tar -tf {:compressed:}"
-    ["tar.gz"]="tar -tzf {:compressed:}"
-    ["tar.bz2"]="tar -tjf {:compressed:}"
-    ["tar.xz"]="tar -tJf {:compressed:}"
-    ["tar.lzma"]="tar --lzma -tf {:compressed:}"
-    ["tar.zst"]="tar --zstd -tf {:compressed:}"
-    ["7z"]="7z l {:compressed:}"
-    ["rar"]="unrar l {:compressed:}"
-    ["xz"]="xz -l {:compressed:}"
-    ["zst"]="zstd -l {:compressed:}"
-    ["lzma"]="xz --list {:compressed:}"
-    ["bz2"]="bzip2 -l {:compressed:}"
-    ["lzh"]="lha l {:compressed:}"
+  ["zip"]="unzip -l {:secondary:}"
+  ["gz"]="gzip -l {:secondary:}"
+  ["tar"]="tar -tf {:secondary:}"
+  ["tar.gz"]="tar -tzf {:secondary:}"
+  ["tar.bz2"]="tar -tjf {:secondary:}"
+  ["tar.xz"]="tar -tJf {:secondary:}"
+  ["tar.lzma"]="tar --lzma -tf {:secondary:}"
+  ["tar.zst"]="tar --zstd -tf {:secondary:}"
+  ["7z"]="7z l {:secondary:}"
+  ["rar"]="unrar l {:secondary:}"
+  ["xz"]="xz -l {:secondary:}"
+  ["zst"]="zstd -l {:secondary:}"
+  ["lzma"]="xz --list {:secondary:}"
+  ["bz2"]="bzip2 -l {:secondary:}"
+  ["lzh"]="lha l {:secondary:}"
 )
 
 declare -A e_cmds=(
-    ["zip"]="unzip {:compressed:} -d {:decomp:}"
-    ["gz"]="gzip -d {:compressed:} -c {:decomp:}"
-    ["tar"]="tar -xf {:compressed:} -C {:decomp:}"
-    ["tar.gz"]="tar -xzf {:compressed:} -C {:decomp:}"
-    ["tar.bz2"]="tar -xjf {:compressed:} -C {:decomp:}"
-    ["tar.xz"]="tar -xJf {:compressed:} -C {:decomp:}"
-    ["tar.lzma"]="tar --lzma -xf {:compressed:} -C {:decomp:}"
-    ["tar.zst"]="tar --zstd -xf {:compressed:} -C {:decomp:}"
-    ["7z"]="7z x {:compressed:} -o {:decomp:}"
-    ["rar"]="unrar x {:compressed:} {:decomp:}"
-    ["xz"]="xz -d {:compressed:} -c | tar -xf - -C {:decomp:}"
-    ["zst"]="zstd -d {:compressed:} -c | tar -xf - -C {:decomp:}"
-    ["lzma"]="xz -d {:compressed:} -c | tar -xf - -C {:decomp:}"
-    ["bz2"]="bzip2 -d {:compressed:} -c | tar -xf - -C {:decomp:}"
-    ["lzh"]="lha e {:compressed:} {:decomp:}"
+  ["zip"]="unzip {:secondary:} -d {:primary:}"
+  ["gz"]="gzip -d {:secondary:} -c {:primary:}"
+  ["tar"]="tar -xf {:secondary:} -C {:primary:}"
+  ["tar.gz"]="tar -xzf {:secondary:} -C {:primary:}"
+  ["tar.bz2"]="tar -xjf {:secondary:} -C {:primary:}"
+  ["tar.xz"]="tar -xJf {:secondary:} -C {:primary:}"
+  ["tar.lzma"]="tar --lzma -xf {:secondary:} -C {:primary:}"
+  ["tar.zst"]="tar --zstd -xf {:secondary:} -C {:primary:}"
+  ["7z"]="7z x {:secondary:} -o {:primary:}"
+  ["rar"]="unrar x {:secondary:} {:primary:}"
+  ["xz"]="xz -d {:secondary:} -c | tar -xf - -C {:primary:}"
+  ["zst"]="zstd -d {:secondary:} -c | tar -xf - -C {:primary:}"
+  ["lzma"]="xz -d {:secondary:} -c | tar -xf - -C {:primary:}"
+  ["bz2"]="bzip2 -d {:secondary:} -c | tar -xf - -C {:primary:}"
+  ["lzh"]="lha e {:secondary:} {:primary:}"
 )
 
 declare -A c_cmds=(
-    ["zip"]="zip {:compressed:} {:decomp:}"
-    ["gz"]="gzip {:decomp:} -c > {:compressed:}"
-    ["tar"]="tar -cf {:compressed:} {:decomp:}"
-    ["tar.gz"]="tar -czf {:compressed:} {:decomp:}"
-    ["tar.bz2"]="tar -cjf {:compressed:} {:decomp:}"
-    ["tar.xz"]="tar -cJf {:compressed:} {:decomp:}"
-    ["tar.lzma"]="tar --lzma -cf {:compressed:} {:decomp:}"
-    ["tar.zst"]="tar --zstd -cf {:compressed:} {:decomp:}"
-    ["7z"]="7z a {:compressed:} {:decomp:}"
-    ["rar"]="rar a {:compressed:} {:decomp:}"
-    ["xz"]="tar -cJf {:compressed:} {:decomp:}"
-    ["zst"]="tar --zstd -cf {:compressed:} {:decomp:}"
-    ["lzma"]="tar --lzma -cf {:compressed:} {:decomp:}"
-    ["bz2"]="tar -cjf {:compressed:} {:decomp:}"
-    ["lzh"]="lha a {:compressed:} {:decomp:}"
+  ["zip"]="zip {:secondary:} {:primary:}"
+  ["gz"]="gzip {:primary:} -c > {:secondary:}"
+  ["tar"]="tar -cf {:secondary:} {:primary:}"
+  ["tar.gz"]="tar -czf {:secondary:} {:primary:}"
+  ["tar.bz2"]="tar -cjf {:secondary:} {:primary:}"
+  ["tar.xz"]="tar -cJf {:secondary:} {:primary:}"
+  ["tar.lzma"]="tar --lzma -cf {:secondary:} {:primary:}"
+  ["tar.zst"]="tar --zstd -cf {:secondary:} {:primary:}"
+  ["7z"]="7z a {:secondary:} {:primary:}"
+  ["rar"]="rar a {:secondary:} {:primary:}"
+  ["xz"]="tar -cJf {:secondary:} {:primary:}"
+  ["zst"]="tar --zstd -cf {:secondary:} {:primary:}"
+  ["lzma"]="tar --lzma -cf {:secondary:} {:primary:}"
+  ["bz2"]="tar -cjf {:secondary:} {:primary:}"
+  ["lzh"]="lha a {:secondary:} {:primary:}"
 )
 
-function main() {
-  local _local_mode='e'
+epanic() {
+  printfc "${@}" 1>&2
+  exit 1
+}
+
+main() {
   local _auto_run=false
   local _just_print=false
+  local old_first="${1}"
   case "${1}" in
-    'e' | 'E' | 'extract' | 'c' | 'C' | 'compress' | 'l' | 'L' | 'list' | 'h' | 'help' | 'v' | 'version')
-      _local_mode="${1}"
+    'e' | 'E' | 'extract' | 'c' | 'C' | 'compress' | 'l' | 'L' | 'list')
+      _oper_mode="${1}"
       shift 1
       ;;
+    'h' | 'help')
+      local help=(
+        '\b{f87}tared{r} - Tired of tar args, just say what you want\n\n'
+        '\b\x1b[4mUsage:\x1b[24m\n'
+        '\b  {f84}tared{r} <{f219}operation{r}> [{f96}values{r}]\n\n'
+        '\b  e, E, extract  <name> <folder>  - Extract <name> to folder or PWD\n'
+        '\b  c, C, compress <name> [...]     - Compress files to <name>\n'
+        '\b  l, L, list     <name>           - List contents of <name>\n'
+        '\b  h, help                         - Show this message and exit\n'
+        '\b  v, version                      - Show version and exit\n\n'
+        '\b\x1b[4mNotes:\x1b[24m\n'
+        '\bThe compression type will be determined by the file extension, just give\n'
+        '\bthe correct arguments and it will work.\n'
+        '\bLong operation names (ex. list) will {f191}execute the command directly{r}\n'
+        '\bshort lowercase ones (ex. l) will {f191}ask to run the command{r}\n'
+        '\bshort uppercase ones (ex. L) will just {f191}print the command{r}\n\n'
+        '\b\x1b[4mSupported files:\x1b[24m\n'
+        '\b  tar, tar.{gz,xz,bz2,zst,lzma}, rar, 7z\n'
+        '\b  zip, gz, xz, lzh, lzma, bz2, zst\n'
+      )
+      printfc "${help[*]}"
+      exit
+      ;;
+    'v' | 'version')
+      printfc '{f87}tared{r} - Tired of tar args, just say what you want\n\ntared v0.1 (unix-bash)\n'
+      exit
+      ;;
+    *)
+      epanic '{f9}Unknown operation "%s", try `tared ''help`{r}\n' "${1:-<empty>}"
+      ;;
   esac
-  if [ "${#_local_mode}" -gt 1 ]; then
-    _local_mode="${_local_mode:0:1}"
+
+  if [ "${#_oper_mode}" -gt 1 ]; then
+    _oper_mode="${_oper_mode:0:1}"
     _auto_run=true
   fi
-  if [[ "${_local_mode}" =~ ^(E|C|L)$ ]]; then
-    _local_mode="${_local_mode,,}"
+  if [[ "${_oper_mode}" =~ ^(E|C|L)$ ]]; then
+    _oper_mode="${_oper_mode,,}"
     _just_print=true
   fi
-  if [ "${_local_mode}" == 'v' ]; then
-    printfc '{fgc.87}tared{r} - Tired of tar args, just say what you want\n\ntared v0.1 (unix-bash)\n'
-    exit
-  fi
-  local compressed="${1}"
-  local all=("${@:2}")
-  if [[ "${_local_mode}" =~ ^(e|c)$ ]]; then
-    if [ -z "${compressed}" ] || [ -z "${all[*]}" ]; then
-      _local_mode='h'
-    fi
-  elif [ "${_local_mode}" == "l" ] && [ -z "${compressed}" ]; then
-    _local_mode='h'
-  fi
 
-  if [[ "${_local_mode}" == 'h' ]]; then
-    local help=(
-      '{fgc.87}tared{r} - Tired of tar args, just say what you want\n\n'
-      '\x1b[4mUsage:\x1b[24m\n'
-      '  {fgc.84}tared{r} <{fgc.219}operation{r}> [{fgc.96}values{r}]\n\n'
-      '  e, E, extract  <name> <folder>  - Extract <name> to folder or PWD\n'
-      '  c, C, compress <name> [...]     - Compress files to <name>\n'
-      '  l, L, list     <name>           - List contents of <name>\n'
-      '  h, help                         - Show this message and exit\n'
-      '  v, version                      - Show version and exit\n\n'
-      '\x1b[4mNotes:\x1b[24m\n'
-      'The compression type will be determined by the file extension, just give\n'
-      'the correct arguments and it will work.\n'
-      'Long operation names (ex. list) will {fgc.191}execute the command directly{r}\n'
-      'short lowercase ones (ex. l) will {fgc.191}ask to run the command{r}\n'
-      'short uppercase ones (ex. L) will just {fgc.191}print the command{r}\n\n'
-      '\x1b[4mSupported files:\x1b[24m\n'
-      '  tar, tar.{gz,xz,bz2,zst,lzma}, rar, 7z\n'
-      '  zip, gz, xz, lzh, lzma, bz2, zst\n'
-    )
-    printfc "${help[*]}"
-    exit
-  fi
+  local primary=()
+  local secondary=""
+
+  local tout_dir=""
+  case "${_oper_mode}" in
+    'c')
+      # compress
+      primary=("${@:1:$#-1}")
+      # : "${@: -1}"
+      secondary="${*: -1}"
+      [[ -z "${secondary}" || -z "${primary[*]}" ]] &&
+        epanic '{f9}Usage: `tared'' %s [files]... <name>`{r}\n' "${old_first}"
+      ;;
+    'e')
+      # extract
+      primary=("${@:2}")
+      secondary="${1}"
+      [[ -z "${secondary}" || -z "${primary[*]}" ]] &&
+        epanic '{f9}Usage: `tared'' %s <file> <folder>`{r}\n' "${old_first}"
+      ((${#primary[@]} > 1)) && epanic '{f9}More than one destination{r}\n'
+      tout_dir="$(realpath "${primary[0]}")"
+      [[ -e "${tout_dir}" && ! -d "${tout_dir}" ]] &&
+        epanic '{f9}Output is a regular file and not a folder{r}: %s\n' "${tout_dir}"
+      [ ! -d "${tout_dir}" ] && {
+        mkdir -p "${tout_dir}" || epanic '{f9}Could not create folder: {r}%s\n' "${tout_dir}"
+      }
+      primary[0]="${tout_dir}"
+      ;;
+    'l')
+      # list
+      secondary="${1}"
+      [ -z "${secondary}" ] &&
+        epanic '{f9}Usage: `tared'' %s <file>`{r}\n' "${old_first}"
+      ;;
+  esac
+
   local ext=(
     'tar.gz'
     'tar.xz'
@@ -129,44 +165,38 @@ function main() {
     'bz2'
     'zst'
   )
+
   local invrt_cmd=false
   local cmd=''
   for _ext in "${ext[@]}"; do
-    if [[ "${compressed}" == *"${_ext}" ]]; then
-      [ "${_local_mode}" == 'e' ] && cmd="${e_cmds[${_ext}]}"
-      [ "${_local_mode}" == 'c' ] && cmd="${c_cmds[${_ext}]}"
-      [ "${_local_mode}" == 'l' ] && cmd="${l_cmds[${_ext}]}"
+    if [[ "${secondary}" == *"${_ext}" ]]; then
+      [ "${_oper_mode}" == 'e' ] && cmd="${e_cmds[${_ext}]}"
+      [ "${_oper_mode}" == 'c' ] && cmd="${c_cmds[${_ext}]}"
+      [ "${_oper_mode}" == 'l' ] && cmd="${l_cmds[${_ext}]}"
       case "${_ext}" in 'gz') invrt_cmd=true ;; esac
       break
     fi
   done
-  if [ -z "${cmd}" ]; then
-    printfc '{fgc.202}Unsupported file {r}"%s"{fgc.202}, see:{r}\n$ {fgc.195}tared help{r}\n' "${compressed}"
-    return 2
-  fi
-  local decomp="${all[*]}"
-  local theoretical_out_dir="$(realpath "${all[0]}")"
+
+  [ -z "${cmd}" ] &&
+    epanic '{f9}Unsupported file{r} "%s", {f9}try `tared'' help`{r}\n' "${secondary}"
 
   if ${invrt_cmd}; then
-    cmd="${cmd/\{:compressed:\}/${decomp@Q}}"
-    cmd="${cmd/\{:decomp:\}/${compressed@Q}}"
+    cmd="${cmd/\{:secondary:\}/"${primary[*]@Q}"}"
+    cmd="${cmd/\{:primary:\}/${secondary@Q}}"
   else
-    cmd="${cmd/\{:decomp:\}/${decomp@Q}}"
-    cmd="${cmd/\{:compressed:\}/${compressed@Q}}"
+    cmd="${cmd/\{:secondary:\}/${secondary@Q}}"
+    cmd="${cmd/\{:primary:\}/"${primary[*]@Q}"}"
   fi
 
   if ${_just_print}; then
     printf "%s" "${cmd}"
-    return 0
+    exit 0
   fi
 
-  if [ "${_local_mode}" == "e" ] && ! [ -d "${decomp}" ]; then
-    mkdir -p "${theoretical_out_dir}"
-  fi
-
-  printfc "{fgc.87}Command{rst}  $ %s\n" "${cmd}"
+  printfc "{f87}Command{r}  $ %s\n" "${cmd}"
   if ! "${_auto_run}"; then
-    printfc '{fgc.99}Execute the command [y|*]:{r} '
+    printfc '{f99}Execute the command [y|*]:{r} '
     read -rn1 _do_run
     if [ "${_do_run}" != 'y' ]; then
       [ "${_do_run}" != '' ] && printf '\n'
@@ -175,14 +205,14 @@ function main() {
     printf '\n'
   fi
   local _exit_code=0
-  if eval "${cmd}"; then
-    printfc '{fgc.87}Command executed successfully!{r}\n'
-    return 0
-  else
+  if ! eval "${cmd}"; then
     _exit_code="${?}"
-    printfc '{fgc.160}Error in the execution of the command!{r}\n'
-    return "${_exit_code}"
+    printfc '{f160}Error in the execution of the command!{r}\n'
+    exit "${_exit_code}"
+  else
+    printfc '{f87}Command executed successfully!{r}\n'
+    exit 0
   fi
 }
 
-main "${@}" || exit "${?}"
+main "${@}"

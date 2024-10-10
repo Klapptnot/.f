@@ -33,6 +33,7 @@ yq.sh() {
   local multiline_key=""
   local line mmode smode #imode
   local indent=2
+  local RESULT=""
   for i in "${!lines[@]}"; do
     line="${lines[i]}"
     case "${line}" in
@@ -139,17 +140,24 @@ yq.sh() {
       case "${v}" in
         "'"*"'" | '"'*'"') v="${v:1:$((${#v} - 2))}" ;;
       esac
-      printf '%s' "${v}"
+      RESULT="${v}"
       break
     fi
   done
   if [ -n "${multiline_str}" ]; then
     if [ "${fpa[*]}" == "${dpa[*]}" ]; then
       printf '%s' "${multiline_str}"
+      return 0
     fi
   fi
+  [ -z "${RESULT}" ] && return 1
+  printf '%s' "${RESULT}"
 }
 
 if [ "${BASH_SOURCE[0]}" == "${0}" ]; then
-  yq.sh "${@}"
+  if RESULT="$(yq.sh "${@}")"; then
+    printf '%s' "${RESULT}"
+    exit
+  fi
+  exit 1
 fi

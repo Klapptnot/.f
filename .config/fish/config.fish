@@ -13,7 +13,7 @@ function _r_fzf_get_file -d "Use fzf to get a file"
   if set -l file (
       fzf --prompt 'File: ' --pointer '>' --marker '='\
         --preview-window '65%' --preview-label 'Preview'\
-        --preview='bat {}' $pwd
+        --preview='bat {}'
     )
     printf $file
   else

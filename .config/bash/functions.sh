@@ -5,7 +5,7 @@ _r_fzf_get_file() {
   file=$(
     fzf --prompt 'File: ' --pointer '>' --marker '=' \
       --preview-window '65%' --preview-label 'Preview' \
-      --preview='bat {}' "${PWD}"
+      --preview='bat {}'
   )
   if ! [ -f "${file}" ]; then
     return 1

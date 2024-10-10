@@ -22,7 +22,7 @@ $env.mirko = ($env.mirko | open)
 $env.mirko.color.git =   {
   i: (ansi $env.mirko.color.git.i)
   d: (ansi $env.mirko.color.git.d)
-  a: (ansi $env.mirko.color.git.a),
+  a: (ansi $env.mirko.color.git.a)
   s: (ansi $env.mirko.color.git.s)
 }
 

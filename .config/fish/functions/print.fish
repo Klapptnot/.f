@@ -5,23 +5,25 @@
 # |>   https://github.com/Klapptnot/dotf   <|
 # |>----|>----|>----|><-><|----<|----<|----<|
 
-function print -d 'printf with color formatting ability'
+function print -d 'Rust style print with color formatting ability'
   set -f __format_str__ $argv[1]
   set -f args $argv[2..-1]
   # Replace all reset escape
-  set __format_str__ (string replace -r --all '\{((f|b)gc.00|r|rst)\}' '\x1b[00m' $__format_str__)
+  set __format_str__ (string replace -r --all '\{(0|r|rst)\}' '\x1b[0m' $__format_str__)
   # Replace all foreground color with the respective escape seq
-  set __format_str__ (string replace -r --all '\{fgc\.([0-9]{1,3})\}' '\x1b[38;05;$1m' $__format_str__)
+  set __format_str__ (string replace -r --all '\{f([0-9]{1,3})\}' '\x1b[38;05;$1m' $__format_str__)
   # Replace all background color with the respective escape seq
-  set __format_str__ (string replace -r --all '\{bgc\.([0-9]{1,3})\}' '\x1b[48;05;$1m' $__format_str__)
+  set __format_str__ (string replace -r --all '\{b([0-9]{1,3})\}' '\x1b[48;05;$1m' $__format_str__)
 
   set -f print_stack $__format_str__
   set -f i 1
   while true
-    test (count $args) -le 0 && break
-    not string match --regex '\{(?::(.)?([<\^>])?([0-9]*))?\}' $print_stack[$i] &>/dev/null && break
-    while set -l rematch (string match --regex '\{(:(.)?([<\^>])?([0-9]*))?\}' -- $print_stack[$i])
-      test (count $args) -le 0 && break
+    # Runs until there is no argument to consume
+    # or fill until no placeholder is found
+    not string match --regex '\{(?:(.)?([<\^>])?([0-9]*))?\}' $print_stack[$i] &>/dev/null; and break
+    while set -l rematch (string match --regex '\{((.)?([<\^>])?([0-9]*))?\}' -- $print_stack[$i])
+      test (count $args) -le 0; and set args[1] ""
+      test (count $args) -le 0; and break
       set -l params $rematch[2]
       set -l l (string match --regex '[0-9]*$' -- $params)[1]; test -z $l && set l '0'
       set -l curr_len (string length -- $args[1])
@@ -30,8 +32,8 @@ function print -d 'printf with color formatting ability'
         set -e args[1]
         continue
       end
-      set -l d (string match --regex ':.?([<\^>])[0-9]*$' -- $params)[2]; test -z $d && set d '<'
-      set -l c (string match --regex ':(.)[<\^>][0-9]*$' -- $params)[2]; test -z $c && set c ' '
+      set -l d (string match --regex '.?([<\^>])[0-9]*$' -- $params)[2]; test -z $d && set d '<'
+      set -l c (string match --regex '(.)[<\^>][0-9]*$' -- $params)[2]; test -z $c && set c ' '
       switch $d
         case '<'
           set -l pr (string repeat -n (math $l - $curr_len) -- $c)
@@ -55,6 +57,7 @@ function print -d 'printf with color formatting ability'
     set i (math $i + 1)
   end
   set print_stack[$i] (string replace --all "{}" "" -- $print_stack[$i])
+  set print_stack[$i] (string replace --regex --all '\{(?:(.)?([<\^>])?([0-9]*))?\}' "" -- $print_stack[$i])
   set print_stack[$i] (string replace -r --all '\\\\(\{|\})' '$1' -- $print_stack[$i])
   set print_stack (string join '' -- $print_stack[1..-1])
   echo -en "$print_stack"

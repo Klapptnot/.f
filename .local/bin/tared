@@ -135,9 +135,6 @@ main() {
       tout_dir="$(realpath "${primary[0]}")"
       [[ -e "${tout_dir}" && ! -d "${tout_dir}" ]] &&
         epanic '{f9}Output is a regular file and not a folder{r}: %s\n' "${tout_dir}"
-      [ ! -d "${tout_dir}" ] && {
-        mkdir -p "${tout_dir}" || epanic '{f9}Could not create folder: {r}%s\n' "${tout_dir}"
-      }
       primary[0]="${tout_dir}"
       ;;
     'l')
@@ -192,6 +189,10 @@ main() {
   if ${_just_print}; then
     printf "%s" "${cmd}"
     exit 0
+  fi
+
+  if [ "${_oper_mode}" == 'e' ] && [ -n "${tout_dir}" ] && [ ! -d "${tout_dir}" ]; then
+    mkdir -p "${tout_dir}" || epanic '{f9}Could not create folder: {r}%s\n' "${tout_dir}"
   fi
 
   printfc "{f87}Command{r}  $ %s\n" "${cmd}"

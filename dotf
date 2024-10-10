@@ -67,7 +67,7 @@ BARG
   case "${BARG_SUBCOMMAND}" in
     install)
       if [[ "${INSTALL_MODE}" =~ ^(reset|update)$ ]]; then
-        printfc '{fgc.87}All local changes will be discarded, continue anyways?{r} [Yn]: '
+        printfc '{f87}All local changes will be discarded, continue anyways?{r} [Yn]: '
         read -r -n 1 REPLY
         echo
         if ! [[ "${REPLY}" =~ ^(Y|y)$ ]]; then
@@ -103,10 +103,10 @@ BARG
 
 do_help() {
   local help=(
-    '{fgc.87}dotf{r} - A simple script to manage dotfiles\n\n'
+    '{f87}dotf{r} - A simple script to manage dotfiles\n\n'
     '\x1b[4mUsage:\x1b[24m\n'
-    '  {fgc.84}dotf{r} <{fgc.219}subcommand{r}> [{fgc.96}options{r}]\n\n'
-    '  install [{fgc.96}options{r}]  - Install all dotfiles\n'
+    '  {f84}dotf{r} <{f219}subcommand{r}> [{f96}options{r}]\n\n'
+    '  install [{f96}options{r}]  - Install all dotfiles\n'
     '  uninstall          - Uninstall all dotfiles\n'
     '  config             - Open the configuration file (neovim)\n'
     '  help               - Show this message and exit\n'
@@ -121,8 +121,8 @@ do_help() {
   )
   local help_install=(
     '\x1b[4mUsage:\x1b[24m\n'
-    '  {fgc.84}dotf{r} {fgc.219}install{r} [{fgc.96}options{r}]\n\n'
-    '  install [{fgc.96}options{r}]  - Install all dotfiles\n'
+    '  {f84}dotf{r} {f219}install{r} [{f96}options{r}]\n\n'
+    '  install [{f96}options{r}]  - Install all dotfiles\n'
     '    -h, --help              Show this message and exit\n'
     '    -r, --reset             Reset the dotfiles installation\n'
     '    -u, --update            Update the dotfiles\n'

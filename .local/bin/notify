@@ -4,7 +4,7 @@ source ~/.config/bash/lib/barg.sh
 source ~/.config/bash/lib/rsum.sh
 source ~/.config/bash/lib/logger.sh
 
-function main {
+main() {
   barg.parse "${@}" << EOF
   #[progname='notify']
   #[extras='PARAMS', reqextras='true']
@@ -50,7 +50,7 @@ EOF
   esac
 }
 
-function send.ntfy {
+send.ntfy() {
   [ ! -e "${HOME}/.notify.conf" ] && {
     log e "Config file not found"
     exit
@@ -150,7 +150,7 @@ function send.ntfy {
   fi
 }
 
-function send.dbus {
+send.dbus() {
   local notification_title="${PARAMS[0]}"
   : "$(
     IFS=$'\n'
@@ -210,7 +210,7 @@ function send.dbus {
   fi
 }
 
-function dbus.notification_eventloop {
+dbus.notification_eventloop() {
   local notif_id="${1}"
   shift 1
   local commands=("${@}")
@@ -243,7 +243,7 @@ function dbus.notification_eventloop {
   rm "${fd}"
 }
 
-function show_help {
+show_help() {
     local help_lines=(
     "\x1b[1;34mnotify\x1b[0m: Sends notifications to dbus and the ntfy.sh service"
     ""

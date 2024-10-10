@@ -1,6 +1,6 @@
 #! /bin/env bash
 
-function main {
+main() {
   if [[ "${1}" =~ ^-f|--full|full$ ]]; then
     colormap
     exit
@@ -8,7 +8,7 @@ function main {
   print_palette_16
 }
 
-function print_palette_16 {
+print_palette_16() {
   # Define array of ANSI color names
   color_names=(
     "Black"        # 00:
@@ -35,7 +35,7 @@ function print_palette_16 {
   done
 }
 
-function colormap() {
+colormap() {
   for c in {0..255}; do
     local d=$(((c + 3) % 6))
     printf "\x1b[48;5;%dm   \x1b[00m\x1b[49m\x1b[38;5;%dm%03d \x1b[00m" "${c}" "${c}" "${c}"

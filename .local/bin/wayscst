@@ -1,7 +1,7 @@
 #! /bin/env bash
 # shellcheck disable=SC2155,SC2059
 
-function main {
+main() {
   local SS_FOLDER="$(xdg-user-dir PICTURES)/Screenshots"
   [ ! -f "${SS_FOLDER}" ] && mkdir -p "${SS_FOLDER}"
 
@@ -64,7 +64,7 @@ function main {
 }
 
 
-function _not_proc {
+_not_proc() {
   local exitc=${1}
   shift 1
   printf -v _str "${@}"
@@ -74,14 +74,14 @@ function _not_proc {
 
 # Slurp adds a surface, we use the surface to blink on
 # capture
-function indicate_take {
+indicate_take() {
   slurp -b#67469860 &
   local pid=${!}
   sleep 0.150
   kill -9 ${pid}
 }
 
-function take_n_save {
+take_n_save() {
   local filename="${1}"
   shift 1
 

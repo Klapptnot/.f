@@ -1,6 +1,6 @@
 #! /bin/env bash
 
-function main {
+main() {
   if [[ "${1}" =~ ^-h$|^--help$|^help$ ]]; then
     lns=(
       "\033[38;5;87mrsum\033[00m Just a easy way to get/generate (random) strings.\n"

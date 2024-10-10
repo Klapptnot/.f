@@ -4,7 +4,7 @@
 source "${HOME}/.config/bash/lib/rsum.sh"
 source "${HOME}/.config/bash/lib/barg.sh"
 
-function main {
+main() {
   barg.parse "${@}" << BARG || { echo "Command need args" && exit 1; }
     #[progname='bulkren']
     ! f/files[vec[str]] => files || F/folder[str] => folder
@@ -15,10 +15,6 @@ function main {
     I/ignore-folders[bool] => ignore_folders
 BARG
 
-  do-bulk-rename
-}
-
-function do-bulk-rename() {
   ${dry_run} && printf '%s\n' "Dry run, no changes will be made"
   if [ ${#files[@]} -eq 0 ]; then
     if [ -z "${folder}" ]; then

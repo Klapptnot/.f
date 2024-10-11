@@ -70,8 +70,8 @@ def get-path-color [path: path] {
 }
 
 def git_status_info [path: path] {
-  let changes = (git diff --shortstat e> $env.NULL_DEV | parse --regex "\\s*(?<f>[0-9]+)[^0-9]*(?<i>[0-9]+)[^0-9]*(?<d>[0-9]+)")
-  let untracked = (git ls-files --other --exclude-standard $path e> $env.NULL_DEV | lines)
+  let changes = (git diff --shortstat | complete | get stdout | parse --regex "\\s*(?<f>[0-9]+)[^0-9]*(?<i>[0-9]+)[^0-9]*(?<d>[0-9]+)")
+  let untracked = (git ls-files --other --exclude-standard $path | complete | get stdout | lines)
   let u_folders = ($untracked | each { $in | path dirname } | uniq | length)
 
 
@@ -82,7 +82,7 @@ def git_status_info [path: path] {
     d: ($changes | get d.0? | default 0 | into int),
     u: ($untracked | length),
     U: $u_folders,
-    b: (git branch --show-current e> $env.NULL_DEV)
+    b: (git branch --show-current | complete | get stdout | str trim)
   }
 }
 

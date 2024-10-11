@@ -159,4 +159,4 @@ generate_mirkop_ps1_prompt() {
 # shellcheck disable=SC1090
 source ~/.config/bash/lib/yq.sh
 load_prompt_config && PROMPT_COMMAND='generate_mirkop_ps1_prompt'
-unset yq.sh
+unset -f yq.sh

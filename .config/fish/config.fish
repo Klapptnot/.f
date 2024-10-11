@@ -3,10 +3,9 @@
 # |>   https://github.com/Klapptnot/dotf   <|
 # |>----|>----|>----|><-><|----<|----<|----<|
 
-if [ $__fish_init_user_env_var = 1 ]
-  set -gx RUST_BACKTRACE full
-  set -gx FZF_DEFAULT_OPTS '--color=fg:#d0d0d0,bg:,hl:#7143e6 --color=fg+:#d0d0d0,bg+:#262626,hl+:#00f2ff --color=info:#afaf87,prompt:#d7005f,pointer:#af5fff --color=marker:#87ff00,spinner:#af5fff,header:#87afaf'
-  set -gx COLORTERM truecolor
+
+if not status is-interactive
+  return
 end
 
 function _r_fzf_get_file -d "Use fzf to get a file"
@@ -64,6 +63,31 @@ if not string match -qi "*.utf-8" -- $LANG $LC_CTYPE $LC_ALL
   fish_is_root_user; and set fish_prompt_delim "#"; or set fish_prompt_delim ">"
 end
 
-if status is-interactive
-  # Commands to run in interactive sessions can go here
+if status is-login
+  # Add user paths to PATH
+  for line in (cat ~/.config/.paths 2>/dev/null)
+    set -l line (echo $line | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+    if string match -q '#*' $line
+      continue
+    end
+    if test -n "$line"
+      set -l line (realpath "$line")
+      if string match -q '@prepend *' $line
+        set path (string trim (echo $line | cut -d''-1f2-))
+        set -gx PATH $PATH $path
+      else
+        set -gx PATH $PATH $line
+      end
+    end
+  end
+
+  # Use .dotf.yaml to set environment variables
+  for key in (bash_yq .shenv ~/.config/.dotf.yaml | string split " ")
+    set -l value (bash_yq ".shenv.$key" ~/.config/.dotf.yaml)
+    if string match -q -- '$ *' $value
+      set -x $key (eval (string replace '$ ' '' $value))
+    else
+      set -x $key $value
+    end
+  end
 end

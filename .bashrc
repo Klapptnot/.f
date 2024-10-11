@@ -53,7 +53,6 @@ if ! shopt -oq posix; then
 fi
 
 PS1='[\u@\h \W]\$ '
-export FZF_DEFAULT_COMMAND='fd --type file --follow --hidden --exclude .git'
 
 # In case of rustup
 [ -f ~/.cargo/env ] && source ~/.cargo/env
@@ -74,3 +73,35 @@ else
 fi
 bind -x '"\C-o": __fzf_nvim_open_file'
 bind -x '"\C-u": __fzf_cat_file'
+
+# if not login shell ignore the rest
+! shopt -q login_shell && return
+
+# Add user paths to PATH
+while read -r line; do
+  [[ "${line}" == "#"* ]] && continue
+  if [ -n "${line}" ]; then
+    line=$(realpath "${line}")
+    if [[ "${line}" == '@prepend '* ]]; then
+      : "${line:9}"
+      export PATH="${PATH}:${_%"${_##*[![:space:]\n]}"}"
+    else
+      export PATH="${PATH}:${line}"
+    fi
+  fi
+done < ~/.config/.paths
+unset -v line
+
+
+source ~/.config/bash/lib/yq.sh
+# Use .dotf.yaml to set environment variables
+for key in $(yq.sh .shenv ~/.config/.dotf.yaml); do
+  value="$(yq.sh ".shenv.${key}" ~/.config/.dotf.yaml)"
+  if [[ "${value}" == "$ "* ]]; then
+    export "${key}=$(eval "${value:2}")"
+  else
+    export "${key}=${value}"
+  fi
+done
+unset -v key value
+unset -f yq.sh

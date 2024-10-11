@@ -31,6 +31,8 @@ yq.sh() {
   local multiline_strp=s
   local multiline_str=""
   local multiline_key=""
+  local probably_key=false
+  local keys=()
   local line mmode smode #imode
   local indent=2
   local RESULT=""
@@ -91,6 +93,7 @@ yq.sh() {
       fi
       ((cai = cai + 1))
       fpa+=("${cai}")
+      ${probably_key} && keys+=("${cai}")
       if [ -n "${last_index}" ]; then
         fpa+=("${last_index}")
         last_index=''
@@ -120,16 +123,22 @@ yq.sh() {
       [ -n "${k}" ] && fpa+=("${k}")
       cai=-1
       pop_2=false
+      if ${probably_key}; then
+        RESULT="${keys[*]}"
+        break
+      fi
     elif ((last_ci < ci)); then
       # ADD
       last_ci=${ci}
       [ -n "${k}" ] && fpa+=("${k}")
+      [ -n "${k}" ] && ${probably_key} && keys+=("${k}")
     else
       # REP
       if [ -n "${line}" ]; then
         if ((cai < 0)) || ${pop_2}; then
           (("${#fpa[@]}" > 0)) && unset 'fpa[-1]'
           [ -n "${k}" ] && fpa+=("${k}")
+          ${probably_key} && keys+=("${k}")
         fi
       fi
     fi
@@ -140,24 +149,25 @@ yq.sh() {
       case "${v}" in
         "'"*"'" | '"'*'"') v="${v:1:$((${#v} - 2))}" ;;
       esac
-      RESULT="${v}"
-      break
+      if [ -z "${v}" ]; then
+        probably_key=true
+      else
+        RESULT="${v}"
+      fi
     fi
   done
-  if [ -n "${multiline_str}" ]; then
+
+  if ${probably_key}; then
+    RESULT="${keys[*]}"
+  elif [ -n "${multiline_str}" ]; then
     if [ "${fpa[*]}" == "${dpa[*]}" ]; then
-      printf '%s' "${multiline_str}"
-      return 0
+      RESULT="${multiline_str}"
     fi
   fi
   [ -z "${RESULT}" ] && return 1
-  printf '%s' "${RESULT}"
+  printf "%s" "${RESULT}"
 }
 
 if [ "${BASH_SOURCE[0]}" == "${0}" ]; then
-  if RESULT="$(yq.sh "${@}")"; then
-    printf '%s' "${RESULT}"
-    exit
-  fi
-  exit 1
+  yq.sh "${@}"
 fi

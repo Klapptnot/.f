@@ -1,4 +1,4 @@
-#! /usr/bin/env brick
+#!/usr/bin/env brick
 
 use std::https;
 use std::quickData::Json;

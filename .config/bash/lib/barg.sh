@@ -1,4 +1,4 @@
-#! /bin/env bash
+#!/usr/bin/env bash
 
 # Barg - Bash ARGuments parser
 # ============================

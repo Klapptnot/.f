@@ -1,4 +1,4 @@
-#! /bin/env bash
+#!/usr/bin/env bash
 
 function str.rgb2hex {
   # Accept 'rgb(244,23,90)' color

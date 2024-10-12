@@ -1,4 +1,4 @@
-#! /bin/env bash
+#!/usr/bin/env bash
 
 declare -rA LOGGER_LOG_COLORS=(
   ['d']='\x1b[32m'

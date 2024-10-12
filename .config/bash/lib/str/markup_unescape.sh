@@ -1,4 +1,4 @@
-#! /bin/env bash
+#!/usr/bin/env bash
 
 function str.markup_unescape {
   : "$(< /dev/stdin)"

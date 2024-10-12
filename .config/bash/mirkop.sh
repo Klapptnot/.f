@@ -1,4 +1,4 @@
-#! /bin/env bash
+#!/usr/bin/env bash
 
 # shellcheck disable=SC2120
 function get_short_pwd {

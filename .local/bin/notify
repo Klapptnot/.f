@@ -1,4 +1,4 @@
-#! /bin/env bash
+#!/usr/bin/env bash
 
 source ~/.config/bash/lib/barg.sh
 source ~/.config/bash/lib/rsum.sh

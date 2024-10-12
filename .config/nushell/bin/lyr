@@ -1,4 +1,4 @@
-#! /bin/env nu
+#!/usr/bin/env nu
 
 # |>----|>----|>----|><-><|----<|----<|----<|
 # |>    from Klapptnot's Nushell setup     <|

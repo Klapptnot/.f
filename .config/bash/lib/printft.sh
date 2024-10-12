@@ -1,4 +1,4 @@
-#! /bin/env bash
+#!/usr/bin/env bash
 
 # Function to retrieve translations based on message ID and locale
 # Needs to get translations files from global variable TRSTR_HOME

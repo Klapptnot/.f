@@ -1,4 +1,4 @@
-#! /bin/env bash
+#!/usr/bin/env bash
 
 function str.hex2rgb {
   # Accepts '#784dFF' or '784dFF' colors

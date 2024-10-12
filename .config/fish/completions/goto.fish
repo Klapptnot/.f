@@ -1,4 +1,4 @@
-#! /bin/env fish
+#!/usr/bin/env fish
 
 # |>----|>----|>----|><-><|----<|----<|----<|
 # |>     from Klapptnot's Termux setup     <|

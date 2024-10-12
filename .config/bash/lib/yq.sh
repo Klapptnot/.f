@@ -1,4 +1,4 @@
-#! /bin/env bash
+#!/usr/bin/env bash
 
 # Simple YAML value reader, currently only useful
 # for YAML files with 2 spaces for indentation

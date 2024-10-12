@@ -1,4 +1,4 @@
-#! /bin/env bash
+#!/usr/bin/env bash
 # shellcheck disable=SC2034
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then

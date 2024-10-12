@@ -1,4 +1,4 @@
-#! /bin/env bash
+#!/usr/bin/env bash
 
 function main {
   if command -v yay &> /dev/null; then

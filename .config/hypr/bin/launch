@@ -20,13 +20,13 @@ function main {
   local mode="${1:?A launch app/mode is needed}"
   shift 1
 
-  ROFI_HOME=''
+  ROFI_THEME_HOME=''
   [[ "${mode}" == 'rofi-'* ]] && {
     ! command -v rofi &> /dev/null && {
       log e "Rofi not installed or not in PATH" >&2
       exit
     }
-    ROFI_HOME="$(get_rofi_home)"
+    ROFI_THEME_HOME="$(get_rofi_theme_path)"
   }
 
   function no_tlf {
@@ -36,19 +36,19 @@ function main {
   killall rofi &> /dev/null
   case "${mode}" in
     rofi-runner)
-      rofi -show drun -theme "${ROFI_HOME}/drun.rasi" || exit
+      rofi -show drun -theme "${ROFI_THEME_HOME}/drun.rasi" || exit
       ;;
     rofi-clipboard)
       cliphist list |
         sed 's/\([0-9]*\)\t\(.*\)/\2\r\1/g' | # The \t is ugly
-        rofi -dmenu -p '   Clip ' -theme "${ROFI_HOME}/clipboard.rasi" |
+        rofi -dmenu -p '   Clip ' -theme "${ROFI_THEME_HOME}/clipboard.rasi" |
         sed 's/\(.*\)\r\([0-9]*\)/\2\t\1/g' |
         cliphist decode |
         wl-copy
       ;;
     rofi-emoji)
       python3 ~/.config/hypr/bin/emoji.py list |
-        rofi -dmenu -p ' 󰱨 Emoji ' -theme "${ROFI_HOME}/emoji.rasi" |
+        rofi -dmenu -p ' 󰱨 Emoji ' -theme "${ROFI_THEME_HOME}/emoji.rasi" |
         python3 ~/.config/hypr/bin/emoji.py decode |
         wl-copy
       ;;
@@ -159,7 +159,7 @@ function rofi_wifi_menu_do {
 
   local rofi_menu_str=""
   IFS=$'\n' rofi_menu_str="${rofi_menu[*]}"
-  rofi -dmenu -config "${ROFI_HOME}/config.rasi" <<< "${rofi_menu_str}" | sed 's/.*\r\(.*\)/\1/' > "${opPipe}" &
+  rofi -dmenu -config "${ROFI_THEME_HOME}/config.rasi" <<< "${rofi_menu_str}" | sed 's/.*\r\(.*\)/\1/' > "${opPipe}" &
 
   IFS=$' \n' read -r operation arg1 < "${opPipe}"
   log d "{ ${operation@A}, ${arg1@A} }"
@@ -182,7 +182,7 @@ function rofi_wifi_menu_do {
         return
       }
       rofi -dmenu -mesg "Type '${SSIDs_F[arg1]}' password" \
-        -theme "${ROFI_HOME}/sinput.rasi" \
+        -theme "${ROFI_THEME_HOME}/sinput.rasi" \
         -theme-str 'entry { placeholder: " password"; }' > "${opPipe}" &
       read -r password < "${opPipe}"
       test -z "${password}" && {
@@ -221,15 +221,16 @@ function rofi_wifi_menu_do {
   return 0
 }
 
-function get_rofi_home {
-  IFS=$'\n\t' read -r rofi_home < <(yq.sh .rofi.theme ~/.config/dotf/.dotf.yaml)
+function get_rofi_theme_path {
+  local rofi_theme=""
+  rofi_theme=$(yq.sh .rofi.theme ~/.config/dotf/props.yaml)
 
-  ROFI_HOME="${rofi_home//\ /\\\ }"
-  if [ ! -d ~/.config/rofi/theme/"${ROFI_HOME}" ]; then
-    ROFI_HOME='default'
+  rofi_theme="${rofi_theme//\ /\\\ }"
+  if [ -z "${rofi_theme}" ] || [ ! -d ~/.config/rofi/theme/"${rofi_theme}" ]; then
+    rofi_theme='default'
   fi
 
-  printf '%s/.config/rofi/theme/%s' "${HOME}" "${ROFI_HOME}"
+  printf '%s/.config/rofi/theme/%s' "${HOME}" "${rofi_theme}"
 }
 
 main "${@}"

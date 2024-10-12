@@ -13,7 +13,7 @@ if ("~/.config/.paths" | path exists) {
   }
 }
 
-for kv in (open .config/.dotf.yaml | get shenv | transpose key val) {
+for kv in (open ~/.config/.dotf.yaml | get shenv | transpose key val) {
   if ($kv.val | str starts-with '$ ') {
     load-env { $kv.key: (bash -c ($kv.val | str substring 2..)) }
   } else {

@@ -1,0 +1,43 @@
+# some defaults / modifications for the emacs mode
+$if mode=emacs
+
+# allow the use of the Home/End keys
+"\e[1~": beginning-of-line
+"\e[2~": quoted-insert
+
+# allow the use of the Delete/Insert keys
+"\e[3~": delete-char
+"\e[4~": end-of-line
+
+# mappings for Ctrl-left-arrow and Ctrl-right-arrow for word moving
+"\e[1;5C": forward-word
+"\e[1;5D": backward-word
+"\e[5C": forward-word
+"\e[5D": backward-word
+
+# mapping Ctrl+Backspace and Ctrl+Delete to delete a word
+"\C-H": backward-kill-word
+"\e[3;5~": kill-word
+
+"\e[8~": end-of-line
+
+$endif
+
+# do not bell on tab-completion
+set bell-style none
+
+set active-region-start-color "\e[38;5;99m"
+set active-region-end-color "\e[0m"
+
+# show matching prefix with a different color
+set colored-completion-prefix on
+# entries with colors according to LS_COLORS
+set colored-stats on
+
+set completion-ignore-case on
+
+# with `completion-ignore-case`, `-` equivalent to `_`
+set completion-map-case on
+
+# truncate completions
+set completion-prefix-display-length 48

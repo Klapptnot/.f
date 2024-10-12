@@ -1,6 +1,6 @@
 #! /bin/env bash
 
-str.json_unescape() {
+function str.json_unescape {
   : "$(< /dev/stdin)"
   : "${_//\\\\/\\}"  # unescape backslashes
   : "${_//\\\"/\"}"  # unescape double quotes

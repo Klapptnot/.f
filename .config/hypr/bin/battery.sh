@@ -1,18 +1,18 @@
 #! /bin/env bash
 
-main() {
+function main {
   local format_it='\{\{([a-z_]+)\}\}'
   local what="${1:-"{{icon}} {{capacity}}% {{status}}"}"
 
   while [[ "${what}" =~ ${format_it} ]]; do
-    IFS=$'\n' read -r res < <(battery-data-get "${BASH_REMATCH[1]}")
+    IFS=$'\n' read -r res < <(battery_data_get "${BASH_REMATCH[1]}")
     what="${what//"${BASH_REMATCH[0]}"/"${res}"}"
   done
 
   printf '%s\n' "${what}"
 }
 
-battery-data-get() {
+function battery_data_get {
   local key="${1}"
   case "${key}" in
     'capacity')

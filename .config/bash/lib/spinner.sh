@@ -1,6 +1,6 @@
 #! /bin/env bash
 
-spinner.start() {
+function spinner.start {
   local __chars__=("⠋" "⠙" "⠹" "⠸" "⠼" "⠴" "⠦" "⠧" "⠇" "⠏")
   local __hint__="${1:-Loading...}"
   local i=0
@@ -18,7 +18,7 @@ spinner.start() {
     sleep 0.008
   done
 }
-spinner.stop() {
+function spinner.stop {
   kill "${1}"
   sleep 0.006 # Perfect always clean line
   printf '\x1b[?25h\x1b[0G\x1b[0J'

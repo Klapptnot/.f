@@ -1,6 +1,6 @@
 #! /bin/env bash
 
-str.markup_escape() {
+function str.markup_escape {
   : "$(< /dev/stdin)"
   local input="${_}"
 

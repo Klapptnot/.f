@@ -1,6 +1,6 @@
 #! /bin/env bash
 
-main() {
+function main {
   # Check if wlogout is already running
   if pgrep -x "wlogout" > /dev/null; then
     pkill -x "wlogout"

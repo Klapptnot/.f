@@ -12,7 +12,7 @@ fi
 # shellcheck disable=SC1090
 source ~/.config/bash/lib/printfc.sh
 
-goto() {
+function goto {
   if [ -z "${1}" ]; then
     cd "${HOME}" &> /dev/null || return
     return

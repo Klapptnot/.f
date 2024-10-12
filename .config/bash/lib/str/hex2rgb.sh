@@ -1,6 +1,6 @@
 #! /bin/env bash
 
-str.hex2rgb() {
+function str.hex2rgb {
   # Accepts '#784dFF' or '784dFF' colors
   local hex
   hex="$(< /dev/stdin)"

@@ -1,6 +1,6 @@
 #! /bin/env bash
 
-str.rgb2hex() {
+function str.rgb2hex {
   # Accept 'rgb(244,23,90)' color
   # local rgb="${1:4}" && rgb="${rgb%?}"
   : "$(< /dev/stdin)"

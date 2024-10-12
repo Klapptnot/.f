@@ -1,6 +1,6 @@
 #! /bin/env bash
 
-term.color.from_hex() {
+function term.color.from_hex {
   read -r s < /dev/stdin
   [[ "${s}" == '#'* ]] && s="${s:1}"
   [[ "${s}" =~ ^[a-fA-F0-9]{6}$ ]] && printf '\x1b[0m' && return
@@ -15,31 +15,31 @@ term.color.from_hex() {
   printf "${format}" "${r}" "${g}" "${b}"
 }
 
-term.cursor.go_up() {
+function term.cursor.go_up {
   local amount=${1:-1}
   ! [[ ${amount} =~ ^[0-9]+$ ]] && amount=1
   printf "%b" "\x1b[${amount}A"
 }
 
-term.cursor.go_down() {
+function term.cursor.go_down {
   local amount=${1:-1}
   ! [[ ${amount} =~ ^[0-9]+$ ]] && amount=1
   printf "%b" "\x1b[${amount}B"
 }
 
-term.cursor.go_right() {
+function term.cursor.go_right {
   local amount=${1:-1}
   ! [[ ${amount} =~ ^[0-9]+$ ]] && amount=1
   printf "%b" "\x1b[${amount}C"
 }
 
-term.cursor.go_left() {
+function term.cursor.go_left {
   local amount=${1:-1}
   ! [[ ${amount} =~ ^[0-9]+$ ]] && amount=1
   printf "%b" "\x1b[${amount}D"
 }
 
-term.cursor.go_to() {
+function term.cursor.go_to {
   local l=${1:-1}
   local c=${2:-1}
   ! [[ ${c} =~ ^[0-9]+$ ]] && c=1
@@ -47,7 +47,7 @@ term.cursor.go_to() {
   printf "%b" "\x1b[${l};${c}H"
 }
 
-cursos.pos() {
+function cursos.pos {
   local pos="0;0"
   IFS='[' read -p $'\e[6n' -d R -rs _ pos
   printf "%s" "${pos}"
@@ -57,19 +57,19 @@ term.cursor.save() { printf '\x1b7'; }
 term.cursor.back() { printf '\x1b8'; }
 term.cursor.home() { printf '\x1b[0H'; }
 
-term.cursor.line.end() {
+function term.cursor.line.end {
   read -r _ cols < <(stty size)
   printf '\x1b[%dG' "${cols}";
 }
 term.cursor.line.home() { printf '\x1b[1G'; }
 
-term.cursor.linefeed() {
+function term.cursor.linefeed {
   local amount=${1:-1}
   ! [[ ${amount} =~ ^[0-9]+$ ]] && amount=1
   printf "%b" "\x1b[${amount}E"
 }
 
-term.cursor.linebackfeed() {
+function term.cursor.linebackfeed {
   local amount=${1:-1}
   ! [[ ${amount} =~ ^[0-9]+$ ]] && amount=1
   printf "%b" "\x1b[${amount}F"

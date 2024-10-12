@@ -4,7 +4,7 @@
 source "${HOME}/.config/bash/lib/rsum.sh"
 source "${HOME}/.config/bash/lib/barg.sh"
 
-main() {
+function main {
   barg.parse "${@}" << BARG || { echo "Command need args" && exit 1; }
     #[progname='bulkren']
     ! f/files[vec[str]] => files || F/folder[str] => folder

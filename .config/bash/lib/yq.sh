@@ -4,7 +4,7 @@
 # for YAML files with 2 spaces for indentation
 # NO SUPPORT FOR SETS, TAGS, SCALARS, etc.
 # ONLY KEY-VALUE, for arrays, strings and integers
-yq.sh() {
+function yq.sh {
   local path="${1}"
   local file="${2}"
 

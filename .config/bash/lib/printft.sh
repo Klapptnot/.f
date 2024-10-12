@@ -4,7 +4,7 @@
 # Needs to get translations files from global variable TRSTR_HOME
 # ${1}       Format string ID
 # ${@:2}     Strings to fill format
-printft() {
+function printft {
   if [[ -z "${TRSTR_HOME}" || ! -d "${TRSTR_HOME}" ]]; then return 1; fi
 
   local locale="${LANG%%.*}"

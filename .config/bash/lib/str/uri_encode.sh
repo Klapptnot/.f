@@ -1,6 +1,6 @@
 #! /bin/env bash
 
-str.uri_encode() {
+function str.uri_encode {
   local input=''
   input="$(< /dev/stdin)"
 

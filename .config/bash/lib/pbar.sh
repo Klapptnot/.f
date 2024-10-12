@@ -1,7 +1,7 @@
 #! /bin/env bash
 
 # Function to display a nice functional progress bar
-pbar() {
+function pbar {
   [ "${#}" -eq 0 ] && return
   local LEFT=false
   local CENTERED=false

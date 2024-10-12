@@ -14,7 +14,7 @@ source ~/.config/bash/lib/barg.sh
 source ~/.config/bash/lib/str/markup_escape.sh
 source ~/.config/bash/lib/str/uri_encode.sh
 
-main() {
+function main {
   barg.parse "${@}" << BARG || _ "${null:?Need something to do}"
   #[progname='medialock']
   #[subcmdr='true', subcmds='=artup =artdown =hwman =waybar metadata']
@@ -33,13 +33,13 @@ BARG
   if [ "${BARG_SUBCOMMAND}" == "artup" ]; then
     test -f "${MEDIA_ART_CACHE_LOC}" && rm "${MEDIA_ART_CACHE_LOC}" 2> /dev/null
     touch "${MEDIA_ART_CACHE_LOC}"
-    media-art-cache &> /dev/null &
+    media_art_cache &> /dev/null &
     return
   elif [ "${BARG_SUBCOMMAND}" == "artdown" ]; then
     test -f "${MEDIA_ART_CACHE_LOC}" && rm "${MEDIA_ART_CACHE_LOC}" 2> /dev/null
     return
   elif [ "${BARG_SUBCOMMAND}" == "hwman" ]; then
-    hyprlock-mw-source-manager &> /dev/null &
+    hyprlock_mw_source_manager &> /dev/null &
     return
   elif [ "${BARG_SUBCOMMAND}" == "waybar" ]; then
     PARAM[0]='{"text": "{{title}} ~ {{artist}}", "tooltip": "Player: {{playerName}} => {{title}}", "alt": "{{statusicon}} {{elapsed}} - {{duration}}", "class": "{{status}}"}'
@@ -53,7 +53,7 @@ BARG
   local what="${PARAM[0]}"
   local format_it='\{\{([a-zA-Z_]+)\}\}'
   while [[ "${what}" =~ ${format_it} ]]; do
-    IFS=$'\n' read -r res < <(media-metadata-get "${BASH_REMATCH[1]}")
+    IFS=$'\n' read -r res < <(media_metadata_get "${BASH_REMATCH[1]}")
     what="${what//"${BASH_REMATCH[0]}"/"${res}"}"
   done
 
@@ -64,14 +64,14 @@ BARG
 
   local res_list=()
   for what in "${PARAM[@]}"; do
-    if res=$(media-metadata-get "${what}"); then
+    if res=$(media_metadata_get "${what}"); then
       res_list+=("${res}")
     fi
   done
   printf '%s\n' "${res_list[@]}"
 }
 
-media-art-cache() {
+function media_art_cache {
   local last=""
   local medI=""
   while [ -f "${MEDIA_ART_CACHE_LOC}" ]; do
@@ -89,7 +89,7 @@ media-art-cache() {
   done
 }
 
-media-metadata-get() {
+function media_metadata_get {
   local what="${1}"
   local METAINFO="none"
   case "${what}" in
@@ -154,7 +154,7 @@ media-metadata-get() {
   printf '%s' "${METAINFO}"
 }
 
-hyprlock-mw-source-manager() {
+function hyprlock_mw_source_manager {
   local csrc_str='^# source = ~/\.config/hypr/conf\.d/medialock\.conf$'
   local usrc_str='^source = ~/\.config/hypr/conf\.d/medialock\.conf$'
   local toggle_file="${HOME}/.cache/hyprland/medialock.conf"

@@ -1,6 +1,6 @@
 #! /bin/env bash
 
-main() {
+function main {
   if command -v yay &> /dev/null; then
     mapfile -t updates < <(yay -Qu | column -t | sed 's/^\([^ ]*\)/<b>\1<\/b>/g')
   elif command -v pacman &> /dev/null; then

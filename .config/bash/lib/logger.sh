@@ -24,7 +24,7 @@ declare -rA LOGGER_LEVEL_NUMS=(
 
 LOGGER_LEVEL="${LOGGER_LEVEL:-e}"
 
-log() {
+function log {
   local level="${1,,}"
   local show_verbose_info=true
   ((${#level} > 1)) && show_verbose_info=false

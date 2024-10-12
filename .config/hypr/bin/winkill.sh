@@ -11,19 +11,19 @@
 # The commands shared on this post will kill all windows from the same PID
 # So, this closes windows and processes
 
-main() {
+function main {
   local opr="${1}"
   shift 1
 
-  if [[ ! "${opr}" =~ ^(kill|close)-(current|others)$ ]]; then
+  if [[ ! "${opr}" =~ ^(kill|close)(-|\.)(current|others)$ ]]; then
     printf '\x1b[31mThe command "%s" is not a know operation\x1b[0m\n' "${opr}"
     exit
   fi
 
-  "${opr}"
+  "${BASH_REMATCH[1]}.${BASH_REMATCH[3]}"
 }
 
-close-others() {
+function close.others {
   while read -r window; do
     hyprctl dispatch closewindow "${window}"
   done < <(
@@ -34,7 +34,7 @@ close-others() {
   )
 }
 
-kill-others() {
+function kill.others {
   jq -rM --null-input \
     --argjson c "$(hyprctl clients -j)" \
     --argjson w "$(hyprctl activeworkspace -j)" \
@@ -42,7 +42,7 @@ kill-others() {
     xargs kill
 }
 
-close-current() {
+function close.current {
   jq --null-input \
     --argjson c "$(hyprctl clients -j)" \
     --argjson w "$(hyprctl activeworkspace -j)" \
@@ -50,7 +50,7 @@ close-current() {
     xargs hyprctl dispatch closewindow
 }
 
-kill-current() {
+function kill.current {
   jq --null-input \
     --argjson c "$(hyprctl clients -j)" \
     --argjson w "$(hyprctl activeworkspace -j)" \

@@ -1,6 +1,6 @@
 #! /bin/env bash
 
-str.strip() {
+function str.strip {
   local s=''
   s="$(< /dev/stdin)"
   [ "${1}" != "start" ] && s="${s%"${s##*[![:space:]\n]}"}"

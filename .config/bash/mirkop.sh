@@ -1,7 +1,7 @@
 #! /bin/env bash
 
 # shellcheck disable=SC2120
-get_short_pwd() {
+function get_short_pwd {
   local short_pwd_s=""
   local old_pwd="${PWD}"
   if [[ "${PWD}" == "${HOME}"* ]]; then
@@ -21,7 +21,7 @@ get_short_pwd() {
   printf '%b' "${short_pwd_s}"
 }
 
-curpos() {
+function curpos {
   # based on a script from http://invisible-island.net/xterm/xterm.faq.html
   exec < /dev/tty
   oldstty=$(stty -g)
@@ -36,7 +36,7 @@ curpos() {
   printf "%s;%s" "${row}" "${col}"
 }
 
-get_cwd_color() {
+function get_cwd_color {
   if command -v cksum &> /dev/null; then
     read -r s < <(pwd -P | cksum | cut -d' ' -f1 | printf '%-6x' "$(< /dev/stdin)" | tr ' ' '0' | head -c 6)
     local r=$((16#${s:0:2}))
@@ -58,7 +58,7 @@ get_cwd_color() {
   fi
 }
 
-load_prompt_config() {
+function load_prompt_config {
   function hex_to_shell {
     read -r s < /dev/stdin
 
@@ -105,7 +105,7 @@ load_prompt_config() {
   )
 }
 
-print_prompt_right() {
+function print_prompt_right {
   local rprompt_parts=()
   local comp=0
 
@@ -131,7 +131,7 @@ print_prompt_right() {
   printf "%$((COLUMNS + comp))s\x1b[0G" "${rprompt_string}"
 }
 
-generate_mirkop_ps1_prompt() {
+function generate_mirkop_ps1_prompt {
   # Set the string for exit status indicator
   local last_exit_code="${?}"
 

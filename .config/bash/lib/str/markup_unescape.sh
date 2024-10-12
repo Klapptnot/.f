@@ -1,6 +1,6 @@
 #! /bin/env bash
 
-str.markup_unescape() {
+function str.markup_unescape {
   : "$(< /dev/stdin)"
   : "${_//&apos;/\'}"
   : "${_//&quot;/\"}"

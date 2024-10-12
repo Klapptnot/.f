@@ -1,6 +1,6 @@
 #! /bin/env bash
 
-str.json_escape() {
+function str.json_escape {
   : "$(< /dev/stdin)"
   : "${_//\\/\\\\}"   # escape backslashes
   : "${_//\"/\\\"}"   # escape double quotes

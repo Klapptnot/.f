@@ -10,7 +10,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   exit 1
 fi
 
-barg.parse() {
+function barg.parse {
   local argv=("${@}")
   [ "${#argv[@]}" -eq 0 ] && return 1
   # Expand the joint arguments

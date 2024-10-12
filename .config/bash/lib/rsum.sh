@@ -1,7 +1,7 @@
 #! /bin/env bash
 
 # Function to easy generate (random) strings
-rsum() {
+function rsum {
   # Usage:
   # '-l' [LENGHT]     int
   # '-c' [CHAR]       string

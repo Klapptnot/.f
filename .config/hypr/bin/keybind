@@ -20,7 +20,7 @@
 # d -> has description, will allow you to write a description for your bind.
 # p -> bypasses the app's requests to inhibit keybinds.
 
-main() {
+function main {
   if [[ "$(type -p yad)" == "" ]]; then
     printf '%s\n' 'Yad not installed, exiting..' >&2
     return 1
@@ -38,7 +38,7 @@ main() {
   hyprctl dispatch "${CMD}" ${ARGS} | printf 'Command: "%s" results in: %s\n' "${CMD} ${ARGS}" "$(< /dev/stdin)"
 }
 
-show_window() {
+function show_window {
   local CONFIG_FILE=~/.config/hypr/conf.d/bindings.conf
   local title="Hyprland 󰧹 "
   local bind_flags="[lrenmtisdp]{0,10}"

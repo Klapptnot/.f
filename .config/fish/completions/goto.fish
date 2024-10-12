@@ -12,7 +12,7 @@
 # on completion request when there is no alias on commandline
 # preventing aliases from
 function __fish_goto_opt_alias
-  print "{}\n" (grep -Po '^\s*\K[^\s]+' "$HOME/.config/goto.idx") -h -l -p --help --list --print
+  print "{}\n" (grep -Po '^\s*\K[^\s]+' ~/.config/dotf/goto.idx) -h -l -p --help --list --print
 end
 
 # Uses current commandline info to add child folders to the completions
@@ -28,7 +28,7 @@ end
 # Parse and set as completions all aliases names from config file
 # on completion request when there are no flags or aliases
 function __fish_goto_list_aliases
-  set -f aliases (grep -Po '^\s*\K[^\s]+' "$HOME/.config/goto.idx")
+  set -f aliases (grep -Po '^\s*\K[^\s]+' ~/.config/dotf/goto.idx)
   for alias in $aliases
     echo $alias
   end

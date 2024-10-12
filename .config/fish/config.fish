@@ -82,8 +82,8 @@ if status is-login
   end
 
   # Use .dotf.yaml to set environment variables
-  for key in (bash_yq .shenv ~/.config/.dotf.yaml | string split " ")
-    set -l value (bash_yq ".shenv.$key" ~/.config/.dotf.yaml)
+  for key in (bash_yq .shenv ~/.config/dotf/.dotf.yaml | string split " ")
+    set -l value (bash_yq ".shenv.$key" ~/.config/dotf/.dotf.yaml)
     if string match -q -- '$ *' $value
       set -x $key (eval (string replace '$ ' '' $value))
     else

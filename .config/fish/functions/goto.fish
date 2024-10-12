@@ -29,7 +29,7 @@ function goto -d 'Alias based fast cd (change dir)'
     print $help
     return
   else if set -q _flag_list
-    if not test -f $HOME/.config/goto.idx
+    if not test -f ~/.config/dotf/goto.idx
       print '{f85}[INFO]{r} Index file not found, printing default aliases\n'
       set -l PATH_INDEX_CONTENT \
         'cfg &!HOME;/.config' \
@@ -42,8 +42,8 @@ function goto -d 'Alias based fast cd (change dir)'
       return 1
     end
 
-    set -l keys (cat $HOME/.config/goto.idx | grep -Po '^\s*\K[^\s]+')
-    set -l alias (cat $HOME/.config/goto.idx | grep -Po '(?<=\s)[^\s].*(?=$)')
+    set -l keys (cat ~/.config/dotf/goto.idx | grep -Po '^\s*\K[^\s]+')
+    set -l alias (cat ~/.config/dotf/goto.idx | grep -Po '(?<=\s)[^\s].*(?=$)')
     set -l keyL 0
     set -l aliasL 0
     for i in (seq 1 (count $keys))
@@ -79,8 +79,8 @@ function goto -d 'Alias based fast cd (change dir)'
     return
   end
 
-  if test -f $HOME/.config/goto.idx
-    set -f PATH_INDEX_CONTENT (cat $HOME/.config/goto.idx)
+  if test -f ~/.config/dotf/goto.idx
+    set -f PATH_INDEX_CONTENT (cat ~/.config/dotf/goto.idx)
   else
     # Set a default config, but give a warning
     set -f PATH_INDEX_CONTENT \

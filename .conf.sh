@@ -80,6 +80,7 @@ function post_install {
     local m_f_c=(
       "#__medialock__"
       "source = ~/.config/hypr/conf.d/medialock.conf"
+      ""
     )
     printf '%s\n' "${m_f_c[@]}" > ~/.cache/hyprland/medialock.conf
   }

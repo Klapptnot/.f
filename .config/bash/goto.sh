@@ -9,8 +9,8 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   exit 1
 fi
 
-# shellcheck disable=SC1091
-source "${HOME}/.config/bash/lib/printfc.sh"
+# shellcheck disable=SC1090
+source ~/.config/bash/lib/printfc.sh
 
 goto() {
   if [ -z "${1}" ]; then
@@ -39,7 +39,7 @@ goto() {
     IFS= printfc "${help[*]}"
     return
   elif [[ "${1}" =~ ^-l|--list$ ]]; then
-    if ! [ -f "${HOME}/.config/goto.idx" ]; then
+    if ! [ -f ~/.config/dotf/goto.idx ]; then
       printfc '{f85}[INFO]{r} Index file not found, printing default aliases\n'
       PATH_INDEX_CONTENT=(
         'cfg   &!HOME;/.config'
@@ -55,13 +55,13 @@ goto() {
       printf '%s\n' "${PATH_INDEX_CONTENT}"
       return
     fi
-    printfc '{f85}[INFO]{r} Printing aliases\n%s\n' "$(< "${HOME}/.config/goto.idx")"
+    printfc '{f85}[INFO]{r} Printing aliases\n%s\n' "$(< ~/.config/dotf/goto.idx)"
     return
   fi
 
-  if [ -f "${HOME}/.config/goto.idx" ]; then
+  if [ -f ~/.config/dotf/goto.idx ]; then
     # shellcheck disable=SC2178
-    declare -r PATH_INDEX_CONTENT="$(< "${HOME}/.config/goto.idx")"
+    declare -r PATH_INDEX_CONTENT="$(< ~/.config/dotf/goto.idx)"
   else
     # Set a default config, but give a warning
     PATH_INDEX_CONTENT=(

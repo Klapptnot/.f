@@ -222,7 +222,7 @@ rofi-wifi-menu-do() {
 }
 
 get-rofi-home() {
-  IFS=$'\n\t' read -r rofi_home < <(yq.sh .rofi.theme ~/.config/.dotf.yaml)
+  IFS=$'\n\t' read -r rofi_home < <(yq.sh .rofi.theme ~/.config/dotf/.dotf.yaml)
 
   ROFI_HOME="${rofi_home//\ /\\\ }"
   if [ ! -d ~/.config/rofi/theme/"${ROFI_HOME}" ]; then

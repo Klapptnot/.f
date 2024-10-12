@@ -4,8 +4,8 @@
 # |>----|>----|>----|><-><|----<|----<|----<|
 
 def get-aliased-paths [] -> table<alias: string[], expand: string[]> {
-  let def = if ($"($env.HOME)/.config/goto.idx" | path exists) {
-    (open $"($env.HOME)/.config/goto.idx" | lines)
+  let def = if (~/.config/dotf/goto.idx | path exists) {
+    (open ~/.config/dotf/goto.idx | lines)
   } else {
     print $'(ansi yellow1)[WARN](ansi reset) Index file not found, default aliases are set'
     # Set a default config, but give a warning

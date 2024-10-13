@@ -20,16 +20,23 @@ if [[ "${BASH_SOURCE[0]}" != "${0}" ]]; then
     printf '%s\n' "\`git\` is not installed, install git and try again" >&2
     exit 1
   fi
+  [ ! -d "${HOME}/repos/dotf" ] && {
+    mkdir -p "${HOME}/repos/dotf" || {
+      printf '%s\n' "Could not create needed folders" >&2
+      exit 1
+    }
+  }
   printf '%s\n' "Getting files"
-  git clone --depth=1 https://github.com/Klapptnot/dotf.git "${HOME}/dotf"
+  git clone --depth=1 https://github.com/Klapptnot/dotf.git "${HOME}/repos/dotf"
   printf '%s\n' "Starting install"
   set -- install
-  BASH_ARGV0="${HOME}/dotf/dotf"
+  BASH_ARGV0="${HOME}/repos/dotf/dotf"
 fi
 
 source ./.config/bash/lib/barg.sh || exit
 source ./.config/bash/lib/printfc.sh || exit
 source ./.config/bash/lib/logger.sh || exit
+source ./.config/bash/lib/spinner.sh || exit
 
 function main {
   MEPATH="$(realpath "${0}")"
@@ -62,7 +69,7 @@ BARG
   needed_folders=()
 
   # Installation config
-  source "${MELOC}/.conf.sh"
+  source "${MELOC}/.iconf.sh"
 
   case "${BARG_SUBCOMMAND}" in
     install)
@@ -83,15 +90,18 @@ BARG
         log e "Neovim not installed or not in PATH"
         exit
       fi
-      nvim "${MELOC}/.conf.sh"
+      nvim "${MELOC}/.iconf.sh"
       ;;
     help) do_help ;;
     version)
+      spinner.start "Gathering info from remote repo" &
+      SPINNER_PID="${!}"
       {
         read -r new_commits
         read -r remote_version
         read -r local_version
       } < <(git_version_gen)
+      spinner.stop "${SPINNER_PID}"
 
       printf '%s %s\n' "Klapptnot/dotf" "${local_version}"
       if ((new_commits > 0)); then
@@ -206,12 +216,14 @@ function do_install {
       log i "Already up to date"
       return
     fi
-    log w "All local changes will be discarded"
+    spinner.start "Updating files" &
+    SPINNER_PID="${!}"
     git restore "${MELOC}" &> /dev/null &&
-      git pull --force &> /dev/null &&
+      git pull --rebase &> /dev/null &&
       log i "Successfully pulled new changes"
     # Source config for updates
-    source "${MELOC}/.conf.sh"
+    source "${MELOC}/.iconf.sh"
+    spinner.stop "${SPINNER_PID}"
   elif [ "${INSTALL_MODE}" == "reset" ]; then
     log w "All local changes were discarded"
     cd "${MELOC}" || exit
@@ -221,7 +233,7 @@ function do_install {
 
   ${NO_INSTALL_PKGS} && log i "User rejected packages installation"
 
-  if ! ${NO_INSTALL_PKGS}; then
+  if ! ${NO_INSTALL_PKGS} && [ -z "${TERMUX_APP__PACKAGE_NAME@A}" ]; then
     log i "Installing packages with pacman"
     # Install packages
     sudo pacman -Syy --noconfirm --needed "${pacman_pkgs[@]}"
@@ -229,6 +241,8 @@ function do_install {
     # Install Yet Another Yogurt
     ! command -v yay > /dev/null && {
       log i "Yay is not installed, installing"
+      spinner.start "Installing yay (Yet Another Yogurt)" &
+      SPINNER_PID="${!}"
       local here="${PWD}"
       local yay_folder
       yay_folder="$(mktemp --directory)"
@@ -238,6 +252,7 @@ function do_install {
       cd "${here}" || exit
       rm -rf "${yay_folder:?Path expected}"
     }
+    spinner.stop "${SPINNER_PID}"
 
     log i "Installing AUR packages with yay"
     # Install yay packages
@@ -246,22 +261,37 @@ function do_install {
 
   log i "Started linking process"
 
+  spinner.start "Generating ignore list" &
+  SPINNER_PID="${!}"
   # Generate ignore list with updated packages
   gen_ignore_list
+  spinner.stop "${SPINNER_PID}"
 
+  spinner.start "Cleaning symbolic links" &
+  SPINNER_PID="${!}"
   # Clean posible outdated links
   do_symlink_cleaning "${MELOC}" "${HOME}"
+  spinner.stop "${SPINNER_PID}"
 
+  spinner.start "Linking files" &
+  SPINNER_PID="${!}"
   # Make symlinks to files
   do_symlink_tree "${MELOC}" "${HOME}"
+  spinner.stop "${SPINNER_PID}"
 
+  spinner.start "Creating needed folders" &
+  SPINNER_PID="${!}"
   # Create needed folders
   for f in "${needed_folders[@]}"; do
     mkdir -p "${f}"
   done
+  spinner.stop "${SPINNER_PID}"
 
+  spinner.start "Running post-install function" &
+  SPINNER_PID="${!}"
   # Run post install commands
   post_install
+  spinner.stop "${SPINNER_PID}"
 
   log i "Installation process finished"
 }
@@ -273,6 +303,8 @@ function do_uninstall {
   log i "Uninstallation Started"
   local folders=()
 
+  spinner.start "Checking linked files" &
+  SPINNER_PID="${!}"
   mapfile -t link < <(find "${HOME}" -type l)
   mapfile -t targ < <(realpath -LP "${link[@]}")
   for ((i = 0; i < ${#link[@]}; i++)); do
@@ -280,8 +312,12 @@ function do_uninstall {
     unlink "${link[i]}"
     folders+=("${link[i]}")
   done
+  spinner.stop "${SPINNER_PID}"
+
   ((${#folders[@]} == 0)) && return
 
+  spinner.start "Cleaning links" &
+  SPINNER_PID="${!}"
   mapfile -t folders < <(dirname "${folders[@]}" | uniq | sort -r | uniq)
 
   local to_remove=()
@@ -289,6 +325,7 @@ function do_uninstall {
     [[ "${f}" =~ ^${HOME}/?(\.config|\.local)?$ ]] && continue
     to_remove+=("${f}")
   done
+  spinner.stop "${SPINNER_PID}"
 
   # Remove folders, will remove empty folders and
   # ignore errors, `--preserve-root` just in case

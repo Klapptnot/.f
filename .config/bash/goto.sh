@@ -41,18 +41,16 @@ function goto {
   elif [[ "${1}" =~ ^-l|--list$ ]]; then
     if ! [ -f ~/.config/dotf/goto.idx ]; then
       printfc '{f85}[INFO]{r} Index file not found, printing default aliases\n'
-      PATH_INDEX_CONTENT=(
-        'cfg   &!HOME;/.config'
-        'ubin  /usr/bin'
-        'ulib  /usr/lib'
-        'uetc  /usr/etc'
-        'dtkp  &!HOME;/Desktop'
-        'nvc   &*cfg;/nvim'
+      default_aliases=(
+        '.c   &!HOME;/.config'
+        'bin  /usr/bin'
+        'lib  /usr/lib'
+        'etc  /usr/etc'
+        'dp   &!HOME;/Desktop'
+        'nc   &*.c;/nvim'
       )
-      # shellcheck disable=SC2178
-      IFS=$'\n' PATH_INDEX_CONTENT="${PATH_INDEX_CONTENT[*]}"
       # shellcheck disable=SC2128
-      printf '%s\n' "${PATH_INDEX_CONTENT}"
+      printf '%s\n' "${default_aliases[@]}"
       return
     fi
     printfc '{f85}[INFO]{r} Printing aliases\n%s\n' "$(< ~/.config/dotf/goto.idx)"
@@ -64,38 +62,40 @@ function goto {
     declare -r PATH_INDEX_CONTENT="$(< ~/.config/dotf/goto.idx)"
   else
     # Set a default config, but give a warning
-    PATH_INDEX_CONTENT=(
-      'cfg &!HOME;/.config'
-      'ubin /usr/bin'
-      'ulib /usr/lib'
-      'uetc /usr/etc'
-      'dtkp &!HOME;/Desktop'
-      'nvc  &*cfg;/nvim'
+    default_aliases=(
+      '.c   &!HOME;/.config'
+      'bin  /usr/bin'
+      'lib  /usr/lib'
+      'etc  /usr/etc'
+      'dp   &!HOME;/Desktop'
+      'nc   &*.c;/nvim'
     )
-    # Join by LF
     # shellcheck disable=SC2178
-    IFS=$'\n' PATH_INDEX_CONTENT="${PATH_INDEX_CONTENT[*]}"
-    # shellcheck disable=SC2178,SC2128
+    printf -v PATH_INDEX_CONTENT '%s\n' "${default_aliases[@]}"
     declare -r PATH_INDEX_CONTENT="${PATH_INDEX_CONTENT}"
     printfc '{f191}[WARN]{r} Index file no found, default aliases is set\n'
   fi
 
   # shellcheck disable=SC2128
-  PATH_INDEX="$(awk '{ print $1 }' <<< "${PATH_INDEX_CONTENT}")"
-  local alias=()
-  while read -r a; do alias+=("${a}"); done <<< "${PATH_INDEX}"
-  declare -A ALIASES
-  while read -r p; do
-    declare ALIASES["${alias[0]}"]="${p}"
-    alias=("${alias[@]:1}")
-  done <<< "$(grep -Po "(?<=\s)[^\s].*(?=$)" <<< "${PATH_INDEX_CONTENT}")"
+  local path_alias
+  mapfile -t path_alias < <(awk '{ print $1 }' <<< "${PATH_INDEX_CONTENT}")
+
+  declare -A ALIAS_FORMAT
+  while read -r format; do
+    ALIAS_FORMAT["${path_alias[0]}"]="${format}"
+    path_alias=("${path_alias[@]:1}")
+  done < <(awk '{ print $2 }' <<< "${PATH_INDEX_CONTENT}")
+  unset path_alias
+
   local modifiers=("${@:2}")
   local ent_regex='&(\*|!|%)([^;\s]*);'
-  local path="${ALIASES[${1}]}"
+  local path="${ALIAS_FORMAT[${1}]}"
+
   if [ -z "${path}" ]; then
     printfc '{f160}[ERR ]{r} Alias "%s" not found\n' "${1}"
     return 2
   fi
+  # While replacing, do not allow & to reference the matched string
   local shopt_restore=false
   if shopt -q patsub_replacement; then
     shopt -u patsub_replacement
@@ -104,11 +104,11 @@ function goto {
   while [[ ${path} =~ ${ent_regex} ]]; do
     case "${BASH_REMATCH[1]}" in
       '*')
-        if [ -z "${ALIASES[${BASH_REMATCH[2]}]}" ]; then
+        if [ -z "${ALIAS_FORMAT[${BASH_REMATCH[2]}]}" ]; then
           printfc '{f160}[ERR ]{r} Alias "%s" not found\n' "${BASH_REMATCH[2]}"
           return 2
         fi
-        path="${path//${BASH_REMATCH[0]}/${ALIASES["${BASH_REMATCH[2]}"]}\/}"
+        path="${path//${BASH_REMATCH[0]}/${ALIAS_FORMAT["${BASH_REMATCH[2]}"]}\/}"
         ;;
       '!')
         if [ -z "${BASH_REMATCH[2]}" ]; then
@@ -124,10 +124,10 @@ function goto {
           return 4
         fi
         path="${path//${BASH_REMATCH[0]}/${modifiers[(${BASH_REMATCH[2]} - 1)]}\/}"
-        modifiers=(
-          "${modifiers[@]:0:${BASH_REMATCH[2]}-1}"
-          "${modifiers[@]:${BASH_REMATCH[2]}}"
-        )
+        # modifiers=(
+        #   "${modifiers[@]:0:${BASH_REMATCH[2]}-1}"
+        #   "${modifiers[@]:${BASH_REMATCH[2]}}"
+        # )
         ;;
     esac
   done
@@ -137,6 +137,7 @@ function goto {
   for ((i = 0; i < ${#modifiers[@]}; i++)); do
     path="${path}/${modifiers[i]}"
   done
+  read -r path < <(realpath "${path}") || path="${path//\/\//\/}"
   if ! [ -d "${path}" ]; then
     printfc '{f160}[ERR ]{r} Folder "%s" does not exist or is not accessible\n' "${path}"
     return 7

@@ -10,12 +10,12 @@ def get-aliased-paths [] -> table<alias: string[], expand: string[]> {
     print $'(ansi yellow1)[WARN](ansi reset) Index file not found, default aliases are set'
     # Set a default config, but give a warning
     [
-      'cfg      &!HOME;/.config',
-      'ubin     /usr/bin',
-      'ulib     /usr/lib',
-      'uetc     /usr/etc',
-      'dtkp     &!HOME;/Desktop',
-      'nvc      &*cfg;/nvim'
+      '.c   &!HOME;/.config'
+      'bin  /usr/bin'
+      'lib  /usr/lib'
+      'etc  /usr/etc'
+      'dp   &!HOME;/Desktop'
+      'nc   &*.c;/nvim'
     ]
   }
   $def | parse "{alias} {expand}" | str trim

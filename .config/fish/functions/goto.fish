@@ -32,12 +32,12 @@ function goto -d 'Alias based fast cd (change dir)'
     if not test -f ~/.config/dotf/goto.idx
       print '{f85}[INFO]{r} Index file not found, printing default aliases\n'
       set -l PATH_INDEX_CONTENT \
-        'cfg &!HOME;/.config' \
-        'ubin /usr/bin' \
-        'ulib /usr/lib' \
-        'uetc /usr/etc' \
-        'dtkp  &!HOME;/Desktop' \
-        'nvc &*cfg;/nvim'
+        '.c   &!HOME;/.config' \
+        'bin  /usr/bin' \
+        'lib  /usr/lib' \
+        'etc  /usr/etc' \
+        'dp   &!HOME;/Desktop' \
+        'nc   &*.c;/nvim'
       print '{}\n' $PATH_INDEX_CONTENT
       return 1
     end
@@ -84,12 +84,12 @@ function goto -d 'Alias based fast cd (change dir)'
   else
     # Set a default config, but give a warning
     set -f PATH_INDEX_CONTENT \
-      'cfg &!HOME;/.config' \
-      'ubin /usr/bin' \
-      'ulib /usr/lib' \
-      'uetc /usr/etc' \
-      'dtkp &!HOME;/Desktop' \
-      'nvc &*cfg;/nvim'
+      '.c   &!HOME;/.config' \
+      'bin  /usr/bin' \
+      'lib  /usr/lib' \
+      'etc  /usr/etc' \
+      'dp   &!HOME;/Desktop' \
+      'nc   &*.c;/nvim'
     print '{f191}[WARN]{r} Index file no found, default aliases are set\n'
   end
 

@@ -8,6 +8,7 @@ declare -rA LOGGER_LOG_COLORS=(
   ['c']='\x1b[30m\x1b[41m'
 )
 declare -rA LOGGER_LEVEL_NAMES=(
+  ['o']='debug'    # 0
   ['d']='debug'    # 1
   ['i']='info'     # 2
   ['w']='warn'     # 3
@@ -15,6 +16,7 @@ declare -rA LOGGER_LEVEL_NAMES=(
   ['c']='critical' # 5
 )
 declare -rA LOGGER_LEVEL_NUMS=(
+  ['o']="0"
   ['d']="1"
   ['i']="2"
   ['w']="3"
@@ -22,7 +24,7 @@ declare -rA LOGGER_LEVEL_NUMS=(
   ['c']="5"
 )
 
-LOGGER_LEVEL="${LOGGER_LEVEL:-e}"
+LOGGER_LEVEL="${LOGGER_LEVEL:-i}"
 
 function log {
   local level="${1,,}"
@@ -35,7 +37,9 @@ function log {
   local format="${2}"
   shift 2
 
-  ((log_id < log_level)) && return
+  if ((0 == log_level)) || ((log_id < log_level)); then
+    return
+  fi
 
   local color="${LOGGER_LOG_COLORS[${level}]}"
   test -z "${color}" && level="default"

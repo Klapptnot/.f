@@ -5,10 +5,10 @@ source ~/.config/bash/lib/rsum.sh
 source ~/.config/bash/lib/logger.sh
 
 function main {
-  barg.parse "${@}" << EOF
+  barg.parse "${@}" << EOF || BARG_SUBCOMMAND='help'
   #[progname='notify']
   #[extras='PARAMS', reqextras='true']
-  #[subcmds="send =list =help"]
+  #[subcmds="send =pull =help"]
 
   @send h/handler [
     "dbus" "ntfy" "both"
@@ -22,19 +22,22 @@ function main {
   @send a/action[vec[str]] => NOTIFICATION_ACTIONS
 
   # dbus exclusive
-  @send n/app-name[str] |> "NotifyCLI" => NOTIFICATION_APP_NAME
-  @send i/icon[str] |> "notification-active" => NOTIFICATION_ICON
-  @send I/id[int] |> "0" => NOTIFICATION_ID
-  @send e/expire[int] |> "-1" => NOTIFICATION_EXPIRE_TIME
-  @send d/delete-action[str] => NOTIFICATION_ACTION_DEL
+  @send n/app-name[str] |> "NotifyCLI" => DBUS_NOTIFICATION_APP_NAME
+  @send i/icon[str] |> "notification-active" => DBUS_NOTIFICATION_ICON
+  @send I/id[int] |> "0" => DBUS_NOTIFICATION_ID
+  @send e/expire[int] |> "-1" => DBUS_NOTIFICATION_EXPIRE_TIME
+  @send d/delete-action[str] => DBUS_NOTIFICATION_ACTION_DEL
 
-  # nfty exclusive
-  @send A/attach[str] => NOTIFICATION_ATTACHMENT
-  @send E/email[str] => NOTIFICATION_EMAIL
-  @send D/defer[str] => NOTIFICATION_DEFER
-  @send C/click-action[str] => NOTIFICATION_CLICK
+  # ntfy exclusive
+  @send A/attach[str] => NTFY_NOTIFICATION_ATTACHMENT
+  @send E/email[str] => NTFY_NOTIFICATION_EMAIL
+  @send D/defer[str] => NTFY_NOTIFICATION_DEFER
+  @send C/click-action[str] => NTFY_NOTIFICATION_CLICK
+  @send T/topic[str] => NTFY_NOTIFICATION_TOPIC
+  @send insecure[bool] => NTFY_ALLOW_INSECURE
 
-  @list j/json[bool] => JSON_OUTPUT
+  @pull insecure[bool] => NTFY_ALLOW_INSECURE
+  @pull T/topic[str] => NTFY_NOTIFICATION_TOPIC
 EOF
   case "${BARG_SUBCOMMAND}" in
     send)
@@ -45,19 +48,25 @@ EOF
         send."${NOTIFICATION_HANDLER}"
       fi
       ;;
-    list) true ;;
+    pull) pull.ntfy ;;
     help) show_help ;;
   esac
 }
 
 function send.ntfy {
-  [ ! -e "${HOME}/.notify.conf" ] && {
-    log e "Config file not found"
-    exit
-  }
-  {
-    read -r topic
-  } < "${HOME}/.notify.conf"
+  if [ -z "${NTFY_NOTIFICATION_TOPIC}" ]; then
+    [ ! -e "${HOME}/.notify.conf" ] && {
+      log e "Config file not found and topic was not specified"
+      exit
+    }
+    {
+      read -r NTFY_NOTIFICATION_TOPIC
+    } < "${HOME}/.notify.conf"
+  fi
+  if [ -z "${NTFY_NOTIFICATION_TOPIC}" ]; then
+    log e "Topic for ntfy.sh is empty"
+    return
+  fi
 
   local notification_title="${PARAMS[0]}"
 
@@ -92,19 +101,19 @@ function send.ntfy {
   local http_method="POST"
 
   local attached attached_filename
-  if [ -n "${NOTIFICATION_ATTACHMENT}" ]; then
-    if [ ! -e "${NOTIFICATION_ATTACHMENT}" ]; then
-      attached="${NOTIFICATION_ATTACHMENT}"
+  if [ -n "${NTFY_NOTIFICATION_ATTACHMENT}" ]; then
+    if [ ! -e "${NTFY_NOTIFICATION_ATTACHMENT}" ]; then
+      attached="${NTFY_NOTIFICATION_ATTACHMENT}"
     else
-      read -r mime_type < <(file -b --mime-type "${NOTIFICATION_ATTACHMENT}")
-      attached_filename="$(basename "${NOTIFICATION_ATTACHMENT}")"
-      content_length="$(stat -c%s "${NOTIFICATION_ATTACHMENT}")"
+      read -r mime_type < <(file -b --mime-type "${NTFY_NOTIFICATION_ATTACHMENT}")
+      attached_filename="$(basename "${NTFY_NOTIFICATION_ATTACHMENT}")"
+      content_length="$(stat -c%s "${NTFY_NOTIFICATION_ATTACHMENT}")"
       http_method="PUT"
     fi
   fi
 
   local http_data=(
-    "${http_method} /${topic} HTTP/1.1"
+    "${http_method} /${NTFY_NOTIFICATION_TOPIC} HTTP/1.1"
     "Host: ntfy.sh"
     "User-Agent: klapptnot/notify bash"
     "Title: ${notification_title}"
@@ -119,12 +128,12 @@ function send.ntfy {
     http_data+=("Message: ${notification_body}")
   }
   [ -n "${attached_filename}" ] && http_data+=("Filename: ${attached_filename}")
-  [ -n "${NOTIFICATION_EMAIL}" ] && http_data+=("Email: ${NOTIFICATION_EMAIL}")
-  [ -n "${NOTIFICATION_CLICK}" ] && http_data+=("Click: ${NOTIFICATION_CLICK}")
+  [ -n "${NTFY_NOTIFICATION_EMAIL}" ] && http_data+=("Email: ${NTFY_NOTIFICATION_EMAIL}")
+  [ -n "${NTFY_NOTIFICATION_CLICK}" ] && http_data+=("Click: ${NTFY_NOTIFICATION_CLICK}")
   [ -n "${actions}" ] && http_data+=("Actions: ${actions}")
 
   [ -n "${tags}" ] && http_data+=("Tags: ${tags}")
-  [ -n "${NOTIFICATION_DEFER}" ] && http_data+=("At: ${NOTIFICATION_DEFER}")
+  [ -n "${NTFY_NOTIFICATION_DEFER}" ] && http_data+=("At: ${NTFY_NOTIFICATION_DEFER}")
 
   http_data+=(
     "Connection: close"
@@ -133,20 +142,145 @@ function send.ntfy {
   printf -v HTTP_REQUEST '%b\r\n' "${http_data[@]}"
   [ -z "${mime_type@A}" ] && printf -v HTTP_REQUEST '%s%s' "${HTTP_REQUEST}" "${notification_body}"
 
-  # Open connection
-  if ! exec 3<> /dev/tcp/ntfy.sh/80; then
-    log e "Connection failed"; exit
-  fi
+  if command -v openssl &> /dev/null; then
+    read -r tmp_pipe < <(mktemp --dry-run ntfy.ssl.XXXXXXXX)
+    mkfifo "${tmp_pipe}.in" "${tmp_pipe}.out" || return
+    openssl s_client -connect ntfy.sh:443 < "${tmp_pipe}.in" > "${tmp_pipe}.out" 2> /dev/null &
 
-  printf '%s' "${HTTP_REQUEST}" >&3
-  [ -n "${mime_type@A}" ] && cat "${NOTIFICATION_ATTACHMENT}" >&3
-  printf '%s' "$(cat <&3)" &>/dev/null # I dont want that now, a while read loop here
+    printf '%s' "${HTTP_REQUEST}" > "${tmp_pipe}.in"
+    [ -n "${mime_type@A}" ] && cat "${NTFY_NOTIFICATION_ATTACHMENT}" > "${tmp_pipe}.in"
+    cat "${tmp_pipe}.out" &> /dev/null
 
-  # Close connection
-  if exec 3>&-; then
+    : "${tmp_pipe:?Cannot \'rm -fr\' with an empty variable}"
+    rm -fr "${_}.in" "${_}.out"
     log i "Notification send (ntfy.sh)"
   else
-    log e "Notification not send (ntfy.sh)"
+    if ! ${NTFY_ALLOW_INSECURE}; then
+      log w "Insecure connection: notification not send, use '--insecure' to send anyways"
+      return
+    fi
+    log w "openssl command not found, using unencrypted HTTP request"
+    # Open bash TCP connection
+    if ! exec 3<> /dev/tcp/ntfy.sh/80; then
+      log e "Connection failed"
+      exit
+    fi
+
+    printf '%s' "${HTTP_REQUEST}" >&3
+    [ -n "${mime_type@A}" ] && cat "${NTFY_NOTIFICATION_ATTACHMENT}" >&3
+    printf '%s' "$(cat <&3)" &> /dev/null # I dont want that now, a while read loop here
+
+    # Close connection
+    if exec 3>&-; then
+      log i "Notification send (ntfy.sh)"
+    else
+      log e "Notification not send (ntfy.sh)"
+    fi
+  fi
+}
+
+function pull.ntfy {
+  if [ -z "${NTFY_NOTIFICATION_TOPIC}" ]; then
+    [ ! -e "${HOME}/.notify.conf" ] && {
+      log e "Config file not found and topic was not specified"
+      exit
+    }
+    {
+      read -r NTFY_NOTIFICATION_TOPIC
+    } < "${HOME}/.notify.conf"
+  fi
+  if [ -z "${NTFY_NOTIFICATION_TOPIC}" ]; then
+    log e "Topic for ntfy.sh is empty"
+    return
+  fi
+
+  local http_data=(
+    "GET /${NTFY_NOTIFICATION_TOPIC}/json HTTP/1.1"
+    "Host: ntfy.sh"
+    "User-Agent: klapptnot/notify bash"
+    ""
+  )
+  printf -v HTTP_REQUEST '%s\r\n' "${http_data[@]}"
+
+  if command -v opsenssl &> /dev/null; then
+    read -r tmp_pipe < <(mktemp --dry-run ntfy.ssl.XXXXXXXX)
+    mkfifo "${tmp_pipe}.in" "${tmp_pipe}.out" || return
+    local conn_open=true
+    openssl s_client -quiet -connect ntfy.sh:443 < "${tmp_pipe}.in" > "${tmp_pipe}.out" 2> /dev/null &
+    trap "kill ${!};"'printf "0\r\n\r\n" >${tmp_pipe}.in; rm -fr "${_}.in" "${_}.out";conn_open=false' SIGINT
+
+    printf '%s' "${HTTP_REQUEST}" > "${tmp_pipe}.in"
+    # Discard headers
+    while true; do
+      read -t 0.05 -r line
+      [ "${line}" == $'\r' ] && break
+      [ ! -e "${tmp_pipe}.in" ] && break
+    done < "${tmp_pipe}.out"
+    # Close connection and file descriptor
+    while ${conn_open}; do
+      [ ! -e "${tmp_pipe}.in" ] && break
+      local lines=()
+      while true; do
+        ! ${conn_open} && break 2
+        IFS=$'\r\n' read -t 0.05 -r line
+        [ -n "${line}" ] && lines+=("${line}")
+        ((${#lines[@]} >= 2)) && break
+      done
+      local length="${lines[0]}"
+      local content="${lines[1]}"
+      lines=()
+
+      [ -z "${length}" ] && continue
+      if ! printf -v dlength '%d' "0x${length}" 2> /dev/null || ((${#content} != (dlength - 1))); then
+        log e 'Content is corrupted, exiting'
+        printf "0\r\n\r\n" > "${tmp_pipe}.in"
+        conn_open=false
+        break
+      fi
+      printf "%s\n" "${content}"
+    done < "${tmp_pipe}.out"
+  else
+    if ! ${NTFY_ALLOW_INSECURE}; then
+      log w "Insecure connection: notification not send, use '--insecure' to send anyways"
+      return
+    fi
+    log w "openssl command not found, using unencrypted HTTP request"
+    # Open bash TCP connection
+    if ! exec 3<> /dev/tcp/ntfy.sh/80; then
+      log e "Connection failed"
+      exit
+    fi
+
+    printf '%s' "${HTTP_REQUEST}" >&3
+    # Discard headers
+    while read -r line; do
+      [ "${line}" == $'\r' ] && break
+    done <&3
+    # Close connection and file descriptor
+    local conn_open=true
+    trap 'printf "0\r\n\r\n" >&3; exec 3>&-;conn_open=false' SIGINT
+    while ${conn_open}; do
+      local lines=()
+      while true; do
+        ! ${conn_open} && break 2
+        IFS=$'\r\n' read -t 0.05 -r line
+        [ -n "${line}" ] && lines+=("${line}")
+        ((${#lines[@]} >= 2)) && break
+      done
+      local length="${lines[0]}"
+      local content="${lines[1]}"
+      lines=()
+
+      [ -z "${length}" ] && continue
+      if ! printf -v dlength '%d' "0x${length}" 2> /dev/null || ((${#content} != (dlength - 1))); then
+        log e 'Content is corrupted, exiting'
+        printf "0\r\n\r\n" >&3
+        exec 3>&-
+        conn_open=false
+        break
+      fi
+      printf "%s\n" "${content}"
+    done <&3
   fi
 }
 
@@ -188,14 +322,14 @@ function send.dbus {
       --object-path /org/freedesktop/Notifications \
       --method org.freedesktop.Notifications.Notify \
       -- \
-      "${NOTIFICATION_APP_NAME}" \
-      "${NOTIFICATION_ID}" \
-      "${NOTIFICATION_ICON}" \
+      "${DBUS_NOTIFICATION_APP_NAME}" \
+      "${DBUS_NOTIFICATION_ID}" \
+      "${DBUS_NOTIFICATION_ICON}" \
       "${notification_title}" \
       "${notification_body}" \
       "${actions_str}" \
       "${data_dict}" \
-      "int32 ${NOTIFICATION_EXPIRE_TIME}" | sed -n 's/^(uint32 \([0-9]\+\),.*$/\1/p'
+      "int32 ${DBUS_NOTIFICATION_EXPIRE_TIME}" | sed -n 's/^(uint32 \([0-9]\+\),.*$/\1/p'
   )
   if [ -n "${notif_id}" ]; then
     log i "Notification send (dbus)"
@@ -232,8 +366,8 @@ function dbus.notification_eventloop {
         bash -c "${commands[i]}" &> /dev/null &
         ;;
       NotificationClosed)
-        if ! ${invoked} && [ -n "${NOTIFICATION_ACTION_DEL}" ]; then
-          bash -c "${NOTIFICATION_ACTION_DEL}" &> /dev/null &
+        if ! ${invoked} && [ -n "${DBUS_NOTIFICATION_ACTION_DEL}" ]; then
+          bash -c "${DBUS_NOTIFICATION_ACTION_DEL}" &> /dev/null &
         fi
         kill "${pid}"
         ;;
@@ -244,17 +378,17 @@ function dbus.notification_eventloop {
 }
 
 function show_help {
-    local help_lines=(
+  local help_lines=(
     "\x1b[1;34mnotify\x1b[0m: Sends notifications to dbus and the ntfy.sh service"
     ""
     "\x1b[1;34mUsage:\x1b[0m"
     "  notify send [options] <title> [<body>...]"
-    "  notify list [options]"
+    "  notify pull [options]"
     "  notify help"
     ""
     "\x1b[1;34mSubcommands:\x1b[0m"
     "  send ...    Send a notification"
-    "  list ...    List available notifications"
+    "  pull ...    List available notifications"
     "  help        Show this help message and exit"
     ""
     "\x1b[1;34mNotification handler options:\x1b[0m"
@@ -278,14 +412,17 @@ function show_help {
     "  -A, --attach <str>  Set notification attachment, URL or file path"
     "  -E, --email <str>   Send email to <str>"
     "  -D, --defer <str>   Send notification at <str> time"
+    "  -T, --topic <str>   Set ntfy.sh topic, ignoring config file"
     "  -C, --click <str>   Set notification click action"
+    "      --insecure      Allow insecure HTTP connections"
     ""
-    "\x1b[1;34mList subcommand options:\x1b[0m"
-    "  -j, --json  Output notifications list in JSON format"
+    "\x1b[1;34mPull subcommand options:\x1b[0m"
+    "  -T, --topic <str>   Output notifications list in JSON format"
+    "      --insecure      Allow insecure HTTP connections"
     ""
     "\x1b[1;34mExamples:\x1b[0m"
     "  notify send -h both 'Hello World' 'This is a test notification'"
-    "  notify list"
+    "  notify pull"
   )
 
   printf '%b\n' "${help_lines[@]}"

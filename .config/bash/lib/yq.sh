@@ -6,7 +6,9 @@
 # Simple YAML value reader, currently only useful
 # for YAML files with 2 spaces for indentation
 # NO SUPPORT FOR SETS, TAGS, SCALARS, etc.
+# NO SUPPORT FOR NESTED ARRAYS, OR ARRAYS
 # ONLY KEY-VALUE, for arrays, strings and integers
+# NESTED KEY-VALUE SUPPORTED
 function yq.sh {
   local path="${1}"
   local file="${2}"
@@ -134,14 +136,14 @@ function yq.sh {
       # ADD
       last_ci=${ci}
       [ -n "${k}" ] && fpa+=("${k}")
-      [ -n "${k}" ] && ${probably_key} && keys+=("${k}")
+      [ -n "${k}" ] && ${probably_key} && ((cai == -1)) && keys+=("${k}")
     else
       # REP
       if [ -n "${line}" ]; then
         if ((cai < 0)) || ${pop_2}; then
           (("${#fpa[@]}" > 0)) && unset 'fpa[-1]'
           [ -n "${k}" ] && fpa+=("${k}")
-          ${probably_key} && keys+=("${k}")
+          ${probably_key} && ((cai == -1)) && keys+=("${k}")
         fi
       fi
     fi

@@ -97,7 +97,7 @@ function gen_ignore_list {
   ignore=(
     "README.md"
     "dotf"
-    ".conf.sh"
+    ".iconf.sh"
     "misc*"
     ".git*"
     ".config/nushell/history*"

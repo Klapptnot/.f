@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC1090
 
 source ~/.config/bash/lib/barg.sh
 source ~/.config/bash/lib/rsum.sh
@@ -202,7 +203,7 @@ function pull.ntfy {
   )
   printf -v HTTP_REQUEST '%s\r\n' "${http_data[@]}"
 
-  if command -v opsenssl &> /dev/null; then
+  if command -v openssl &> /dev/null; then
     read -r tmp_pipe < <(mktemp --dry-run ntfy.ssl.XXXXXXXX)
     mkfifo "${tmp_pipe}.in" "${tmp_pipe}.out" || return
     local conn_open=true

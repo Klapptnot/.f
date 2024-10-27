@@ -12,6 +12,38 @@ window#waybar {
   background: @waybarbg;
 }
 
+#window {
+  background: @backgnd;
+  color: @win-inf;
+}
+
+window.empty #window {
+  background: transparent;
+  color: transparent;
+  border: none;
+  margin: 0px;
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
+tooltip {
+	color: @tooltip;
+	background: @backgnd;
+	border-radius: 10px;
+	border: 1px solid @borders;
+  margin: 0px;
+  padding: 0px;
+}
+
+tooltip > * {
+  margin: 0px;
+  padding: 0px;
+}
+
+#tray menu separator {
+  min-height: 2px;
+}
+
 /* Single elements */
 #window,
 #backlight,
@@ -164,35 +196,6 @@ window#waybar {
 }
 #workspaces button:hover:not(.active) {
   color: @wp-inac;
-}
-
-
-#window {
-  background: @backgnd;
-  color: @win-inf;
-}
-
-window.empty #window {
-  background: transparent;
-  color: transparent;
-  border: none;
-  margin: 0px;
-  padding-left: 0px;
-  padding-right: 0px;
-}
-
-tooltip {
-	color: @tooltip;
-	background: @backgnd;
-	border-radius: 10px;
-	border: 1px solid @borders;
-  margin: 0px;
-  padding: 0px;
-}
-
-tooltip > * {
-  margin: 0px;
-  padding: 0px;
 }
 
 #backlight {

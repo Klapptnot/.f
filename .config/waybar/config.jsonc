@@ -4,7 +4,6 @@
   "exclusive": true,
   "reload_style_on_change": true,
   "modules-left": [
-    "group/motherboard",
     "custom/weather",
     "hyprland/workspaces",
     "hyprland/window"

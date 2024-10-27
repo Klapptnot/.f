@@ -303,38 +303,46 @@ function do_uninstall {
   log i "Uninstallation Started"
   local folders=()
 
-  spinner.start "Checking linked files" &
+  spinner.start "Unlinking owned files..." &
   SPINNER_PID="${!}"
   mapfile -t link < <(find "${HOME}" -type l)
-  mapfile -t targ < <(realpath -LP "${link[@]}")
   for ((i = 0; i < ${#link[@]}; i++)); do
-    [[ "${targ[i]}" != "${MELOC}"* ]] && continue
-    unlink "${link[i]}"
+    read -r targ < <(realpath -LP "${link[i]}" 2> /dev/null)
+    [[ "${targ}" != "${MELOC}"* ]] && continue
     folders+=("${link[i]}")
+    [[ -z "${targ}" ]] && continue
+    unlink "${link[i]}"
   done
   spinner.stop "${SPINNER_PID}"
 
   ((${#folders[@]} == 0)) && return
-
-  spinner.start "Cleaning links" &
-  SPINNER_PID="${!}"
   mapfile -t folders < <(dirname "${folders[@]}" | uniq | sort -r | uniq)
 
-  local to_remove=()
-  for f in "${folders[@]}"; do
-    [[ "${f}" =~ ^${HOME}/?(\.config|\.local)?$ ]] && continue
-    to_remove+=("${f}")
+  spinner.start "Cleaning created folders..." &
+  SPINNER_PID="${!}"
+  local not_empty=()
+  for ff in "${folders[@]}"; do
+    local f="${ff}"
+    while true; do
+      [[ "${f}" == "${HOME}" ]] && break
+      [[ "${f}" == "${HOME}/.local" ]] && break
+      [[ "${f}" == "${HOME}/.config" ]] && break
+      if ! rm --dir "${f:?}" 2> /dev/null; then
+        [ -e "${f}" ] && not_empty+=("${f}")
+        break
+      fi
+      f="${f%\/*}" # Pop last dir
+    done
   done
   spinner.stop "${SPINNER_PID}"
+  mapfile -t not_empty < <(for f in "${not_empty[@]}"; do
+    [ -e "${f}" ] && printf '%s\n' "${f}"
+  done | uniq)
 
-  # Remove folders, will remove empty folders and
-  # ignore errors, `--preserve-root` just in case
-  local res
-  if res=$(rm --preserve-root -df "${to_remove[@]}" 2>&1 | sed "s/^.*'\(.*\)'.*$/\1/g"); then
-    mapfile -t not_rm <<< "${res}"
-    log w "Some folders (${#not_rm[@]}) have untracked files. Not removed"
-  else
-    echo "Something wrong happenned while removing the folders"
+  if ((${#not_empty[@]} > 0)); then
+    log w 'Some folders (%d) have untracked files.' ${#not_empty[@]}
+    log i 'These folders were not removed:'
+    printf '  - %s\n' "${not_empty[@]}"
   fi
 
   log i "Uninstallation process finished"

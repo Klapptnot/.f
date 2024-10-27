@@ -9,118 +9,118 @@
 # https://github.com/nushell/nu_scripts/tree/main/themes
 
 let catppuccin = {
-  latte: {
-    rosewater: "#dc8a78"
-    flamingo: "#dd7878"
-    pink: "#ea76cb"
-    mauve: "#8839ef"
-    red: "#d20f39"
-    maroon: "#e64553"
-    peach: "#fe640b"
-    yellow: "#df8e1d"
-    green: "#40a02b"
-    teal: "#179299"
-    sky: "#04a5e5"
-    sapphire: "#209fb5"
-    blue: "#1e66f5"
-    lavender: "#7287fd"
-    text: "#4c4f69"
-    subtext1: "#5c5f77"
-    subtext0: "#6c6f85"
-    overlay2: "#7c7f93"
-    overlay1: "#8c8fa1"
-    overlay0: "#9ca0b0"
-    surface2: "#acb0be"
-    surface1: "#bcc0cc"
-    surface0: "#ccd0da"
-    crust: "#dce0e8"
-    mantle: "#e6e9ef"
-    base: "#eff1f5"
-  }
-  frappe: {
-    rosewater: "#f2d5cf"
-    flamingo: "#eebebe"
-    pink: "#f4b8e4"
-    mauve: "#ca9ee6"
-    red: "#e78284"
-    maroon: "#ea999c"
-    peach: "#ef9f76"
-    yellow: "#e5c890"
-    green: "#a6d189"
-    teal: "#81c8be"
-    sky: "#99d1db"
-    sapphire: "#85c1dc"
-    blue: "#8caaee"
-    lavender: "#babbf1"
-    text: "#c6d0f5"
-    subtext1: "#b5bfe2"
-    subtext0: "#a5adce"
-    overlay2: "#949cbb"
-    overlay1: "#838ba7"
-    overlay0: "#737994"
-    surface2: "#626880"
-    surface1: "#51576d"
-    surface0: "#414559"
-    base: "#303446"
-    mantle: "#292c3c"
-    crust: "#232634"
-  }
-  macchiato: {
-    rosewater: "#f4dbd6"
-    flamingo: "#f0c6c6"
-    pink: "#f5bde6"
-    mauve: "#c6a0f6"
-    red: "#ed8796"
-    maroon: "#ee99a0"
-    peach: "#f5a97f"
-    yellow: "#eed49f"
-    green: "#a6da95"
-    teal: "#8bd5ca"
-    sky: "#91d7e3"
-    sapphire: "#7dc4e4"
-    blue: "#8aadf4"
-    lavender: "#b7bdf8"
-    text: "#cad3f5"
-    subtext1: "#b8c0e0"
-    subtext0: "#a5adcb"
-    overlay2: "#939ab7"
-    overlay1: "#8087a2"
-    overlay0: "#6e738d"
-    surface2: "#5b6078"
-    surface1: "#494d64"
-    surface0: "#363a4f"
-    base: "#24273a"
-    mantle: "#1e2030"
-    crust: "#181926"
-  }
-  mocha: {
-    rosewater: "#f5e0dc"
-    flamingo: "#f2cdcd"
-    pink: "#f5c2e7"
-    mauve: "#cba6f7"
-    red: "#f38ba8"
-    maroon: "#eba0ac"
-    peach: "#fab387"
-    yellow: "#f9e2af"
-    green: "#a6e3a1"
-    teal: "#94e2d5"
-    sky: "#89dceb"
-    sapphire: "#74c7ec"
-    blue: "#89b4fa"
-    lavender: "#b4befe"
-    text: "#cdd6f4"
-    subtext1: "#bac2de"
-    subtext0: "#a6adc8"
-    overlay2: "#9399b2"
-    overlay1: "#7f849c"
-    overlay0: "#6c7086"
-    surface2: "#585b70"
-    surface1: "#45475a"
-    surface0: "#313244"
-    base: "#1e1e2e"
-    mantle: "#181825"
-    crust: "#11111b"
-  }
+    latte: {
+        rosewater: "#dc8a78"
+        flamingo:  "#dd7878"
+        pink:      "#ea76cb"
+        mauve:     "#8839ef"
+        red:       "#d20f39"
+        maroon:    "#e64553"
+        peach:     "#fe640b"
+        yellow:    "#df8e1d"
+        green:     "#40a02b"
+        teal:      "#179299"
+        sky:       "#04a5e5"
+        sapphire:  "#209fb5"
+        blue:      "#1e66f5"
+        lavender:  "#7287fd"
+        text:      "#4c4f69"
+        subtext1:  "#5c5f77"
+        subtext0:  "#6c6f85"
+        overlay2:  "#7c7f93"
+        overlay1:  "#8c8fa1"
+        overlay0:  "#9ca0b0"
+        surface2:  "#acb0be"
+        surface1:  "#bcc0cc"
+        surface0:  "#ccd0da"
+        base:      "#eff1f5"
+        mantle:    "#e6e9ef"
+        crust:     "#dce0e8"
+    }
+    frappe: {
+        rosewater: "#f2d5cf"
+        flamingo:  "#eebebe"
+        pink:      "#f4b8e4"
+        mauve:     "#ca9ee6"
+        red:       "#e78284"
+        maroon:    "#ea999c"
+        peach:     "#ef9f76"
+        yellow:    "#e5c890"
+        green:     "#a6d189"
+        teal:      "#81c8be"
+        sky:       "#99d1db"
+        sapphire:  "#85c1dc"
+        blue:      "#8caaee"
+        lavender:  "#babbf1"
+        text:      "#c6d0f5"
+        subtext1:  "#b5bfe2"
+        subtext0:  "#a5adce"
+        overlay2:  "#949cbb"
+        overlay1:  "#838ba7"
+        overlay0:  "#737994"
+        surface2:  "#626880"
+        surface1:  "#51576d"
+        surface0:  "#414559"
+        base:      "#303446"
+        mantle:    "#292c3c"
+        crust:     "#232634"
+    }
+    macchiato: {
+        rosewater: "#f4dbd6"
+        flamingo:  "#f0c6c6"
+        pink:      "#f5bde6"
+        mauve:     "#c6a0f6"
+        red:       "#ed8796"
+        maroon:    "#ee99a0"
+        peach:     "#f5a97f"
+        yellow:    "#eed49f"
+        green:     "#a6da95"
+        teal:      "#8bd5ca"
+        sky:       "#91d7e3"
+        sapphire:  "#7dc4e4"
+        blue:      "#8aadf4"
+        lavender:  "#b7bdf8"
+        text:      "#cad3f5"
+        subtext1:  "#b8c0e0"
+        subtext0:  "#a5adcb"
+        overlay2:  "#939ab7"
+        overlay1:  "#8087a2"
+        overlay0:  "#6e738d"
+        surface2:  "#5b6078"
+        surface1:  "#494d64"
+        surface0:  "#363a4f"
+        base:      "#24273a"
+        mantle:    "#1e2030"
+        crust:     "#181926"
+    }
+    mocha: {
+        rosewater: "#f5e0dc"
+        flamingo:  "#f2cdcd"
+        pink:      "#f5c2e7"
+        mauve:     "#cba6f7"
+        red:       "#f38ba8"
+        maroon:    "#eba0ac"
+        peach:     "#fab387"
+        yellow:    "#f9e2af"
+        green:     "#a6e3a1"
+        teal:      "#94e2d5"
+        sky:       "#89dceb"
+        sapphire:  "#74c7ec"
+        blue:      "#89b4fa"
+        lavender:  "#b4befe"
+        text:      "#cdd6f4"
+        subtext1:  "#bac2de"
+        subtext0:  "#a6adc8"
+        overlay2:  "#9399b2"
+        overlay1:  "#7f849c"
+        overlay0:  "#6c7086"
+        surface2:  "#585b70"
+        surface1:  "#45475a"
+        surface0:  "#313244"
+        base:      "#1e1e2e"
+        mantle:    "#181825"
+        crust:     "#11111b"
+    }
 }
 
 let stheme = $catppuccin.mocha
@@ -239,13 +239,18 @@ $env.config = {
             truncating_suffix: "…" # A suffix used by the 'truncating' methodology
         }
         header_on_separator: false # show header text on separator/border line
+        # footer_inheritance: false # render footer in parent table if child is big enough (extended table option)
         # abbreviated_row_count: 10 # limit data rows from top and bottom after reaching a set point
     }
 
     error_style: "fancy" # "fancy" or "plain" for screen reader-friendly error messages
+
+    # Whether an error message should be printed if an error of a certain kind is triggered.
     display_errors: {
-      exit_code: false
-      termination_signal: false
+        exit_code: false # assume the external command prints an error message
+        # Core dump errors are always printed, and SIGPIPE never triggers an error.
+        # The setting below controls message printing for termination by all other signals.
+        termination_signal: false
     }
 
     # datetime_format determines what a datetime rendered in the shell would look like.
@@ -265,12 +270,9 @@ $env.config = {
             warn: {}
             info: {}
         },
-        table: {
-            split_line: { fg: "#404040" },
-            selected_cell: { bg: light_blue },
-            selected_row: {},
-            selected_column: {},
-        },
+        selected_cell: { bg: light_blue },
+        selected_row: {},
+        selected_column: {},
     }
 
     history: {
@@ -285,6 +287,7 @@ $env.config = {
         quick: true    # set this to false to prevent auto-selecting completions when only one remains
         partial: true    # set this to false to prevent partial filling of the prompt
         algorithm: "prefix"    # prefix or fuzzy
+        sort: "smart" # "smart" (alphabetical for prefix matching, fuzzy score for fuzzy matching) or "alphabetical"
         external: {
             enable: true # set to false to prevent nushell looking into $env.PATH to find more suggestions, `false` recommended for WSL users as this look up may be very slow
             max_results: 100 # setting it lower can improve completion performance at the cost of omitting some options
@@ -305,9 +308,9 @@ $env.config = {
     }
 
     color_config: $theme # if you want a more interesting theme, you can replace the empty record with `$dark_theme`, `$light_theme` or another custom record
-    footer_mode: "25" # always, never, number_of_rows, auto
+    footer_mode: 25 # always, never, number_of_rows, auto
     float_precision: 2 # the precision for displaying floats in tables
-    buffer_editor: "" # command that will be used to edit the current line buffer with ctrl+o, if unset fallback to $env.EDITOR and $env.VISUAL
+    buffer_editor: null # command that will be used to edit the current line buffer with ctrl+o, if unset fallback to $env.EDITOR and $env.VISUAL
     use_ansi_coloring: true
     bracketed_paste: true # enable bracketed paste, currently useless on windows
     edit_mode: emacs # emacs, vi
@@ -332,7 +335,7 @@ $env.config = {
         # 633;B - Mark prompt end
         # 633;C - Mark pre-execution
         # 633;D;exit - Mark execution finished with exit code
-        # 633;E - NOT IMPLEMENTED - Explicitly set the command line with an optional nonce
+        # 633;E - Explicitly set the command line with an optional nonce
         # 633;P;Cwd=<path> - Mark the current working directory and communicate it to the terminal
         # and also helps with the run recent menu in vscode
         osc633: true
@@ -474,9 +477,16 @@ $env.config = {
             }
         }
         {
+            name: completion_previous_menu
+            modifier: shift
+            keycode: backtab
+            mode: [emacs, vi_normal, vi_insert]
+            event: { send: menuprevious }
+        }
+        {
             name: ide_completion_menu
             modifier: control
-            keycode: char_n
+            keycode: space
             mode: [emacs vi_normal vi_insert]
             event: {
                 until: [
@@ -499,13 +509,6 @@ $env.config = {
             keycode: f1
             mode: [emacs, vi_insert, vi_normal]
             event: { send: menu name: help_menu }
-        }
-        {
-            name: completion_previous_menu
-            modifier: shift
-            keycode: backtab
-            mode: [emacs, vi_normal, vi_insert]
-            event: { send: menuprevious }
         }
         {
             name: next_page_menu
@@ -574,6 +577,13 @@ $env.config = {
                 cmd: "__open_nvim_fzf_file"
             }
         }
+        # {
+        #     name: open_command_editor
+        #     modifier: control
+        #     keycode: char_o
+        #     mode: [emacs, vi_normal, vi_insert]
+        #     event: { send: openeditor }
+        # }
         {
             name: move_up
             modifier: none
@@ -695,6 +705,18 @@ $env.config = {
             event: { edit: movetolineend }
         }
         {
+            name: move_down
+            modifier: control
+            keycode: char_n
+            mode: [emacs, vi_normal, vi_insert]
+            event: {
+                until: [
+                    { send: menudown }
+                    { send: down }
+                ]
+            }
+        }
+        {
             name: move_up
             modifier: control
             keycode: char_p
@@ -703,18 +725,6 @@ $env.config = {
                 until: [
                     { send: menuup }
                     { send: up }
-                ]
-            }
-        }
-        {
-            name: move_down
-            modifier: control
-            keycode: char_t
-            mode: [emacs, vi_normal, vi_insert]
-            event: {
-                until: [
-                    { send: menudown }
-                    { send: down }
                 ]
             }
         }
@@ -832,7 +842,7 @@ $env.config = {
             modifier: control
             keycode: char_k
             mode: emacs
-            event: { edit: cuttoend }
+            event: { edit: cuttolineend }
         }
         {
             name: cut_line_from_start
@@ -937,8 +947,6 @@ $env.config = {
         }
         # The following bindings with `*system` events require that Nushell has
         # been compiled with the `system-clipboard` feature.
-        # This should be the case for Windows, macOS, and most Linux distributions
-        # Not available for example on Android (termux)
         # If you want to use the system clipboard for visual selection or to
         # paste directly, uncomment the respective lines and replace the version
         # using the internal clipboard.

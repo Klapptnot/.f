@@ -2,7 +2,7 @@ def --env get-env [name] { $env | get $name }
 def --env set-env [name, value] { load-env { $name: $value } }
 def --env unset-env [name] { hide-env $name }
 
-let carapace_completer = {|spans|
+let carapace_completer = { |spans|
   # if the current command is an alias, get it's expansion
   let expanded_alias = (scope aliases | where name == $spans.0 | get -i 0 | get -i expansion)
 

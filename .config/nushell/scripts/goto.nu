@@ -4,7 +4,7 @@
 # |>----|>----|>----|><-><|----<|----<|----<|
 
 def get-aliased-paths [] -> table<alias: string[], expand: string[]> {
-  let def = if (~/.config/dotf/goto.idx | path exists) {
+  let def = if ("~/.config/dotf/goto.idx" | path exists) {
     (open ~/.config/dotf/goto.idx | lines)
   } else {
     print $'(ansi yellow1)[WARN](ansi reset) Index file not found, default aliases are set'

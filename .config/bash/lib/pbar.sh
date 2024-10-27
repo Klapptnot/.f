@@ -1,6 +1,21 @@
 #!/usr/bin/env bash
 
-# Function to display a nice functional progress bar
+# Display a nice functional progress bar
+# Usage: rsum [options]
+#   -l, --label     Opt<str> default: ""    -> bar label
+#   -c, --char      Opt<str> default: "•"   -> char displayed
+#   -k, --keep      (flag)   default: false -> keep bar when done
+#   -L, --left      (flag)   default: false -> show progress left
+#   -C, --centered  (flag)   default: false -> center the bar
+#   -n, --linefeed  (flag)   default: false -> add \n when done
+#
+# Function must print '[::pb.draw::] <percentage>' to update bar
+# Any other (stdin) input will be repeated
+# Example:
+# for ((i=0;i<=100;i++)); do
+#   (((i % 5) == 0)) && printf 'Multiple of 5!\n'
+#   printf '[::pb.draw::] %d\n'
+# done | pbar -l 'Test label'
 function pbar {
   [ "${#}" -eq 0 ] && return
   local LEFT=false
@@ -9,22 +24,22 @@ function pbar {
   local LINEBREAK=false
   local CHAR="•" # █
   local TERM_WIDTH=""
-  local HINT=""
+  local LABEL=""
   while [ "${#}" -gt 0 ]; do
     case "${1}" in
-      -h | --hint)
-        HINT=${2}
+      -l | --label)
+        LABEL="${2}"
         shift 2
         ;;
-      -e | --char)
+      -c | --char)
         [ "${#2}" -eq 1 ] && CHAR="${2}"
         shift 2
         ;;
-      -l | --left)
+      -L | --left)
         LEFT=true
         shift 1
         ;;
-      -c | --centered)
+      -C | --centered)
         CENTERED=true
         shift 1
         ;;
@@ -32,7 +47,7 @@ function pbar {
         REMOVE_BAR=false
         shift 1
         ;;
-      -n | --linebreak)
+      -n | --linefeed)
         LINEBREAK=true
         shift 1
         ;;
@@ -47,7 +62,7 @@ function pbar {
 
   local WIDTH
   for w in "${BAR_SIZES[@]}"; do
-    (((${#HINT} + w) + 7 <= TERM_WIDTH)) && {
+    (((${#LABEL} + w) + 7 <= TERM_WIDTH)) && {
       WIDTH="${w}"
       break
     }
@@ -72,7 +87,7 @@ function pbar {
 
     # Enable auto-resizing when window resize occurs
     for w in "${BAR_SIZES[@]}"; do
-      if (((${#HINT} + w) + 7 <= TERM_WIDTH)); then
+      if (((${#LABEL} + w) + 7 <= TERM_WIDTH)); then
         WIDTH="${w}"
         # Set to 0 to redraw
         LAST_STEP=0
@@ -82,15 +97,16 @@ function pbar {
       fi
     done
 
+    local SHOW_LABEL="${LABEL}"
     # shellcheck disable=SC2183
     if ${CENTERED}; then
       local margin=$(((TERM_WIDTH - (WIDTH + 7)) / 2))
       (((margin % 2) != 0)) && margin=$((margin - 1))
 
-      printf -v SHOW_HINT "%s%*s" "${HINT}" $((margin - ${#HINT}))
+      printf -v SHOW_LABEL "%s%*s" "${LABEL}" $((margin - ${#LABEL}))
 
-    elif [ -n "${HINT}" ]; then
-      ((((${#HINT} + WIDTH) + 7) > TERM_WIDTH)) && HINT="| "
+    elif [ -n "${LABEL}" ]; then
+      ((((${#LABEL} + WIDTH) + 7) > TERM_WIDTH)) && SHOW_LABEL="| "
     fi
 
     local CHR_PL="${CHAR}"
@@ -128,7 +144,7 @@ function pbar {
 
     LAST_STEP=${CURRENT_STEP}
 
-    printf -v LAST_LINE "\x1b[0K%s[%b%${PAD_SPC}s] %4s\x1b[0G" "${SHOW_HINT}" "${BAR_PROGRESS_CHARS}" "" "${DISPLAY_STEP_NUM}%"
+    printf -v LAST_LINE "\x1b[0K%s[%b%${PAD_SPC}s] %4s\x1b[0G" "${SHOW_LABEL}" "${BAR_PROGRESS_CHARS}" "" "${DISPLAY_STEP_NUM}%"
     printf '%s' "${LAST_LINE}"
 
     ((CURRENT_STEP < 100)) && continue

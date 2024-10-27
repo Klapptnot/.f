@@ -79,6 +79,7 @@ term.cursor.hide() { printf '\x1b[?25l'; }
 term.cursor.show() { printf '\x1b[?25h'; }
 
 term.size() { stty size; }
+term.title() { printf '\x1b]0;%s\x07' "${*}"; }
 
 term.clear_line() { printf '\x1b[0G\x1b[0K'; }
 term.clear_below() { printf '\x1b[0G\x1b[0J'; }

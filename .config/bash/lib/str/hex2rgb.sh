@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# Usage:
+#   str.hex2rgb <<< "#784dFF" # rgb(120,77,255)
 function str.hex2rgb {
   # Accepts '#784dFF' or '784dFF' colors
   local hex

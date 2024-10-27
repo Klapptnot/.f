@@ -1,4 +1,16 @@
-function pprint.alist {
+#!/usr/bin/env bash
+
+# Print passed strings vertically aligned
+# Usage:
+#   pprint.vlist [strings]
+# Example:
+#   $ pprint.vlist * # Simulates `ls -A` using bash glob
+#
+#   $ pprint.vlist Hello darkness my old friend I\'ve come to talk with you again
+#   Hello     old       come      with
+#   darkness  friend    to        you
+#   my        I've      talk      again
+function pprint.vlist {
   local items=("${@}")
   local count="${#items[@]}"
   read -r _ cols < <(stty size)

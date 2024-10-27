@@ -1,3 +1,13 @@
+#!/usr/bin/env bash
+
+# Print passed strings horizontally aligned
+# Usage:
+#   pprint.list [strings]
+# Example:
+#   $ pprint.list Hello darkness my old friend I\'ve come to talk with you again
+#   Hello     darkness  my        old
+#   friend    I've      come      to
+#   talk      with      you       again
 function pprint.list {
   local items=("${@}")
   local count="${#items[@]}"

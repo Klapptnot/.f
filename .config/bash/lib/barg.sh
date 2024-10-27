@@ -10,6 +10,28 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   exit 1
 fi
 
+# Parse command line arguments based on a
+# special definition syntax
+# Usage:
+#   barg.parse "<command_line>" <<< "${definitions}"
+# Example:
+# This will have 3 subcommands, and will require
+# positional arguments for `echo`, and for `help` and `echo`
+# will have flags (true/false)
+# For `tell` will have required (note the `!`) parameters
+# ```bash
+#   barg.parse "${argv[@]}" <<EOF
+#     #[progname='Example']
+#     #[subcmds='=help =tell echo', subcmdr='true']
+#     #[reqextras='true', extras='PARAMS']
+#
+#     @help a/all[bool] => HELP_SHOW_ALL
+#     @tell ! r/receiver[str] => TELL_MESSAGE_RECEIVER
+#     @tell ! m/message[str] => TELL_MESSAGE
+#
+#     @echo n/no-lf[bool] => ECHO_NO_LINEFEED
+#   EOF
+# ```
 function barg.parse {
   local argv=("${@}")
   [ "${#argv[@]}" -eq 0 ] && return 1

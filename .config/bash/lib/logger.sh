@@ -26,6 +26,18 @@ declare -rA LOGGER_LEVEL_NUMS=(
 
 LOGGER_LEVEL="${LOGGER_LEVEL:-i}"
 
+# Print (or not) to output info based on the LOGGER_LEVEL env var
+# LOGGER_LEVEL is set to `i` by default
+# Usage:
+#   log <level> <fmt> [args...]
+# Example:
+#   $ some_fun_or_script() {
+#   >   log d 'Given %d params' ${#}
+#   >  }
+#   $
+#   $ some_fun_or_script a b c d # does not print
+#   $ LOGGER_LEVEL=d some_fun_or_script a b c d # prints the info
+#   Given 4 params
 function log {
   local level="${1,,}"
   local show_verbose_info=true

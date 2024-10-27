@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# Usage:
+#   str.json_unescape <<< 'A string\n\tThat will be \"unescaped\"'
 function str.json_unescape {
   : "$(< /dev/stdin)"
   : "${_//\\\\/\\}"  # unescape backslashes

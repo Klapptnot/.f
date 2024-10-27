@@ -1,55 +1,56 @@
 #!/usr/bin/env bash
 
 # Function to easy generate (random) strings
+# Usage: rsum [options]
+#   -l, --length  Opt<int> default: 16
+#   -c, --chars   Opt<str> default: "a-zA-Z0-9"
+#   -s, --sep     Opt<str> default: ""
+#   -t, --times   Opt<int> default: 0
+#   -b, --breakl  (flag)   default: false
+#
+# This: rsum -l 5 -c '0-9' -s '-' -t 5 -b
+# Prints something like: 28942-11609-47543-66540-15565
 function rsum {
-  # Usage:
-  # '-l' [LENGHT]     int
-  # '-c' [CHAR]       string
-  # '-s' [SEPARATOR]  string
-  # '-t' [TIMES]      int
-  # '-n' [Linebreak at end]
-  # Example:
-  #          rsum -l 16 -c '0-9' -s '-' -t 5 -n
-  # Return: A string of 5 '16 number' strings separated by "-" and trailing linebreak
-  # Default: 16 lenght alphanumeric string without trailing linebreak
   [ "${#}" -eq 0 ] && {
     tr -dc "a-zA-Z0-9" < /dev/urandom 2> >(sed 's/^tr:/rsum:/' >&2) | head -c "16"
     return
   }
 
-  local LINEBREAK=false
-  local LENGHT="16"
-  local CHARS="a-zA-Z0-9"
+  local break_line=false
+  local length="16"
+  local charset="a-zA-Z0-9"
+  local sep=""
+  local times=""
   while [ "$#" -gt 0 ]; do
     case "${1}" in
-      -l | -l*)
+      -l | -l* | --length)
         if [ -n "${1#*-l}" ]; then
-          LENGHT=${1#*-l}
+          length=${1#*-l}
           shift 1
         else
-          LENGHT=${2}
+          length=${2}
           shift 2
         fi
         ;;
-      -c)
-        CHARS=${2}
+      -c | --chars)
+        charset=${2}
         shift 2
         ;;
-      -s)
-        local SEPARATOR=${2}
+      -s | --sep)
+        sep=${2}
         shift 2
         ;;
-      -t | -t*)
+      -t | -t* | --times)
         if [ -n "${1#*-t}" ]; then
-          local TIMES=${1#*-t}
+          times=${1#*-t}
           shift 1
         else
-          local TIMES=${2}
+          times=${2}
           shift 2
         fi
         ;;
-      -n)
-        LINEBREAK=true
+      -b | --break)
+        break_line=true
         shift 1
         ;;
       *)
@@ -58,15 +59,15 @@ function rsum {
     esac
   done
 
-  [[ -n "${SEPARATOR}" && -n "${TIMES}" ]] && {
-    [[ ${TIMES} =~ [0-9] ]] && {
-      tr -dc "${CHARS}" < /dev/urandom 2> >(sed 's/^tr:/rsum:/' >&2) | head -c "$((LENGHT * TIMES))" | sed "s/\s//g;s/\(.\{1,${LENGHT}\}\)/\1${SEPARATOR}/g;s/${SEPARATOR}$//"
-      ${LINEBREAK} && echo '' 2> /dev/null
+  [[ -n "${sep}" && -n "${times}" ]] && {
+    [[ ${times} =~ [0-9] ]] && {
+      tr -dc "${charset}" < /dev/urandom 2> >(sed 's/^tr:/rsum:/' >&2) | head -c "$((length * times))" | sed "s/\s//g;s/\(.\{1,${length}\}\)/\1${sep}/g;s/${sep}$//"
+      ${break_line} && echo '' 2> /dev/null
       return
     }
   }
 
-  tr -dc "${CHARS}" < /dev/urandom 2> >(sed 's/^tr:/rsum:/' >&2) | head -c "${LENGHT}"
-  ${LINEBREAK} && echo '' 2> /dev/null
+  tr -dc "${charset}" < /dev/urandom 2> >(sed 's/^tr:/rsum:/' >&2) | head -c "${length}"
+  ${break_line} && echo '' 2> /dev/null
   return 0
 }

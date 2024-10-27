@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 
+# Usage
+#   str.rgb2hex <<< "rgb(120,77,255)" # #784dFF
 function str.rgb2hex {
-  # Accept 'rgb(244,23,90)' color
-  # local rgb="${1:4}" && rgb="${rgb%?}"
   : "$(< /dev/stdin)"
+  : "${_//\ /}"
   local rgb="${_:4:${#_}-2}"
   # This works as long as printf will print the result
   # instead of just exiting with a stderr message

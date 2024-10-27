@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 
+# Usage:
+#   str.uri_decode <<< "I%20%F0%9F%92%9C%20bash" # I 💜 bash
 function str.uri_decode {
   : "$(< /dev/stdin)"
-  while [[ ${_} =~ %([0-9]+)[^0-9] ]]; do
-    : "${_//${BASH_REMATCH[0]}/\\u$(printf '%02x' "${BASH_REMATCH[1]}")}"
-  done
-  printf "%b" "${_}"
+  printf "%b" "${_//\%/\\x}"
 }

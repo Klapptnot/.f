@@ -1,9 +1,14 @@
 #!/usr/bin/env bash
 
-# Function to retrieve translations based on message ID and locale
+# printf wrapper to retrieve translations based on message ID and locale
 # Needs to get translations files from global variable TRSTR_HOME
-# ${1}       Format string ID
-# ${@:2}     Strings to fill format
+# DOES NOT SUPPORT printf FLAGS
+# Example:
+#   $ printft greeting.user "${USER:-${USERNAME}}"
+#   $ printft root.perm.needed "${progname}"
+# Where file for en_US is "${TRSTR_HOME}/en_US.lang" with
+# greeting.user=Welcome again %s!!
+# root.perm.needed=Root access needed, please restart %s with sudo.
 function printft {
   if [[ -z "${TRSTR_HOME}" || ! -d "${TRSTR_HOME}" ]]; then return 1; fi
 
@@ -15,10 +20,6 @@ function printft {
   fi
 
   # Read the translation file and retrieve the translation
-  # Command substitution should be faster with large output
-  # and equal as subshell if not, but idk
-  # I've never seen if it's true/false
-  # Also read gets only one line
   read -r msg < <(grep -E "^${1}=" "${file}" | cut -d'=' -f2-)
   if [ -n "${msg}" ]; then
     # shellcheck disable=SC2059,SC2210

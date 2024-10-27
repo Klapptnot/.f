@@ -1,14 +1,23 @@
 #!/usr/bin/env bash
 
+# Usage:
+# ```bash
+# spinner.start "Downloading network resources..." & # background process
+# SPINNER_PID="${!}" # REQUIRED to save
+# ... more commands
+# spinner.stop "${SPINNER_PID}"
+# ```
+# NOTE: always make spinner.start a background process
+# NOTE: always stop spinner accordingly (`trap <> SIGINT` as example)
 function spinner.start {
   local _chars=("⠋" "⠙" "⠹" "⠸" "⠼" "⠴" "⠦" "⠧" "⠇" "⠏")
-  local _hint="${1:-Loading...}"
+  local _label="${1:-Loading...}"
   local i=0
   local n="${#_chars[@]}"
   read -r _r_col < <(od -An -N1 -tu1 /dev/urandom)
   printf '\x1b[?25l'
   while true; do
-    printf "\x1b[0K%b\x1b[0G" "\x1b[38;5;${_r_col//\ /}m${_chars[i]}\x1b[00m ${_hint}"
+    printf "\x1b[0K%b\x1b[0G" "\x1b[38;5;${_r_col//\ /}m${_chars[i]}\x1b[00m ${_label}"
     ((i++))
     if ((i >= n)); then
       i=0
@@ -18,7 +27,7 @@ function spinner.start {
   done
 }
 function spinner.stop {
-  kill "${1}" &> /dev/null
+  kill "${1:?Required to pass the spinner PID}" &> /dev/null
   sleep 0.006 # Perfect always clean line
   printf '\x1b[?25h\x1b[0G\x1b[0J'
 }

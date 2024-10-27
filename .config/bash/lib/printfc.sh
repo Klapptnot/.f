@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+# printf wrapper for colors support
+# DOES NOT SUPPORT printf FLAGS
+# Example:
+#   $ printfc '{f99}Foreground color \\x1b[38;5;99m{r}\n'
+#   $ printfc '{b99}Background color \\x1b[38;5;99m{r}\n'
+#   $ printfc '{b99}Background{r} and {f99}foreground{r} colors\n'
 function printfc {
   local __format_str__="${1}"
   local __color_code__='\x1b[0m' # Default is reset

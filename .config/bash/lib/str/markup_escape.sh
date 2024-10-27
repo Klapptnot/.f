@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# Usage:
+#   str.markup_escape <<< 'escape & "quote"?' # escape &amp; &quot;quote&quot;&#63;
 function str.markup_escape {
   : "$(< /dev/stdin)"
   local input="${_}"

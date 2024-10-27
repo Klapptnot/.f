@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# $ yq.sh <yaml_value_path> [file]
+# $ command | yq.sh <yaml_value_path>
+#
 # Simple YAML value reader, currently only useful
 # for YAML files with 2 spaces for indentation
 # NO SUPPORT FOR SETS, TAGS, SCALARS, etc.

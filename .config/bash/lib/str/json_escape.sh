@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# Usage:
+#  str.json_escape <<< $'A string\n\tThat will be "escaped"'
 function str.json_escape {
   : "$(< /dev/stdin)"
   : "${_//\\/\\\\}"   # escape backslashes

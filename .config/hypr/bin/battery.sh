@@ -22,6 +22,12 @@ function battery_data_get {
     'status')
       cat /sys/class/power_supply/BAT*/status
       ;;
+    'icon_name')
+      read -r status < /sys/class/power_supply/BAT*/status
+      read -r charge < /sys/class/power_supply/BAT*/capacity
+      [ "${status}" == "Charging" ] && local icon="-charging"
+      printf 'battery-%03d%s' "$(((charge / 10) * 10))" "${icon}"
+      ;;
     'icon')
       read -r status < /sys/class/power_supply/BAT*/status
       [ "${status}" == "Charging" ] && printf '' && return

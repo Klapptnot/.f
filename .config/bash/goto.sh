@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-
-# Small utility to go to folders by alias
+# shellcheck disable=SC1090
 
 # Check if this script is being executed as the main script
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
@@ -9,10 +8,14 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   exit 1
 fi
 
-# shellcheck disable=SC1090
-source ~/.config/bash/lib/printfc.sh
-
+# Small utility to go to folders by alias
 function goto {
+  source ~/.config/bash/lib/printfc.sh
+  __goto_main "${@}"
+  unset -f printfc
+}
+
+function __goto_main {
   if [ -z "${1}" ]; then
     cd "${HOME}" &> /dev/null || return
     return
@@ -40,7 +43,7 @@ function goto {
     return
   elif [[ "${1}" =~ ^-l|--list$ ]]; then
     if ! [ -f ~/.config/dotf/goto.idx ]; then
-      printfc '{f85}[INFO]{r} Index file not found, printing default aliases\n'
+      printfc '{f85}Index file not found, printing default aliases{r}\n'
       default_aliases=(
         '.c   &!HOME;/.config'
         'bin  /usr/bin'
@@ -53,7 +56,7 @@ function goto {
       printf '%s\n' "${default_aliases[@]}"
       return
     fi
-    printfc '{f85}[INFO]{r} Printing aliases\n%s\n' "$(< ~/.config/dotf/goto.idx)"
+    printfc '{f85}Printing aliases{r}\n%s\n' "$(< ~/.config/dotf/goto.idx)"
     return
   fi
 
@@ -73,7 +76,7 @@ function goto {
     # shellcheck disable=SC2178
     printf -v PATH_INDEX_CONTENT '%s\n' "${default_aliases[@]}"
     declare -r PATH_INDEX_CONTENT="${PATH_INDEX_CONTENT}"
-    printfc '{f191}[WARN]{r} Index file no found, default aliases is set\n'
+    printfc '{f191}Index file no found, default aliases is set{r}\n'
   fi
 
   # shellcheck disable=SC2128
@@ -92,7 +95,7 @@ function goto {
   local path="${ALIAS_FORMAT[${1}]}"
 
   if [ -z "${path}" ]; then
-    printfc '{f160}[ERR ]{r} Alias "%s" not found\n' "${1}"
+    printfc '{f9}Alias "%s" not found{r}\n' "${1}"
     return 2
   fi
   # While replacing, do not allow & to reference the matched string
@@ -105,14 +108,14 @@ function goto {
     case "${BASH_REMATCH[1]}" in
       '*')
         if [ -z "${ALIAS_FORMAT[${BASH_REMATCH[2]}]}" ]; then
-          printfc '{f160}[ERR ]{r} Alias "%s" not found\n' "${BASH_REMATCH[2]}"
+          printfc '{f9}Alias "%s" not found{r}\n' "${BASH_REMATCH[2]}"
           return 2
         fi
         path="${path//${BASH_REMATCH[0]}/${ALIAS_FORMAT["${BASH_REMATCH[2]}"]}\/}"
         ;;
       '!')
         if [ -z "${BASH_REMATCH[2]}" ]; then
-          printfc '{f160}[ERR ]{r} Environment variable "%s" inaccessible\n' "${BASH_REMATCH[2]}"
+          printfc '{f9}Environment variable "%s" inaccessible{r}\n' "${BASH_REMATCH[2]}"
           return 3
         fi
         path="${path//${BASH_REMATCH[0]}/${!BASH_REMATCH[2]}\/}"
@@ -120,7 +123,7 @@ function goto {
       '%')
         if [ -z "${modifiers[(${BASH_REMATCH[2]} - 1)]}" ]; then
           # shellcheck disable=SC2004
-          printfc '{f160}[ERR ]{r} Modifiers number "%s" not found\n' "$((${BASH_REMATCH[2]} - 1))"
+          printfc '{f9}Modifiers number "%s" not found{r}\n' "$((${BASH_REMATCH[2]} - 1))"
           return 4
         fi
         path="${path//${BASH_REMATCH[0]}/${modifiers[(${BASH_REMATCH[2]} - 1)]}\/}"
@@ -139,7 +142,7 @@ function goto {
   done
   read -r path < <(realpath "${path}") || path="${path//\/\//\/}"
   if ! [ -d "${path}" ]; then
-    printfc '{f160}[ERR ]{r} Folder "%s" does not exist or is not accessible\n' "${path}"
+    printfc '{f9}Folder "%s" does not exist or is not accessible{r}\n' "${path}"
     return 7
   fi
   if ${print_path}; then

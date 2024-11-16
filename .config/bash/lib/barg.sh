@@ -36,7 +36,7 @@ function barg.parse {
   local argv=("${@}")
   [ "${#argv[@]}" -eq 0 ] && return 1
   # Expand the joint arguments
-  barg.normalize_args() {
+  function barg.normalize_args {
     for ((i = 0; i < ${#argv[@]}; i++)); do
       #* Joint parameters
       # Example 1:
@@ -90,7 +90,7 @@ function barg.parse {
     done
   }
 
-  barg.set_indices_to_empty() {
+  function barg.set_indices_to_empty {
     for index in "${@}"; do
       if ((index >= 0 && index < ${#BARG_EXTRAS_BEFORE[@]})); then
         BARG_EXTRAS_BEFORE[index]=""
@@ -99,7 +99,7 @@ function barg.parse {
   }
 
   # barg.define "${arg_pat}" "${var_name}" "${def_val}" "${arg_type}" "${vec_type}" "${switch_pat}" "${__ignore__}"
-  barg.define() {
+  function barg.define {
     local __pat__="${1}" # short/long[...]
     local __var__="${2}" # VARIABLE (variable name)
     local __val__="${3}" # Variable default value
@@ -351,15 +351,15 @@ function barg.parse {
     return 1
   }
 
-  # barg.exit <error type> <error desc>
+  # barg.exit <error type> <error desc> <exit code>
   # shellcheck disable=SC2154
-  barg.exit() {
-    local ecolor=${__barg_colors[err]}
-    local stderr=${__barg_opts__[stderr]}
-    local output=${__barg_opts__[output]}
-    local errvar=${__barg_opts__[errvar]}
-    local progname=${__barg_opts__[progname]}
-    local exit=${__barg_opts__[exit]}
+  function barg.exit {
+    local ecolor="${__barg_colors[err]}"
+    local stderr="${__barg_opts__[stderr]}"
+    local output="${__barg_opts__[output]}"
+    local errvar="${__barg_opts__[errvar]}"
+    local progname="${__barg_opts__[progname]}"
+    local exit="${__barg_opts__[exit]}"
 
     local error_type="${1:-null}"
     local error_desc="${2:-null}"
@@ -661,4 +661,5 @@ function barg.parse {
       barg.exit "Missing arguments" "positional arguments are required" 120
     fi
   fi
+  unset -f barg.normalize_args barg.set_indices_to_empty barg.define barg.exit
 }

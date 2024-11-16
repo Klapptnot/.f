@@ -7,13 +7,19 @@ source "${HOME}/.config/bash/lib/barg.sh"
 function main {
   barg.parse "${@}" << BARG || { echo "Command need args" && exit 1; }
     #[progname='bulkren']
+    #[extras="PARAMS", reqextras="true"]
     ! f/files[vec[str]] => files || F/folder[str] => folder
     s/suffix[str] => suffix p/prefix[str] => prefix
-    format[str] |> "{rand}.{ext}" => format
     r/replace[str] => replace_str
     D/dry[bool] => dry_run
     I/ignore-folders[bool] => ignore_folders
 BARG
+
+  local format="${PARAMS[*]}"
+  if [ -z "${format}" ]; then
+    printf '%s\n' "Format string cannot be empty"
+    return
+  fi
 
   ${dry_run} && printf '%s\n' "Dry run, no changes will be made"
   if [ ${#files[@]} -eq 0 ]; then
@@ -29,23 +35,24 @@ BARG
   # shellcheck disable=SC2155
   for ((iter = 0; iter < "${#files[@]}"; iter++)); do
     local file="${files[iter]}"
-    local file_path=$(realpath "${file}")
+    read -r file_path < <(realpath "${file}")
     if ${ignore_folders} && [ -d "${file_path}" ]; then
       continue
     fi
-    local file_name=$(basename "${file_path}")
+    read -r file_name < <(basename "${file_path}")
     # Nothing to replace, skip
     if [ -n "${replace_str}" ]; then
       # shellcheck disable=SC2076  # Match literally
       [[ "${file_name}" =~ "${replace_str}" ]] || continue
     fi
-    local fp_dir=$(dirname "${file_path}")
+    read -r fp_dir < <(dirname "${file_path}")
 
     local ext="${file_name##*.}"
     local name="${format}"
 
     while [[ "${name}" == *'{rand}'* ]]; do
-      name="${name/\{rand\}/$(rsum)}"
+      read -r rand_str < <(rsum)
+      name="${name/\{rand\}/${rand_str}}"
     done
 
     name="${name//\{prefix\}/${prefix}}"
@@ -64,7 +71,7 @@ BARG
 
     printf '%b\n' "Moving \x1b[38;05;12m${file_path}\x1b[00m to \x1b[38;05;7m${fp_dir}/${name}\x1b[00m"
     if [ -f "${fp_dir}/${name}" ]; then
-      local mkmdds=$(rsum -l6)
+      read -r mkmdds < <(rsum -l6)
       printf '%b\n' "    - File exists, renaming to \x1b[38;05;7m${fp_dir}/${name}_${mkmdds}.${ext}\x1b[00m"
       ! ${dry_run} && mv "${file_path}" "${fp_dir}/${name}_${mkmdds}.${ext}"
     else

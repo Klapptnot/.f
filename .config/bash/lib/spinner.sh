@@ -14,14 +14,14 @@ function spinner.start {
   local _label="${1:-Loading...}"
   local i=0
   local n="${#_chars[@]}"
-  read -r _r_col < <(od -An -N1 -tu1 /dev/urandom)
+  read -r __rcol < <(od -An -N1 -tu1 /dev/urandom)
   printf '\x1b[?25l'
   while true; do
-    printf "\x1b[0K%b\x1b[0G" "\x1b[38;5;${_r_col//\ /}m${_chars[i]}\x1b[00m ${_label}"
+    printf "\x1b[0K%b\x1b[0G" "\x1b[38;5;${__rcol}m${_chars[i]}\x1b[00m ${_label}"
     ((i++))
     if ((i >= n)); then
       i=0
-      read -r _r_col < <(od -An -N1 -tu1 /dev/urandom)
+      read -r __rcol < <(od -An -N1 -tu1 /dev/urandom)
     fi
     sleep 0.008
   done

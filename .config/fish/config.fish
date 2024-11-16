@@ -8,10 +8,11 @@ if not status is-interactive
   return
 end
 
-function _r_fzf_get_file -d "Use fzf to get a file"
+function __fzf_get_file -d "Use fzf to get a file"
   if set -l file (
-      fzf --prompt 'File: ' --pointer '>' --marker '='\
-        --preview-window '65%' --preview-label 'Preview'\
+      fzf --prompt 'File: ' \
+        --preview-window '65%' \
+        --preview-label 'Preview' \
         --preview='bat {}'
     )
     printf $file
@@ -21,14 +22,14 @@ function _r_fzf_get_file -d "Use fzf to get a file"
 end
 
 function __fzf_nvim_open_file -d "Open a file searched by fzf with nvim"
-  if set -l file (_r_fzf_get_file)
+  if set -l file (__fzf_get_file)
     nvim "$file"
     commandline -f repaint
   end
 end
 
 function __fzf_cat_file -d "Print the content of a file searched by fzf"
-  if set -l file (_r_fzf_get_file)
+  if set -l file (__fzf_get_file)
     printf '\n'
     bat "$file"
     commandline -f repaint

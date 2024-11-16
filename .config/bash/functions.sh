@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 
-function _r_fzf_get_file {
+function __fzf_get_file {
   local file
-  file=$(
-    fzf --prompt 'File: ' --pointer '>' --marker '=' \
-      --preview-window '65%' --preview-label 'Preview' \
+  read -r file < <(
+    fzf --prompt 'File: ' \
+      --preview-window '65%' \
+      --preview-label 'Preview' \
       --preview='bat {}'
   )
   if ! [ -f "${file}" ]; then
@@ -15,7 +16,7 @@ function _r_fzf_get_file {
 
 function __fzf_nvim_open_file {
   local file
-  if file=$(_r_fzf_get_file); then
+  if file=$(__fzf_get_file); then
     nvim "${file}"
   fi
 }
@@ -28,7 +29,6 @@ function __fzf_cat_file {
 }
 
 function print_path {
-  for p in ${PATH//:/\ }; do
-    printf '%s\n' "${p}"
-  done
+  # shellcheck disable=SC2086
+  printf '%s\n' ${PATH//:/\ }
 }

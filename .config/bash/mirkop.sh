@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # shellcheck disable=SC2120
-function get_short_pwd {
+function __mirkop_get_short_pwd {
   local short_pwd_s=""
   local old_pwd="${PWD}"
   if [[ "${PWD}" == "${HOME}"* ]]; then
@@ -21,7 +21,7 @@ function get_short_pwd {
   printf '%b' "${short_pwd_s}"
 }
 
-function curpos {
+function __mirkop_cursor_position {
   # based on a script from http://invisible-island.net/xterm/xterm.faq.html
   exec < /dev/tty
   oldstty=$(stty -g)
@@ -36,7 +36,7 @@ function curpos {
   printf "%s;%s" "${row}" "${col}"
 }
 
-function get_cwd_color {
+function __mirkop_get_cwd_color {
   if command -v cksum &> /dev/null; then
     read -r s < <(pwd -P | cksum | cut -d' ' -f1 | printf '%-6x' "$(< /dev/stdin)" | tr ' ' '0' | head -c 6)
     local r=$((16#${s:0:2}))
@@ -58,7 +58,7 @@ function get_cwd_color {
   fi
 }
 
-function load_prompt_config {
+function __mirkop_load_prompt_config {
   function hex_to_shell {
     read -r s < /dev/stdin
 
@@ -105,7 +105,7 @@ function load_prompt_config {
   )
 }
 
-function print_prompt_right {
+function __mirkop_print_prompt_right {
   local rprompt_parts=()
   local comp=0
 
@@ -131,17 +131,17 @@ function print_prompt_right {
   printf "%$((COLUMNS + comp))s\x1b[0G" "${rprompt_string}"
 }
 
-function generate_mirkop_ps1_prompt {
+function __mirkop_generate_prompt_left {
   # Set the string for exit status indicator
   local last_exit_code="${?}"
 
-  IFS=';' read -r _ col < <(curpos 2> /dev/null)
+  IFS=';' read -r _ col < <(__mirkop_cursor_position 2> /dev/null)
   ((col > 1)) && printf "\x1b[38;5;242m⏎\x1b[0m\n"
 
   local prompt_parts=()
 
-  read -r pwd_color < <(get_cwd_color)
-  read -r short_cwd < <(get_short_pwd)
+  read -r pwd_color < <(__mirkop_get_cwd_color)
+  read -r short_cwd < <(__mirkop_get_short_pwd)
 
   prompt_parts+=(
     "\[${MIRKOP_PROMPT_COLORS[0]}\]${MIRKOP_PROMPT_STR[0]}\[${MIRKOP_PROMPT_COLORS[3]}\]" # User
@@ -152,11 +152,11 @@ function generate_mirkop_ps1_prompt {
   )
   printf -v prompt_string '%s' "${prompt_parts[@]}"
 
-  print_prompt_right "${last_exit_code}"
+  __mirkop_print_prompt_right "${last_exit_code}"
   PS1="${prompt_string}\[\033[0m\]"
 }
 
 # shellcheck disable=SC1090
 source ~/.config/bash/lib/yq.sh
-load_prompt_config && PROMPT_COMMAND='generate_mirkop_ps1_prompt'
+__mirkop_load_prompt_config && PROMPT_COMMAND='__mirkop_generate_prompt_left'
 unset -f yq.sh

@@ -118,10 +118,8 @@ function main {
   local tout_dir=""
   case "${_oper_mode}" in
     'c')
-      # compress
-      primary=("${@:1:$#-1}")
-      # : "${@: -1}"
-      secondary="${*: -1}"
+      primary=("${@:2}")
+      secondary="${1}"
       [[ -z "${secondary}" || -z "${primary[*]}" ]] &&
         epanic '{f9}Usage: `tared'' %s [files]... <name>`{r}\n' "${old_first}"
       ;;
@@ -191,10 +189,6 @@ function main {
     exit 0
   fi
 
-  if [ "${_oper_mode}" == 'e' ] && [ -n "${tout_dir}" ] && [ ! -d "${tout_dir}" ]; then
-    mkdir -p "${tout_dir}" || epanic '{f9}Could not create folder: {r}%s\n' "${tout_dir}"
-  fi
-
   printfc "{f87}Command{r}  $ %s\n" "${cmd}"
   if ! "${_auto_run}"; then
     printfc '{f99}Execute the command [y|*]:{r} '
@@ -205,6 +199,11 @@ function main {
     fi
     printf '\n'
   fi
+
+  if [ "${_oper_mode}" == 'e' ] && [ -n "${tout_dir}" ] && [ ! -d "${tout_dir}" ]; then
+    mkdir -p "${tout_dir}" || epanic '{f9}Could not create folder: {r}%s\n' "${tout_dir}"
+  fi
+
   local _exit_code=0
   if ! eval "${cmd}"; then
     _exit_code="${?}"

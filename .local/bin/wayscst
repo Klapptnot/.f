@@ -2,11 +2,16 @@
 # shellcheck disable=SC2155,SC2059
 
 function main {
-  local SS_FOLDER="$(xdg-user-dir PICTURES)/Screenshots"
+  read -r MELOC < <(realpath -LP "${0}")
+  read -r MEAKA < <(basename "${MELOC}")
+  # read -r MEDIR < <(dirname  "${MELOC}")
+
+  read -r SS_FOLDER < <(xdg-user-dir PICTURES)
+  local SS_FOLDER="${SS_FOLDER}/Screenshots"
   [ ! -f "${SS_FOLDER}" ] && mkdir -p "${SS_FOLDER}"
 
   for cmd in grim slurp hyprctl xdg-user-dir wl-paste; do
-    local COMMAND="$(type -p "${cmd}")"
+    read -r COMMAND < <(type -p "${cmd}")
     if [ -z "${COMMAND}" ]; then
       _not_proc 3 'Command "%s" not found in PATH\n' "${COMMAND}"
     fi
@@ -23,7 +28,8 @@ function main {
     shift 1
   fi
 
-  local SAVE_PATH="${SS_FOLDER}/screenshot_$(date +'%Y-%m-%d-%H-%M-%S')"
+  read -r SAVE_PATH < <(date +'%Y-%m-%d-%H-%M-%S')
+  local SAVE_PATH="${SS_FOLDER}/screenshot_${SAVE_PATH}"
 
   case "${MODE}" in
   screen)
@@ -31,8 +37,7 @@ function main {
     take_n_save "${SAVE_PATH}.png" "${args_to_grim[@]}"
     ;;
   selection)
-    local POS_N_SIZE="$(slurp -b#67469860 -c#7b00f7ff)"
-    # sleep 0.1 # Slurp lines are saved in the screenshot, prevent
+    read -r POS_N_SIZE < <(slurp -d -b#67469860 -c#7b00f7ff)
     local filename="${SAVE_PATH}.png"
     [ -z "${POS_N_SIZE}" ] && _not_proc 4 'Nothing selected, abort'
 
@@ -58,7 +63,7 @@ function main {
     take_n_save "${filename}" "${args_to_grim[@]}"
     ;;
   *)
-    _not_proc 1 'Select one of screen, selection, window. Usage: %s {screen|selection|window}' "$(basename "${0}")"
+    _not_proc 1 'Select one of screen, selection, window.\n -> Usage: %s {screen|selection|window}' "${MEAKA}"
     ;;
   esac
 }

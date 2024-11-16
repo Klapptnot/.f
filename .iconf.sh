@@ -100,6 +100,7 @@ function gen_ignore_list {
     ".iconf.sh"
     "misc*"
     ".git*"
+    "_*"
     ".config/nushell/history*"
   )
 

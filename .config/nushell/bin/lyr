@@ -12,7 +12,7 @@
 use std log
 use ua.nu get-rdm
 
-def get-mxm-urls [query: string, tries: int, timeout: int] {
+def get-mxm-urls [query: string, tries: int, timeout: duration] {
   let url = $"https://www.google.com/search?q=site%3Amusixmatch.com%2Flyrics+($query | url encode)"
   let ua = (get-rdm)
 
@@ -71,7 +71,7 @@ def get-mxm-urls [query: string, tries: int, timeout: int] {
   $items
 }
 
-def get-mxm-json [url: string, tries: int = 5, timeout: int = 5] {
+def get-mxm-json [url: string, tries: int = 5, timeout: duration = 5sec] {
   let ua = (get-rdm)
 
   mut body = ""
@@ -106,7 +106,7 @@ def select-url [urls: list<string>] {
   for i in 0..(($urls | length) - 1) {
     let it = ($urls | get $i)
     print $"  ($i) (ansi --escape '38;2;255;169;140m')-> (ansi --escape '38;2;255;232;184m')($it.desc)"
-    print $"    (ansi --escape '38;2;195;79;230m')At: (ansi --escape '38;2;189;147;249m')($it.url)(ansi reset)",
+    print $"    (ansi --escape '38;2;195;79;230m')At: (ansi --escape '38;2;189;147;249m')($it.url)(ansi reset)"
   }
 
   print -n $"(ansi --escape '38;2;195;79;230m')Select one from above:(ansi reset) "
@@ -144,7 +144,7 @@ def describe-data [data: record] {
 export def main [
   query: string,    # Query used to try to find song, or musixmatch URL
   tries: int = 5,   # Max number of retries before giving up search
-  timeout: int = 5, # Max time to wait for response
+  timeout: duration = 5sec, # Max time to wait for response
   --lyrics (-l),    # Print only the lyrics of the songs
   --repeat (-r),    # Print <title> - <artist> when --lyrics/-l is passed
   --select (-s)     # Select one of the available songs found

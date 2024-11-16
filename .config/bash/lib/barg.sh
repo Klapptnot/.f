@@ -364,7 +364,7 @@ function barg.parse {
     local error_type="${1:-null}"
     local error_desc="${2:-null}"
 
-    local __err__="${ecolor}[${progname}> ERROR] ${error_type}\x1b[00m\n${error_desc}"
+    local __err__="${ecolor}ERROR: ${progname} -> ${error_type}...\x1b[00m ${error_desc}."
 
     if [ "${output}" == 'true' ]; then
       [ "${stderr}" == 'true' ] && printf '%b\n' "${__err__}" >&2 ||
@@ -390,7 +390,6 @@ function barg.parse {
   local __flt_regex__='^(-?[0-9]{1,3}(_[0-9]{3})+\.([0-9]{3}(_[0-9]{1,3})*|[0-9]{1,3})|-?[0-9]+\.[0-9]+)$'
   local __opt_regex__='(,|#\[)\ *([A-Za-z_][_A-Za-z0-9]+?)=|"(([^"\\]|\\.)*)"\]?|'\''(([^'\''\\]|\\.)*)'\''\]?'
   # shellcheck disable=SC1003
-  # local __def_regex__='\s*(\|\||&&|<>)?\s*(!)?\s*(@[a-zA-Z0-9\-_]+)?\s*([A-Za-z0-9!?@#_.:<>]?/?[A-Za-z0-9!?@#_.:<>\-]+\[(str|float|int|num|bool|vec\[(str|float|int|num|bool)\])\]|\{((\s*[A-Za-z0-9!?@#_.:<>]?/?[A-Za-z0-9!?@#_.:<>\-]+\s*=>\s*("((\\"|[^"])*?)"|'\''((\\'\''|[^'\''])*?)'\'')\s*)+)\})\s*(\|>\s*("((\\"|[^"])*?)"|'\''((\\'\''|[^'\''])*?)'\''))?\s*=>\s*([a-zA-Z][a-zA-Z0-9_]*)' #(\s*("((\\"|[^"])*?)"|'\''((\\'\''|[^'\''])*?)'\''))?'
   local __def_regex__='\s*(\|\||&&|<>)?\s*(!)?\s*(@[a-zA-Z0-9\-_]+)?\s*([A-Za-z0-9!?@#_.:<>]?/?[A-Za-z0-9!?@#_.:<>\-]+\[(str|float|int|num|bool|vec\[(str|float|int|num|bool)\])\]|\{((\s*[A-Za-z0-9!?@#_.:<>]?/?[A-Za-z0-9!?@#_.:<>\-]+\s*=>\s*("((\\"|[^"])*?)"|'\''((\\'\''|[^'\''])*?)'\'')\s*)+)\}|\s*[A-Za-z0-9!?@#_.:<>]?/?[A-Za-z0-9!?@#_.:<>\-]+\s*\[((\s*\s*("((\\"|[^"])*?)"|'\''((\\'\''|[^'\''])*?)'\'')\s*)+)\])\s*(\|>\s*("((\\"|[^"])*?)"|'\''((\\'\''|[^'\''])*?)'\''))?\s*=>\s*([a-zA-Z][a-zA-Z0-9_]*)' #(\s*("((\\"|[^"])*?)"|'\''((\\'\''|[^'\''])*?)'\''))?'
   # shellcheck disable=SC1003
   local __swi_regex__='\s*(([A-Za-z0-9!?@#_.:<>])/([A-Za-z0-9!?@#_.:<>\-]+)\s*=>\s*("((\\"|[^"])*?)"|'\''((\\'\''|[^'\''])*?)'\''))\s*'
@@ -648,13 +647,14 @@ function barg.parse {
   fi
 
   local extras_count=0
-  local grbg="${__barg_opts__[extras]}"
+  local extras_var_name="${__barg_opts__[extras]}"
   for item in "${BARG_EXTRAS_BEFORE[@]}"; do
     if [[ -n "${item}" ]]; then
-      declare -ag "${grbg}+=(\"${item//\"/\\\"}\")"
+      declare -ag "${extras_var_name}+=(\"${item//\"/\\\"}\")"
       ((extras_count++))
     fi
   done
+  declare -g BARG_EXTRAS_COUNT="${extras_count}"
 
   if ${__barg_opts__[reqextras]} && ((extras_count < 1)); then
     if [ -z "${BARG_SUBCOMMAND}" ] || [ -n "${BARG_SUBCOMMAND}" ] && ${BARG_SUBCOMMAND_NEEDS_EXTRAS}; then

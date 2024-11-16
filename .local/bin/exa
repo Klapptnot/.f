@@ -29,9 +29,12 @@ function google_search {
   read -r google_req_url < <(str.uri_params google_url_params)
   google_req_url="https://www.google.com/search?${google_req_url:?}"
 
-  local __success=false
   local __attempts=0
   until [ -n "${ALL_URL_BASE[0]}" ] || [ "${__attempts}" -ge "${request[tries]:-5}" ]; do
+    if [ "${__attempts}" -eq "${request[tries]:-5}" ]; then
+      log e 'Reached max attempts (%d). Try again or set tries to a greater number.' "${request[tries]:-5}"
+      return 1
+    fi
     ((__attempts++))
     response_body=$(
       curl -Ss "${google_req_url}" --compressed \
@@ -53,36 +56,31 @@ function google_search {
         -w '\n%{http_code}' \
         2> >(sed 's/curl: ([0-9]*)/[INFO]/' >&2)
     )
-    local http_resp_code="${response_body: -3}"
+    local http_code="${response_body: -3}"
 
-    [ "${http_resp_code:-000}" == '301' ] && break # MOVED
-    [ "${http_resp_code:-000}" == '302' ] && break # CAPTCHA
-    [ "${http_resp_code:-000}" == '308' ] && break # MOVED
-
-    if [ "${http_resp_code:-000}" == '200' ]; then
-      __success=true
+    if ((100 <= http_code && http_code <= 199)); then
+      log d 'HTTP %s -> Google informative... skipped. %d attempt.' "${http_code}" "${__attempts}"
+      continue
+    elif ((200 <= http_code && http_code <= 299)); then
+      log d 'HTTP %s -> Google successful. %d attempt.' "${http_code}" "${__attempts}"
+      if [[ "${response_body}" == *'<script src="https://www.google.com/recaptcha/api.js" async defer></script>'* ]]; then
+        log e "HTTP %s -> Google Captcha. Change any of proxy, user-agent, cookies or try again later. %d attempt." "${http_code}" "${__attempts}"
+        return 1
+      fi
       break
+    else
+      if ((300 <= http_code && http_code <= 399)); then
+        log e 'HTTP %s -> Google redirection, try again changing user-agent. %d attempt.' "${http_code}" "${__attempts}"
+      elif ((400 <= http_code && http_code <= 499)); then
+        log e 'HTTP %s -> Client error, check the data and try again. %d attempt.' "${http_code}" "${__attempts}"
+      elif ((500 <= http_code && http_code <= 599)); then
+        log e 'HTTP %s -> Server error, try again later. %d attempt.' "${http_code}" "${__attempts}"
+      else
+        log e 'HTTP %s -> Invalid code, try again later or report. %d attempt.' "${http_code}" "${__attempts}"
+      fi
+      return 1
     fi
   done
-
-  if ! ${__success}; then
-    case ${http_resp_code} in
-      '301' | '308')
-        log e 'HTTP %s -> Google [MOVED]. After %d attempts.' "${http_resp_code}" "${__attempts}"
-        ;;
-      '302')
-        log e 'HTTP 302 -> Google [CAPTCHA]. After %d attempts.' "${__attempts}"
-        ;;
-      *)
-        if [ "${__attempts}" -eq "${request[tries]:-5}" ]; then
-          log e 'Reached max attempts (%d). Try again or set tries to a greater number.' "${request[tries]:-5}"
-        else
-          log e 'HTTP %s -> Unexpected code. After %s attempts.' "${http_resp_code}" "${__attempts}"
-        fi
-        ;;
-    esac
-    return 1
-  fi
 
   mapfile -t GOOGLE_RESULT_TITLES < <(grep -oP '(?<=<br><h3 class="LC20lb MBeuO DKV0Md">)[^<]*(?=<)' <<< "${response_body}" | str.markup_unescape)
   mapfile -t GOOGLE_RESULT_LINKS < <(grep -oP '(?<=><a jsname="UWckNb" href=")[^ ]*(?=")' <<< "${response_body}")
@@ -103,7 +101,7 @@ function main {
   t/timeout[num] |> "5" => EXA_TIMEOUT
   T/tries[int] |> "5" => EXA_TRIES
   c/cookies[str] => EXA_COOKIES
-  u/user-agent[str] |> "Mozilla/5.0 (X11; Linux x86_64; rv:132.0) Gecko/20100101 Exa/1.0" => EXA_USER_AGENT
+  u/user-agent[str] |> "Mozilla/5.0 (X11; Linux x86_64; rv:132.0) Gecko/20100101 Firefox/132.0" => EXA_USER_AGENT
   a/amount[int] |> "10" => EXA_RESULT_AMOUNT
   m/no-color[bool] => EXA_NO_COLOR
 BARG

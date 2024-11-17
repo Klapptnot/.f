@@ -33,8 +33,17 @@ fi
 #   EOF
 # ```
 function barg.parse {
-  local argv=("${@}")
-  [ "${#argv[@]}" -eq 0 ] && return 1
+  [ "${#}" -eq 0 ] && return 1
+  read -r _ extglob_s < <(shopt extglob)
+  [ "${extglob_s}" == 'off' ] && shopt -s extglob
+  function barg.var_exists {
+    declare -p "${1}" &> /dev/null
+  }
+  function barg.is_in_arr {
+    local arr=("${@:2}")
+    printf -v t '%s' "${arr[@]/#!("${1}")/}"
+    test "${#t}" -gt 0
+  }
   # Expand the joint arguments
   function barg.normalize_args {
     for ((i = 0; i < ${#argv[@]}; i++)); do
@@ -93,6 +102,7 @@ function barg.parse {
   function barg.set_indices_to_empty {
     for index in "${@}"; do
       if ((index >= 0 && index < ${#BARG_EXTRAS_BEFORE[@]})); then
+        [ "${BARG_EXTRAS_BEFORE[index]}" == '--' ] && BARG_EXTRAS_BEFORE[(index + 1)]=""
         BARG_EXTRAS_BEFORE[index]=""
       fi
     done
@@ -109,15 +119,6 @@ function barg.parse {
     local __lst__="${7}" # List
     local __ign__="${8}" # Ignore command line value and set default if available
 
-    # To test whether a variable is defined
-    # > ! declare -p "${__var__}" &>/dev/null
-    # > test -n "${__var__@A}" or [ -n "${__var__@A}" ]
-    # Both have the same output (for example: foo="bar" or declare -r foo="baz")
-    # Preferably @A, no error is returned, but bash redirection is needed here
-    # > test -n "${!__var__@A}"
-    # In declare -p '${__var__}', bash replaces the variable name
-    # To set the variable, use declare -g "${__var__}=${content}"
-
     local check_valid_item=false
     if [ -n "${__swi__}" ]; then
       local STR="${__swi__}"
@@ -126,21 +127,20 @@ function barg.parse {
         local short="${BASH_REMATCH[2]}"
         local long="${BASH_REMATCH[3]}"
         local value="${BASH_REMATCH[5]:-${BASH_REMATCH[7]}}"
-        local items="${!_argv_table[*]}"
 
-        if [[ "${items}" == *"-${short}"* ]]; then
-          [ -z "${!__var__@A}" ] && declare -g "${__var__}=${value}"
+        if barg.is_in_arr "-${short}" "${!_argv_table[@]}"; then
+          ! barg.var_exists "${__var__}" && declare -g "${__var__}=${value}"
           barg.set_indices_to_empty $((${_argv_table["-${short}"]} - 1))
           unset "_argv_table[-${short}]"
-        elif [[ "${items}" == *"--${long}"* ]]; then
-          [ -z "${!__var__@A}" ] && declare -g "${__var__}=${value}"
+        elif barg.is_in_arr "--${long}" "${!_argv_table[@]}"; then
+          ! barg.var_exists "${__var__}" && declare -g "${__var__}=${value}"
           barg.set_indices_to_empty $((${_argv_table["-${long}"]} - 1))
           unset "_argv_table[--${long}]"
         fi
 
         STR="${STR/#"${BASH_REMATCH[0]}"/}"
       done
-      if ! ${__ign__} && [ -n "${!__var__@A}" ]; then
+      if ! ${__ign__} && barg.var_exists "${__var__}"; then
         return 0
       fi
       declare -g "${__var__}=${__val__:-0}"
@@ -164,19 +164,17 @@ function barg.parse {
     local __short__="${__key__%/*}"
     local __long__="${__key__#*/}"
 
+    # Check if it was found in command line and set its
+    # form for the key of the args table, otherwise set default
     if [ -n "${_argv_table["-${__short__}"]}" ]; then
       local _table_item="-${__short__}"
     elif [ -n "${_argv_table["--${__long__}"]}" ]; then
       local _table_item="--${__long__}"
     else
-      # Set default value
       if [ "${__typ__}" == "bool" ]; then
         declare -g "${__var__}=false"
-        return 2
-      fi
-      if [ -n "${__val__}" ]; then
+      else
         declare -g "${__var__}=${__val__}"
-        return 2
       fi
       return 1
     fi
@@ -184,7 +182,7 @@ function barg.parse {
     local __rm_arg__=true
     case "${__typ__}" in
       'bool')
-        [ -z "${!__var__@A}" ] && declare -g "${__var__}=true"
+        ! barg.var_exists "${__var__}" && declare -g "${__var__}=true"
         barg.set_indices_to_empty $((${_argv_table[${_table_item}]} - 1))
         unset "_argv_table[${_table_item}]"
         __rm_arg__=false
@@ -198,20 +196,20 @@ function barg.parse {
             if [[ "${argv[index]}" =~ ^[_\.0-9]*$ ]]; then                                   # but could be a num?
               barg.exit "Unknown format" "Invalid numerical value, expected a int or float (${argv[index]})" 15
             fi
-            barg.exit "Type mismatch" "Expected a int or float, got a string (${argv[index]})" 14
+            barg.exit "Type mismatch" "Expected int or float, got string (${argv[index]})" 14
           elif [ "${__vec__}" == "int" ] && ! [[ "${argv[index]}" =~ ${__int_regex__} ]]; then # Not an valid int...
             if [[ "${argv[index]}" =~ ^[_\.0-9]*$ ]]; then                                     # but could be a int?
               barg.exit "Unknown format" "Invalid numerical value, expected a integer (${argv[index]})" 15
             fi
-            barg.exit "Type mismatch" "Expected a int, got a string (${argv[index]})" 14
+            barg.exit "Type mismatch" "Expected int, got string (${argv[index]})" 14
           elif [ "${__vec__}" == "float" ] && ! [[ "${argv[index]}" =~ ${__flt_regex__} ]]; then # Not an valid float...
             if [[ "${argv[index]}" =~ ^[_\.0-9]*$ ]]; then                                       # but could be a float?
               barg.exit "Unknown format" "Invalid numerical value, expected a float (${argv[index]})" 15
             fi
-            barg.exit "Type mismatch" "Expected a float, got a string (${argv[index]})" 14
+            barg.exit "Type mismatch" "Expected float, got string (${argv[index]})" 14
           fi
           case "${argv[index]}" in
-            '---')
+            '--')
               if [ "${__vec__}" == 'str' ]; then
                 declare -ga "${__var__}+=(\"${argv[index + 1]}\")"
               else
@@ -219,7 +217,7 @@ function barg.parse {
               fi
               ;;
             '-'*)
-              barg.exit "Param-like value" "Value for '${argv[(index - 1)]}' looks like an option/flag. Use '--- ${argv[index]}' to bypass" 18
+              barg.exit "Param-like value" "Value for '${argv[(index - 1)]}' looks like an option/flag. Use '-- ${argv[index]}' to bypass" 18
               ;;
             *)
               if [ "${__vec__}" == 'str' ]; then
@@ -237,17 +235,17 @@ function barg.parse {
           if [[ "${argv[${_argv_table[${_table_item}]}]}" =~ ^[_\.0-9]*$ ]]; then      # but could be a num?
             barg.exit "Unknown format" "Invalid numerical value, expected a int or float (${argv[${_argv_table[${_table_item}]}]})" 15
           fi
-          barg.exit "Type mismatch" "Expected a int or float, got a string (${argv[${_argv_table[${_table_item}]}]})" 14
+          barg.exit "Type mismatch" "Expected int or float, got string (${argv[${_argv_table[${_table_item}]}]})" 14
         fi
         case "${argv[${_argv_table[${_table_item}]}]}" in
-          '---')
-            [ -z "${!__var__@A}" ] && declare -g "${__var__}=${argv[(${_argv_table[${_table_item}]} + 1)]//_/}"
+          '--')
+            ! barg.var_exists "${__var__}" && declare -g "${__var__}=${argv[(${_argv_table[${_table_item}]} + 1)]//_/}"
             ;;
           '-'*)
-            barg.exit "Param-like value" "Value for '${argv[(${_argv_table[${_table_item}]} - 1)]}' looks like an option/flag. Use '--- ${argv[${_argv_table[${_table_item}]}]}' to bypass" 18
+            barg.exit "Param-like value" "Value for '${argv[(${_argv_table[${_table_item}]} - 1)]}' looks like an option/flag. Use '-- ${argv[${_argv_table[${_table_item}]}]}' to bypass" 18
             ;;
           *)
-            [ -z "${!__var__@A}" ] && declare -g "${__var__}=${argv[${_argv_table[${_table_item}]}]//_/}"
+            ! barg.var_exists "${__var__}" && declare -g "${__var__}=${argv[${_argv_table[${_table_item}]}]//_/}"
             ;;
         esac
         ;;
@@ -256,17 +254,17 @@ function barg.parse {
           if [[ "${argv[${_argv_table[${_table_item}]}]}" =~ ^[_\.0-9]*$ ]]; then      # but could be a int?
             barg.exit "Unknown format" "Invalid numerical value, expected a integer (${argv[${_argv_table[${_table_item}]}]})" 15
           fi
-          barg.exit "Type mismatch" "Expected a int, got a string (${argv[${_argv_table[${_table_item}]}]})" 14
+          barg.exit "Type mismatch" "Expected int, got string (${argv[${_argv_table[${_table_item}]}]})" 14
         fi
         case "${argv[${_argv_table[${_table_item}]}]}" in
-          '---')
-            [ -z "${!__var__@A}" ] && declare -g "${__var__}=${argv[(${_argv_table[${_table_item}]} + 1)]//_/}"
+          '--')
+            ! barg.var_exists "${__var__}" && declare -g "${__var__}=${argv[(${_argv_table[${_table_item}]} + 1)]//_/}"
             ;;
           '-'*)
-            barg.exit "Param-like value" "Value for '${argv[(${_argv_table[${_table_item}]} - 1)]}' looks like an option/flag. Use '--- ${argv[${_argv_table[${_table_item}]}]}' to bypass" 18
+            barg.exit "Param-like value" "Value for '${argv[(${_argv_table[${_table_item}]} - 1)]}' looks like an option/flag. Use '-- ${argv[${_argv_table[${_table_item}]}]}' to bypass" 18
             ;;
           *)
-            [ -z "${!__var__@A}" ] && declare -g "${__var__}=${argv[${_argv_table[${_table_item}]}]//_/}"
+            ! barg.var_exists "${__var__}" && declare -g "${__var__}=${argv[${_argv_table[${_table_item}]}]//_/}"
             ;;
         esac
         ;;
@@ -275,30 +273,30 @@ function barg.parse {
           if [[ "${argv[${_argv_table[${_table_item}]}]}" =~ ^[_\.0-9]*$ ]]; then      # but could be a float?
             barg.exit "Unknown format" "Invalid numerical value, expected a float (${argv[${_argv_table[${_table_item}]}]})" 15
           fi
-          barg.exit "Type mismatch" "Expected a float, got a string (${argv[${_argv_table[${_table_item}]}]})" 14
+          barg.exit "Type mismatch" "Expected float, got string (${argv[${_argv_table[${_table_item}]}]})" 14
         fi
         case "${argv[${_argv_table[${_table_item}]}]}" in
-          '---')
-            [ -z "${!__var__@A}" ] && declare -g "${__var__}=${argv[(${_argv_table[${_table_item}]} + 1)]//_/}"
+          '--')
+            ! barg.var_exists "${__var__}" && declare -g "${__var__}=${argv[(${_argv_table[${_table_item}]} + 1)]//_/}"
             ;;
           '-'*)
-            barg.exit "Param-like value" "Value for '${argv[(${_argv_table[${_table_item}]} - 1)]}' looks like an option/flag. Use '--- ${argv[${_argv_table[${_table_item}]}]}' to bypass" 18
+            barg.exit "Param-like value" "Value for '${argv[(${_argv_table[${_table_item}]} - 1)]}' looks like an option/flag. Use '-- ${argv[${_argv_table[${_table_item}]}]}' to bypass" 18
             ;;
           *)
-            [ -z "${!__var__@A}" ] && declare -g "${__var__}=${argv[${_argv_table[${_table_item}]}]//_/}"
+            ! barg.var_exists "${__var__}" && declare -g "${__var__}=${argv[${_argv_table[${_table_item}]}]//_/}"
             ;;
         esac
         ;;
       'str')
         case "${argv[${_argv_table[${_table_item}]}]}" in
-          '---')
-            [ -z "${!__var__@A}" ] && declare -g "${__var__}=${argv[(${_argv_table[${_table_item}]} + 1)]}"
+          '--')
+            ! barg.var_exists "${__var__}" && declare -g "${__var__}=${argv[(${_argv_table[${_table_item}]} + 1)]}"
             ;;
           '-'*)
-            barg.exit "Param-like value" "Value for '${argv[(${_argv_table[${_table_item}]} - 1)]}' looks like an option/flag. Use '--- ${argv[${_argv_table[${_table_item}]}]}' to bypass" 18
+            barg.exit "Param-like value" "Value for '${argv[(${_argv_table[${_table_item}]} - 1)]}' looks like an option/flag. Use '-- ${argv[${_argv_table[${_table_item}]}]}' to bypass" 18
             ;;
           *)
-            [ -z "${!__var__@A}" ] && declare -g "${__var__}=${argv[${_argv_table[${_table_item}]}]}"
+            ! barg.var_exists "${__var__}" && declare -g "${__var__}=${argv[${_argv_table[${_table_item}]}]}"
             ;;
         esac
         ;;
@@ -318,36 +316,22 @@ function barg.parse {
       unset "_argv_table[${_table_item}]"
     fi
 
-    if ${__ign__}; then
-      if [ "${__typ__}" == "bool" ]; then
-        declare -g "${__var__}=false"
-        return 2
-      fi
-      if [ -n "${__val__}" ]; then
-        declare -g "${__var__}=${__val__}"
-        return 2
-      fi
-    elif ${check_valid_item}; then
-      if [ -n "${!__var__@A}" ] && [[ " ${__valid_items__[*]} " != *" ${!__var__} "* ]]; then
+    if ${check_valid_item}; then
+      if barg.var_exists "${__var__}" && barg.is_in_arr "${!__var__}" "${__valid_items__[@]}"; then
         printf -v items '%s, ' "${__valid_items__[@]:1}"
         items="${items%,*} or ${__valid_items__[0]}"
         barg.exit "Invalid parameter value" "Argument of \`-${__short__}/--${__long__}\` must be between: ${items}" 23
       fi
     fi
 
-    [ -n "${!__var__@A}" ] && return 0
+    ! ${__ign__} && return 0
 
-    # Set default value
+    # Set default value if command line was empty
     if [ "${__typ__}" == "bool" ]; then
       declare -g "${__var__}=false"
-      return 2
-    fi
-
-    if [ -n "${__val__}" ]; then
+    else
       declare -g "${__var__}=${__val__}"
-      return 2
     fi
-
     return 1
   }
 
@@ -390,7 +374,7 @@ function barg.parse {
   local __flt_regex__='^(-?[0-9]{1,3}(_[0-9]{3})+\.([0-9]{3}(_[0-9]{1,3})*|[0-9]{1,3})|-?[0-9]+\.[0-9]+)$'
   local __opt_regex__='(,|#\[)\ *([A-Za-z_][_A-Za-z0-9]+?)=|"(([^"\\]|\\.)*)"\]?|'\''(([^'\''\\]|\\.)*)'\''\]?'
   # shellcheck disable=SC1003
-  local __def_regex__='\s*(\|\||&&|<>)?\s*(!)?\s*(@[a-zA-Z0-9\-_]+)?\s*([A-Za-z0-9!?@#_.:<>]?/?[A-Za-z0-9!?@#_.:<>\-]+\[(str|float|int|num|bool|vec\[(str|float|int|num|bool)\])\]|\{((\s*[A-Za-z0-9!?@#_.:<>]?/?[A-Za-z0-9!?@#_.:<>\-]+\s*=>\s*("((\\"|[^"])*?)"|'\''((\\'\''|[^'\''])*?)'\'')\s*)+)\}|\s*[A-Za-z0-9!?@#_.:<>]?/?[A-Za-z0-9!?@#_.:<>\-]+\s*\[((\s*\s*("((\\"|[^"])*?)"|'\''((\\'\''|[^'\''])*?)'\'')\s*)+)\])\s*(\|>\s*("((\\"|[^"])*?)"|'\''((\\'\''|[^'\''])*?)'\''))?\s*=>\s*([a-zA-Z][a-zA-Z0-9_]*)' #(\s*("((\\"|[^"])*?)"|'\''((\\'\''|[^'\''])*?)'\''))?'
+  local __def_regex__='\s*(\|\||&&|<>)?\s*(!)?\s*(@[a-zA-Z0-9\-_]*)?\s*([A-Za-z0-9!?@#_.:<>]?/?[A-Za-z0-9!?@#_.:<>\-]+\[(str|float|int|num|bool|vec\[(str|float|int|num|bool)\])\]|\{((\s*[A-Za-z0-9!?@#_.:<>]?/?[A-Za-z0-9!?@#_.:<>\-]+\s*=>\s*("((\\"|[^"])*?)"|'\''((\\'\''|[^'\''])*?)'\'')\s*)+)\}|\s*[A-Za-z0-9!?@#_.:<>]?/?[A-Za-z0-9!?@#_.:<>\-]+\s*\[((\s*\s*("((\\"|[^"])*?)"|'\''((\\'\''|[^'\''])*?)'\'')\s*)+)\])\s*(\|>\s*("((\\"|[^"])*?)"|'\''((\\'\''|[^'\''])*?)'\''))?\s*=>\s*([a-zA-Z][a-zA-Z0-9_]*)' #(\s*("((\\"|[^"])*?)"|'\''((\\'\''|[^'\''])*?)'\''))?'
   # shellcheck disable=SC1003
   local __swi_regex__='\s*(([A-Za-z0-9!?@#_.:<>])/([A-Za-z0-9!?@#_.:<>\-]+)\s*=>\s*("((\\"|[^"])*?)"|'\''((\\'\''|[^'\''])*?)'\''))\s*'
   # shellcheck disable=SC1003
@@ -414,20 +398,6 @@ function barg.parse {
     [err]=''
     [hil]=''
   )
-  barg.normalize_args # Normalize joint arguments, from '-abc' to '-a -b -c'
-  local BARG_EXTRAS_BEFORE=("${argv[@]}")
-  declare -A _argv_table
-  for ((i = 0; i < ${#argv[@]}; i++)); do
-    # ignore values
-    [[ "${argv[i]}" != -* ]] && continue
-    # If not set, simply add
-    if [ -z "${_argv_table[${argv[i]}]}" ]; then
-      _argv_table[${argv[i]}]=$((i + 1))
-      continue
-    fi
-    # Append comma separated for vec[any]
-    _argv_table[${argv[i]}]="${_argv_table[${argv[i]}]},$((i + 1))"
-  done
 
   local __ilegal_var_names__=(
     BASH BASH_ENV BASH_SUBSHELL BASHPID BASH_VERSINFO BASH_VERSION CDPATH
@@ -470,17 +440,19 @@ function barg.parse {
     __barg_colors[hil]="\x1b[${__barg_opts__[colors]#*:}m"
   fi
 
-  BARG_SUBCOMMAND=""
+  local argv=("${@}")
+
+  declare -g BARG_SUBCOMMAND=""
   local BARG_SUBCOMMAND_NEEDS_EXTRAS=true
   # Try to get the possible sub command
   if [ -n "${__barg_opts__[subcmds]}" ]; then
     # shellcheck disable=SC2206
     local subcommands=(${__barg_opts__[subcmds]})
-    : "${subcommands[*]/#=/}"
-    if [[ " ${_} " == *" ${argv[0]} "* ]]; then
+    if barg.is_in_arr "${argv[0]}" "${subcommands[@]/#=/}"; then
+      # check if it does not need extras
       [[ " ${__barg_opts__[subcmds]} " == *" =${argv[0]} "* ]] && BARG_SUBCOMMAND_NEEDS_EXTRAS=false
       BARG_SUBCOMMAND="${argv[0]}"
-      BARG_EXTRAS_BEFORE[0]="" # Let it empty to remove it from extras
+      argv=("${argv[@]:1}")
     fi
   fi
   if [ "${__barg_opts__[subcmdr]}" == "true" ] && [ -n "${__barg_opts__[subcmds]}" ] && [ -z "${BARG_SUBCOMMAND}" ]; then
@@ -489,6 +461,32 @@ function barg.parse {
     : "${subcommands[*]/#=/}" && : "${_//\ /,\ }"
     barg.exit "Missing subcommand" "A subcommand is required, one of ${_% *} or ${_##* }" 21
   fi
+  # remove to not add it to extras
+  [ "${argv[0]}" == '--' ] && argv=("${argv[@]:1}")
+
+  barg.normalize_args # Normalize joint arguments, from '-abc' to '-a -b -c'
+  declare -A _argv_table
+  local i=-1
+  while ((i < ${#argv[@]})); do
+    ((i++))
+    # Treating next as a value
+    if [[ "${argv[i]}" == '--' ]]; then
+      ((i++))
+      continue
+    elif [[ "${argv[i]}" != -* ]]; then
+      continue
+    fi
+
+    # If not set, simply add
+    if [ -z "${_argv_table[${argv[i]}]}" ]; then
+      _argv_table[${argv[i]}]=$((i + 1))
+      continue
+    fi
+    # Append comma separated for vec[any]
+    _argv_table[${argv[i]}]="${_argv_table[${argv[i]}]},$((i + 1))"
+  done
+  unset i
+  local BARG_EXTRAS_BEFORE=("${argv[@]}")
 
   local __ignore__=false
   local __grpsts__=''
@@ -530,6 +528,9 @@ function barg.parse {
     [ -n "${log_opr}" ] && [ -n "${subcmd_prop}" ] && arg_par="@${subcmd_prop}"
     [ -n "${log_opr}" ] && ${__required__} && arg_lvl='!'
 
+    # If it's only `@`, the param is for the use without subcommand
+    ((${#BARG_SUBCOMMAND} > 0)) && ((${#arg_par} == 1)) && continue
+
     local subcmd_prop="${arg_par:1}"
     # skip options for a distinct sub command
     if [ -n "${subcmd_prop}" ] && [ "${subcmd_prop}" != "${BARG_SUBCOMMAND}" ]; then
@@ -544,8 +545,8 @@ function barg.parse {
 
     [ "${arg_lvl}" == "!" ] && __required__=true || __required__=false
 
-    if [[ " ${__ilegal_var_names__[*]} " == *" ${var_name} "* ]]; then
-      barg.exit "Ilegal variable name" "'${var_name}' is a reserved variable name." 78
+    if barg.is_in_arr "${var_name}" "${__ilegal_var_names__[@]}"; then
+      barg.exit "Ilegal variable name" "${var_name} is a reserved variable name." 78
     fi
 
     if [ "${log_opr}" == "<>" ]; then
@@ -568,14 +569,17 @@ function barg.parse {
     local def_set=false
     local last_run=false
     # shellcheck disable=SC2015
-    barg.define "${arg_pat}" "${var_name}" "${def_val}" "${arg_type}" "${vec_type}" "${switch_pat}" "${list_pat}" "${__ignore__}" &&
+    if barg.define "${arg_pat}" "${var_name}" "${def_val}" "${arg_type}" "${vec_type}" "${switch_pat}" "${list_pat}" "${__ignore__}"; then
       last_run=true
-    [ ${?} == 2 ] && def_set=true
+    else
+      ((${#def_val} > 0)) && def_set=true
+    fi
 
     # Default values are not useful in required
-    if ${__required__} && ${def_set}; then
+    # Default value of the default value is ""
+    # restore the not set status
+    if ${__required__} && ! ${last_run}; then
       def_set=false
-      last_run=false
       unset "${var_name}"
     fi
 
@@ -610,7 +614,7 @@ function barg.parse {
             ${def_set} && continue
             barg.exit "Failed OR operation" "One of ${signat} OR ${__last_sig} is required" 113
           fi
-        elif [ -z "${!var_name@A}" ]; then
+        elif ! barg.var_exists "${var_name}"; then
           __defer_error=("Missing required arguments" "${signat} is a required argument" 113)
         fi
       else
@@ -625,7 +629,7 @@ function barg.parse {
           fi
         fi
       fi
-    elif [ -z "${!var_name@A}" ]; then
+    elif ! barg.var_exists "${var_name}"; then
       if ${__required__} && ! ${last_run}; then
         __defer_error=("Missing required arguments" "${signat} is a required argument" 113)
       fi
@@ -661,5 +665,6 @@ function barg.parse {
       barg.exit "Missing arguments" "positional arguments are required" 120
     fi
   fi
-  unset -f barg.normalize_args barg.set_indices_to_empty barg.define barg.exit
+  unset -f barg.var_exists barg.is_in_arr barg.normalize_args barg.set_indices_to_empty barg.define barg.exit
+  [ "${extglob_s}" == 'off' ] && shopt -u extglob
 }

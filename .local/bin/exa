@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 # shellcheck disable=SC2034,SC1090
-# shellcheck disable=SC2317
 
 source ~/.config/bash/lib/logger.sh
 source ~/.config/bash/lib/str/markup_unescape.sh
@@ -26,7 +25,7 @@ function main {
 BARG
 
   if ${show_usage}; then
-    printf 'Usage: exa [options] ...QUERY\n'
+    printf '\x1b[1;34musage\x1b[0m: \x1b[38;5;14m%s\x1b[0m [OPTIONS] ...QUERY\n' "${MEAKA}"
     return
   fi
 
@@ -72,14 +71,14 @@ function show_help_message {
   local help_lines=(
     "\x1b[1;34m${MEAKA}\x1b[0m: Command line tool for Google"
     ""
-    "\x1b[1;34mUsage:\x1b[0m"
+    '\x1b[1;34mUsage\x1b[0m:'
     "  \x1b[38;5;14m${MEAKA}\x1b[0m [OPTIONS] ...QUERY"
     "  \x1b[38;5;14m${MEAKA}\x1b[0m help"
     ""
-    "\x1b[1;34mSubcommands:\x1b[0m"
+    '\x1b[1;34mSubcommands\x1b[0m:'
     "  help        Show this help message and exit"
     ""
-    '\x1b[1;34mOptions:\x1b[0m'
+    '\x1b[1;34mOptions\x1b[0m:'
     '  -t, --tries \x1b[38;5;15m<int>\x1b[0m       Number of attempts to search Google (default: 5)'
     '  -c, --cookies \x1b[38;5;15m<str>\x1b[0m     Cookies to send with the request'
     '  -u, --user-agent \x1b[38;5;15m<str>\x1b[0m  User-agent string to send with the request (default: Mozilla/5.0)'
@@ -118,10 +117,13 @@ function google_search {
   google_req_url="https://www.google.com/search?${google_req_url:?}"
 
   local __attempts=0
-  until [ -n "${ALL_URL_BASE[0]}" ] || [ "${__attempts}" -ge "${request[tries]:-5}" ]; do
+  local http_codes=()
+  local in_error=false
+  until [ -n "${ALL_URL_BASE[0]}" ] || [ "${__attempts}" -gt "${request[tries]:-5}" ]; do
     if [ "${__attempts}" -eq "${request[tries]:-5}" ]; then
-      log e 'Reached max attempts (%d). Try again or set tries to a greater number.' "${request[tries]:-5}"
-      return 1
+      log e 'Stopped after %d failed attempts. Try again later' "${request[tries]:-5}"
+      in_error=true
+      break
     fi
     ((__attempts++))
     response_body=$(
@@ -145,6 +147,7 @@ function google_search {
         2> >(sed 's/curl: ([0-9]*)/[INFO]/' >&2)
     )
     local http_code="${response_body: -3}"
+    http_codes+=("${http_code}")
 
     if ((100 <= http_code && http_code <= 199)); then
       log d 'HTTP %s -> Google informative... skipped. %d attempt.' "${http_code}" "${__attempts}"
@@ -153,7 +156,7 @@ function google_search {
       log d 'HTTP %s -> Google successful. %d attempt.' "${http_code}" "${__attempts}"
       if [[ "${response_body}" == *'<script src="https://www.google.com/recaptcha/api.js" async defer></script>'* ]]; then
         log e "HTTP %s -> Google Captcha. Change any of proxy, user-agent, cookies or try again later. %d attempt." "${http_code}" "${__attempts}"
-        return 1
+        in_error=true
       fi
       break
     else
@@ -164,11 +167,14 @@ function google_search {
       elif ((500 <= http_code && http_code <= 599)); then
         log e 'HTTP %s -> Server error, try again later. %d attempt.' "${http_code}" "${__attempts}"
       else
-        log e 'HTTP %s -> Invalid code, try again later or report. %d attempt.' "${http_code}" "${__attempts}"
+        log d 'HTTP %s -> Invalid code. %d attempt.' "${http_code}" "${__attempts}"
+        continue
       fi
-      return 1
+      in_error=true
     fi
   done
+  log d 'Record of HTTP codes [%s]' "${http_codes[*]}"
+  ${in_error} && return 1
 
   mapfile -t GOOGLE_RESULT_TITLES < <(grep -oP '(?<=<br><h3 class="LC20lb MBeuO DKV0Md">)[^<]*(?=<)' <<< "${response_body}" | str.markup_unescape)
   mapfile -t GOOGLE_RESULT_LINKS < <(grep -oP '(?<=><a jsname="UWckNb" href=")[^ ]*(?=")' <<< "${response_body}")

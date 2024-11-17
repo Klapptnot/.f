@@ -102,6 +102,7 @@ function barg.parse {
   function barg.set_indices_to_empty {
     for index in "${@}"; do
       if ((index >= 0 && index < ${#BARG_EXTRAS_BEFORE[@]})); then
+        # shellcheck disable=SC2323
         [ "${BARG_EXTRAS_BEFORE[index]}" == '--' ] && BARG_EXTRAS_BEFORE[(index + 1)]=""
         BARG_EXTRAS_BEFORE[index]=""
       fi
@@ -646,7 +647,7 @@ function barg.parse {
     STR="${STR//$'\n'/}"
     STR="${STR//\ /}"
     if [ -n "${STR}" ]; then
-      barg.exit "Regex error" "This BASH version may not support regex" 2
+      barg.exit "Regex error" "LIBC regex support: GLIBC required" 2
     fi
   fi
 

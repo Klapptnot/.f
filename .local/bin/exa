@@ -21,6 +21,7 @@ function main {
   @ c/cookies[str] => EXA_COOKIES
   @ u/user-agent[str] |> "Mozilla/5.0 (X11; Linux x86_64; rv:132.0) Gecko/20100101 Firefox/132.0" => EXA_USER_AGENT
   @ a/amount[int] |> "10" => EXA_RESULT_AMOUNT
+  @ s/skip[int] |> "0" => EXA_RESULT_START
   @ m/no-color[bool] => EXA_NO_COLOR
 BARG
 
@@ -51,6 +52,7 @@ BARG
 
   # google params
   grequest['g_num']="${EXA_RESULT_AMOUNT}"
+  grequest['g_start']="${EXA_RESULT_START}"
 
   if ! google_search grequest; then
     log e 'Failed to search google'
@@ -81,8 +83,9 @@ function show_help_message {
     '\x1b[1;34mOptions\x1b[0m:'
     '  -t, --tries \x1b[38;5;15m<int>\x1b[0m       Number of attempts to search Google (default: 5)'
     '  -c, --cookies \x1b[38;5;15m<str>\x1b[0m     Cookies to send with the request'
-    '  -u, --user-agent \x1b[38;5;15m<str>\x1b[0m  User-agent string to send with the request (default: Mozilla/5.0)'
+    '  -u, --user-agent \x1b[38;5;15m<str>\x1b[0m  User-agent to send with the request (default: Mozilla/5.0)'
     '  -a, --amount \x1b[38;5;15m<int>\x1b[0m      Number of results to return (default: 10)'
+    '  -s, --skip \x1b[38;5;15m<int>\x1b[0m        Number of results skipped (default: 0)'
     '  -n, --no-color          Disable color output'
     ""
     '\x1b[1;34mExamples:\x1b[0m'
@@ -131,7 +134,7 @@ function google_search {
         -H "User-Agent: ${request[user_agent]}" \
         -H 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' \
         -H 'Accept-Language: en-US,en;q=0.5' \
-        -H 'Accept-Encoding: gzip, deflate, br, zstd' \
+        -H 'Accept-Encoding: gzip, deflate' \
         -H 'DNT: 1' \
         -H 'Sec-GPC: 1' \
         -H 'Connection: disconnect' \

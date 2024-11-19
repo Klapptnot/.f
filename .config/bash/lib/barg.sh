@@ -30,16 +30,21 @@ fi
 #     @tell ! m/message[str] => TELL_MESSAGE
 #
 #     @echo n/no-lf[bool] => ECHO_NO_LINEFEED
+#
+#     @ v/verbose[bool] => MAIN_VERBOSE
 #   EOF
 # ```
 function barg.parse {
   [ "${#}" -eq 0 ] && return 1
   read -r _ extglob_s < <(shopt extglob)
+  read -r _ patsub_replacement_s < <(shopt patsub_replacement)
   [ "${extglob_s}" == 'off' ] && shopt -s extglob
+  [ "${patsub_replacement_s}" == 'off' ] && shopt -s patsub_replacement
   function barg.var_exists {
     declare -p "${1}" &> /dev/null
   }
   function barg.is_in_arr {
+    # This works with shopt -s extglob
     local arr=("${@:2}")
     printf -v t '%s' "${arr[@]/#!("${1}")/}"
     test "${#t}" -gt 0
@@ -47,28 +52,6 @@ function barg.parse {
   # Expand the joint arguments
   function barg.normalize_args {
     for ((i = 0; i < ${#argv[@]}; i++)); do
-      #* Joint parameters
-      # Example 1:
-      # 	Short for --lenght is -l, so --lenght 10 can be
-      # 		-l 10
-      # 		-l10
-      # For this (-l10) to work properly, with all the checks
-      # we need to split the parameter and reasign
-      # the parameter and value to argv
-      #
-      # Example 2:
-      #	Short for parameter --get is -g, and for --all is -a
-      # 		-ga
-      # 		-ag
-      # With this, we need to reasign argv with the short parameters
-      # for each parameter: -${char}
-      # So it can hold a long list of short parameters
-      # We need to check that all characters are letters, otherwise
-      # we would have to use them as a value... NO
-      #
-      # Here we need to modify the the argv array, so we need to break
-      # and restart the for loop to make sure that the argv array
-      # length is consistent
       if [[ "${argv[i]}" != -* ]] || [ "${#argv[i]}" -eq 2 ] || [[ "${argv[i]}" == --* ]]; then
         continue
       fi
@@ -79,14 +62,10 @@ function barg.parse {
           "${argv[i]:2:${#argv[i]}}" # The content of the argument
           "${argv[@]:(i + 1)}"       # All after joint argument
         )
-      else #if [[ "${argv[i]}" =~ ^-[A-Za-z]*$ ]]; then # only -ag, -us4 or -hj (flags)
-        # argv[i]="${argv[i]:1}"
-        # This works with shopt -s patsub_replacement
-        # read -ra __slices__ <<<"${argv[i]//?/-&\ }"
-        local __slices__=()
-        while read -rn 1 char; do
-          __slices__+=("-${char}")
-        done <<< "${argv[i]:1}"
+      else
+        argv[i]="${argv[i]:1}"
+        # This works with `shopt -s patsub_replacement`
+        read -ra __slices__ <<< "${argv[i]//?/-&\ }"
         if [[ "${#__slices__[@]}" -gt 0 ]]; then
           argv=(
             "${argv[@]:0:i}"                             # All before joint argument
@@ -174,6 +153,8 @@ function barg.parse {
     else
       if [ "${__typ__}" == "bool" ]; then
         declare -g "${__var__}=false"
+      elif [ -n "${__vec__}" ]; then
+        declare -ag "${__var__}=()"
       else
         declare -g "${__var__}=${__val__}"
       fi
@@ -318,7 +299,7 @@ function barg.parse {
     fi
 
     if ${check_valid_item}; then
-      if barg.var_exists "${__var__}" && barg.is_in_arr "${!__var__}" "${__valid_items__[@]}"; then
+      if barg.var_exists "${__var__}" && ! barg.is_in_arr "${!__var__}" "${__valid_items__[@]}"; then
         printf -v items '%s, ' "${__valid_items__[@]:1}"
         items="${items%,*} or ${__valid_items__[0]}"
         barg.exit "Invalid parameter value" "Argument of \`-${__short__}/--${__long__}\` must be between: ${items}" 23
@@ -330,6 +311,8 @@ function barg.parse {
     # Set default value if command line was empty
     if [ "${__typ__}" == "bool" ]; then
       declare -g "${__var__}=false"
+    elif [ -n "${__vec__}" ]; then
+      declare -ag "${__var__}=()"
     else
       declare -g "${__var__}=${__val__}"
     fi
@@ -444,14 +427,14 @@ function barg.parse {
   local argv=("${@}")
 
   declare -g BARG_SUBCOMMAND=""
-  local BARG_SUBCOMMAND_NEEDS_EXTRAS=true
+  local BARG_SUBCOMMAND_NEEDS_EXTRAS=false
   # Try to get the possible sub command
   if [ -n "${__barg_opts__[subcmds]}" ]; then
     # shellcheck disable=SC2206
     local subcommands=(${__barg_opts__[subcmds]})
-    if barg.is_in_arr "${argv[0]}" "${subcommands[@]/#=/}"; then
+    if barg.is_in_arr "${argv[0]}" "${subcommands[@]/#\*/}"; then
       # check if it does not need extras
-      [[ " ${__barg_opts__[subcmds]} " == *" =${argv[0]} "* ]] && BARG_SUBCOMMAND_NEEDS_EXTRAS=false
+      [[ " ${__barg_opts__[subcmds]} " == *" *${argv[0]} "* ]] && BARG_SUBCOMMAND_NEEDS_EXTRAS=true
       BARG_SUBCOMMAND="${argv[0]}"
       argv=("${argv[@]:1}")
     fi
@@ -459,7 +442,7 @@ function barg.parse {
   if [ "${__barg_opts__[subcmdr]}" == "true" ] && [ -n "${__barg_opts__[subcmds]}" ] && [ -z "${BARG_SUBCOMMAND}" ]; then
     # shellcheck disable=SC2206
     local subcommands=(${__barg_opts__[subcmds]})
-    : "${subcommands[*]/#=/}" && : "${_//\ /,\ }"
+    : "${subcommands[*]/#\*/}" && : "${_//\ /,\ }"
     barg.exit "Missing subcommand" "A subcommand is required, one of ${_% *} or ${_##* }" 21
   fi
   # remove to not add it to extras
@@ -659,6 +642,8 @@ function barg.parse {
       ((extras_count++))
     fi
   done
+
+  # shellcheck disable=SC2034
   declare -g BARG_EXTRAS_COUNT="${extras_count}"
 
   if ${__barg_opts__[reqextras]} && ((extras_count < 1)); then
@@ -668,4 +653,6 @@ function barg.parse {
   fi
   unset -f barg.var_exists barg.is_in_arr barg.normalize_args barg.set_indices_to_empty barg.define barg.exit
   [ "${extglob_s}" == 'off' ] && shopt -u extglob
+  [ "${patsub_replacement_s}" == 'off' ] && shopt -u patsub_replacement
+  return 0
 }

@@ -14,7 +14,7 @@ function main {
   barg.parse "${@}" << BARG || show_usage=true
   #[progname='${MEAKA}']
   #[reqextras='true', extras='QUERY']
-  #[subcmds='=help']
+  #[subcmds='help']
 
   @ t/timeout[num] |> "5" => EXA_TIMEOUT
   @ T/tries[int] |> "5" => EXA_TRIES
@@ -71,7 +71,7 @@ BARG
 
 function show_help_message {
   local help_lines=(
-    "\x1b[1;34m${MEAKA}\x1b[0m: Command line tool for Google"
+    "\x1b[1;34m${MEAKA}\x1b[0m: Command line tool for Google Search"
     ""
     '\x1b[1;34mUsage\x1b[0m:'
     "  \x1b[38;5;14m${MEAKA}\x1b[0m [OPTIONS] ...QUERY"
@@ -90,7 +90,7 @@ function show_help_message {
     ""
     '\x1b[1;34mExamples:\x1b[0m'
     "  ${MEAKA}"' site:en.wikipedia.org '\''intext:"ugliest colour"'\'
-    "  ${MEAKA}"' -t 10 -c "SKD=8KHnxKFrzuGRZfJ; EYW=c6kl8" 448c'
+    "  ${MEAKA}"' -t 10 -c "SKD=8KHnxKFrzuGRZfJ; EYW=c64kl8" 448c'
   )
 
   printf '%b\n' "${help_lines[@]}"
@@ -110,11 +110,11 @@ function google_search {
   fi
 
   declare -A google_url_params=()
-  google_url_params['q']="${request[query]}"          # Search Query
   google_url_params['udm']=14                         # Only web search results
+  google_url_params['q']="${request[query]}"          # Search Query
   google_url_params['num']="${request[g_num]:-10}"    # Amount of results
   google_url_params['start']="${request[g_start]:-0}" # Start from the N result
-  google_url_params['dpf']=${request[g_dpf]:-1}       # Results page number
+  google_url_params['dpf']="${request[g_dpf]:-1}"     # Results page number
 
   read -r google_req_url < <(str.uri_params google_url_params)
   google_req_url="https://www.google.com/search?${google_req_url:?}"
@@ -122,13 +122,14 @@ function google_search {
   local __attempts=0
   local http_codes=()
   local in_error=false
-  until [ -n "${ALL_URL_BASE[0]}" ] || [ "${__attempts}" -gt "${request[tries]:-5}" ]; do
-    if [ "${__attempts}" -eq "${request[tries]:-5}" ]; then
+  while true; do
+    if [ "${__attempts}" -ge "${request[tries]:-5}" ]; then
       log e 'Stopped after %d failed attempts. Try again later' "${request[tries]:-5}"
       in_error=true
       break
     fi
     ((__attempts++))
+
     response_body=$(
       curl -Ss "${google_req_url}" --compressed \
         -H "User-Agent: ${request[user_agent]}" \
@@ -146,9 +147,10 @@ function google_search {
         -H 'Sec-Fetch-User: ?1' \
         -H 'Priority: u=0, i' \
         --max-time "${request[timeout]:-5}" \
-        -w '\n%{http_code}' \
+        --write-out '\n%{http_code}' \
         2> >(sed 's/curl: ([0-9]*)/[INFO]/' >&2)
     )
+
     local http_code="${response_body: -3}"
     http_codes+=("${http_code}")
 
@@ -176,6 +178,7 @@ function google_search {
       in_error=true
     fi
   done
+
   log d 'Record of HTTP codes [%s]' "${http_codes[*]}"
   ${in_error} && return 1
 

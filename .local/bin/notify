@@ -9,7 +9,7 @@ function main {
   barg.parse "${@}" << EOF || BARG_SUBCOMMAND='help'
   #[progname='notify']
   #[extras='PARAMS', reqextras='true']
-  #[subcmds="send =pull =help"]
+  #[subcmds="*send pull help"]
 
   @send h/handler [
     "dbus" "ntfy" "both"
@@ -23,7 +23,7 @@ function main {
   @send a/action[vec[str]] => NOTIFICATION_ACTIONS
 
   # dbus exclusive
-  @send n/app-name[str] |> "NotifyCLI" => DBUS_NOTIFICATION_APP_NAME
+  @send n/app-name[str] |> "Notify" => DBUS_NOTIFICATION_APP_NAME
   @send i/icon[str] |> "notification-active" => DBUS_NOTIFICATION_ICON
   @send I/id[int] |> "0" => DBUS_NOTIFICATION_ID
   @send e/expire[int] |> "-1" => DBUS_NOTIFICATION_EXPIRE_TIME
@@ -40,6 +40,7 @@ function main {
   @pull insecure[bool] => NTFY_ALLOW_INSECURE
   @pull T/topic[str] => NTFY_NOTIFICATION_TOPIC
 EOF
+
   case "${BARG_SUBCOMMAND}" in
     send)
       if [ "${NOTIFICATION_HANDLER}" == "both" ]; then

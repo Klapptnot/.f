@@ -73,25 +73,26 @@ function main {
       ;;
     'h' | 'help')
       local help=(
-        '\b{f87}tared{r} - Tired of tar args, just say what you want\n\n'
-        '\b\x1b[4mUsage:\x1b[24m\n'
-        '\b  {f84}tared{r} <{f219}operation{r}> [{f96}values{r}]\n\n'
-        '\b  e, E, extract  <name> <folder>  - Extract <name> to folder or PWD\n'
-        '\b  c, C, compress <name> [...]     - Compress files to <name>\n'
-        '\b  l, L, list     <name>           - List contents of <name>\n'
-        '\b  h, help                         - Show this message and exit\n'
-        '\b  v, version                      - Show version and exit\n\n'
-        '\b\x1b[4mNotes:\x1b[24m\n'
-        '\bThe compression type will be determined by the file extension, just give\n'
-        '\bthe correct arguments and it will work.\n'
-        '\bLong operation names (ex. list) will {f191}execute the command directly{r}\n'
-        '\bshort lowercase ones (ex. l) will {f191}ask to run the command{r}\n'
-        '\bshort uppercase ones (ex. L) will just {f191}print the command{r}\n\n'
-        '\b\x1b[4mSupported files:\x1b[24m\n'
-        '\b  tar, tar.{gz,xz,bz2,zst,lzma}, rar, 7z\n'
-        '\b  zip, gz, xz, lzh, lzma, bz2, zst\n'
+        '{f12}tared{r} - Tired of tar args, just say what you want\n\n'
+        '{f12}Usage{r}:\n'
+        '  {f14}tared{r} <{f219}operation{r}> [{f15}values{r}]\n\n'
+        '  e, E, extract  <name> <folder>  - Extract <name> to folder or PWD\n'
+        '  c, C, compress <name> [...]     - Compress files to <name>\n'
+        '  l, L, list     <name>           - List contents of <name>\n'
+        '  h, help                         - Show this message and exit\n'
+        '  v, version                      - Show version and exit\n\n'
+        '{f12}Notes{r}:\n'
+        '  The compression type will be determined by the file extension, just give\n'
+        '  the correct arguments and it will work.\n'
+        '  Long operation names (ex. list) will {f191}execute the command directly{r}\n'
+        '  short lowercase ones (ex. l) will {f191}ask to run the command{r}\n'
+        '  short uppercase ones (ex. L) will just {f191}print the command{r}\n\n'
+        '{f12}Supported files{r}:\n'
+        '  tar, tar.{gz,xz,bz2,zst,lzma}, rar, 7z\n'
+        '  zip, gz, xz, lzh, lzma, bz2, zst\n'
       )
-      printfc "${help[*]}"
+      printf -v help_msg '%s' "${help[@]}"
+      printfc "${help_msg}"
       exit
       ;;
     'v' | 'version')

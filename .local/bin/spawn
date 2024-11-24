@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+# shellcheck disable=SC1090,SC2015
+
+source ~/.config/bash/lib/barg.sh
+source ~/.config/bash/lib/logger.sh
+
+function main {
+  local show_usage=false
+  barg.parse "${@}" << BARG || show_usage=true
+  #[progname='spawn']
+  #[reqextras='true', extras='EXEC_LINE']
+
+  r/restart[bool] => DO_RESTART
+  a/run-at[str] |> "0:0:0:0" => SPAWN_AT
+BARG
+
+  if ${show_usage}; then
+    printf 'spawn [OPTIONS] <command>\n'
+    return
+  fi
+
+  if ! command -v "${EXEC_LINE[0]}" &> /dev/null; then
+    log e 'The command %s is not an executable' "${EXEC_LINE[0]}"
+    return 1
+  fi
+
+  printf -v cmd_line ' %q' "${EXEC_LINE[@]:1}"
+  local cmd_line="${EXEC_LINE[0]}${cmd_line}"
+  IFS=':' read -r seconds minutes hours days <<< "${SPAWN_AT}"
+
+  ((run_at = (days * 24 * 60 * 60) + (hours * 60 * 60) + (minutes * 60) + seconds))
+
+  if ((run_at > 0)); then
+    if ${DO_RESTART}; then
+      log i 'Process will be restarted in %s seconds' "${run_at}"
+    else
+      log i 'Process will be spawned in %s seconds' "${run_at}"
+    fi
+  fi
+  log d 'Command to run: %s' "${cmd_line}"
+  spawner "${run_at}" "${EXEC_LINE[@]}" &
+}
+
+function spawner {
+  sleep "${1:?}" || return
+  shift 1
+
+  if ${DO_RESTART}; then
+    if pgrep "${EXEC_LINE[0]}" &> /dev/null; then
+      pkill --signal SIGKILL "${EXEC_LINE[0]}"
+    fi
+  fi
+
+  exec "${@}" &> /dev/null
+}
+
+main "${@}"

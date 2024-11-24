@@ -644,10 +644,10 @@ function barg.parse {
   done
 
   # shellcheck disable=SC2034
-  declare -g BARG_EXTRAS_COUNT="${extras_count}"
+  declare -g "${extras_var_name}_COUNT"="${extras_count}"
 
   if ${__barg_opts__[reqextras]} && ((extras_count < 1)); then
-    if [ -z "${BARG_SUBCOMMAND}" ] || [ -n "${BARG_SUBCOMMAND}" ] && ${BARG_SUBCOMMAND_NEEDS_EXTRAS}; then
+    if [ -z "${BARG_SUBCOMMAND}" ] || ${BARG_SUBCOMMAND_NEEDS_EXTRAS}; then
       barg.exit "Missing arguments" "positional arguments are required" 120
     fi
   fi

@@ -290,19 +290,16 @@ function backgrounds_manager {
 
   case "${BGM_MODE}" in
     list)
+      local lines=()
       for grp in "${__groups[@]}"; do
         if ! ${BGM_ALL_GROUPS} && ! item_is_in_arr "${grp}" "${EXTRA_PARAMS[@]}"; then
           continue
         fi
         mapfile -t it_home < <(yq -rM ".${grp}[] | .home" "${BGM_INDEX_FILE}")
-        mapfile -t it_name < <(yq -rM ".${grp}[] | .name" "${BGM_INDEX_FILE}")
-        mapfile -t it_size < <(yq -rM ".${grp}[] | .size" "${BGM_INDEX_FILE}")
         local item_count="${#it_home[@]}"
-        ((EXTRA_PARAMS_COUNT > 1)) && log i 'Group: %s\n' "${grp}"
-        for ((i = 0; i < item_count; i++)); do
-          log i 'Save name: %s\nHome page: %s\nSize (px): %s\n' "${it_name[i]}" "${it_home[i]}" "${it_size[i]}"
-        done
+        lines+=("${grp}" "${item_count}")
       done
+      printf '%-20s %3s background(s)\n' "${lines[@]}"
       ;;
     download)
       declare -A gtotl=()

@@ -142,7 +142,7 @@ def make_waybar_json(weather: dict) -> str:
 
 
 def make_hyprlock_fmt(weather) -> str:
-    return f"<b><big>{WEATHER_CODES[weather["current_condition"][0]["weatherCode"]]}</big> Feels like <big>{weather["current_condition"][0]["FeelsLikeC"]}°</big></b>"
+    return f"<b>Feels like <big>{weather["current_condition"][0]["FeelsLikeC"]}°{WEATHER_CODES[weather["current_condition"][0]["weatherCode"]]}</big></b>"
 
 
 def main() -> None:

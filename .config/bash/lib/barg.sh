@@ -68,9 +68,9 @@ function barg.parse {
         read -ra __slices__ <<< "${argv[i]//?/-&\ }"
         if [[ "${#__slices__[@]}" -gt 0 ]]; then
           argv=(
-            "${argv[@]:0:i}"                             # All before joint argument
-            "${__slices__[@]:0:(${#__slices__[@]} - 1)}" # All individual argument
-            "${argv[@]:(i + 1)}"                         # All after joint argument
+            "${argv[@]:0:i}"     # All before joint argument
+            "${__slices__[@]}"   # All individual argument
+            "${argv[@]:(i + 1)}" # All after joint argument
           )
         fi
         unset __slices__

@@ -15,12 +15,18 @@ source ~/.config/bash/lib/str/markup_escape.sh
 source ~/.config/bash/lib/str/uri_encode.sh
 
 function main {
-  barg.parse "${@}" << BARG || _ "${null:?Need something to do}"
+  local show_usage=false
+  barg.parse "${@}" << BARG || show_usage=true
   #[progname='medialock']
-  #[subcmdr='true', subcmds='=artup =artdown =hwman =waybar metadata']
+  #[subcmdr='true', subcmds='artup artdown hwman waybar *metadata']
   #[extras='PARAM', reqextras='true']
   @metadata m/markup[bool] => MARKUP_ESCAPE || u/uri[bool] => URI_ESCAPE
 BARG
+
+  if ${show_usage}; then
+    printf 'usage: medialock <subcommand> ...[args]\n'
+    return 1
+  fi
 
   # Icon is the action to be made, not the status, except stop
   declare -A states=(

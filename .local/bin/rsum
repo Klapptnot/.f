@@ -3,47 +3,30 @@
 function main {
   if [[ "${1}" =~ ^-h$|^--help$|^help$ ]]; then
     lns=(
-      "\033[38;5;87mrsum\033[00m Just a easy way to get/generate (random) strings.\n"
-      "Usage:\n"
-      "    '-l' [LENGHT]     int\n"
-      "    '-c' [CHAR]       string\n"
-      "    '-s' [SEPARATOR]  string\n"
-      "    '-t' [TIMES]      int\n"
-      "    '-n' [Linebreak at end]\n"
-      "    '-P' [PRESET]     string\n"
-      "Presets (Not available in lib)\n"
-      "    'password'   - Use default char for passwords\n"
-      "    'code-r'     - Simple code for any redeem\n"
-      "Example:\n"
-      "    rsum -l 16 -c '0-9' -s '-' -t 5 -n\n"
-      "Return: A string of 5 '16 number' strings separated by \"-\" and trailing linebreak\n"
-      "Default: 16 lenght alphanumeric string without trailing linebreak"
+      "\x1b[38;5;12mrsum\x1b[0m: Get/generate (random) strings.\n\n"
+      "\x1b[38;5;12mUsage\x1b[0m:\n"
+      '  \x1b[38;5;14mrsum\x1b[0m [OPTIONS]\n'
+      '  \x1b[38;5;14mrsum\x1b[0m help\n\n'
+      "\x1b[38;5;12mOptions\x1b[0m:\n"
+      '  -l, --lenght \x1b[38;5;15m<int>\x1b[0m  The lenght of each random portion (def: 16)\n'
+      '  -c, --chars \x1b[38;5;15m<str>\x1b[0m   Allowed to use characters (def: a-zA-Z0-9)\n'
+      '  -s, --sep \x1b[38;5;15m<str>\x1b[0m     Chained string separator (def: "")\n'
+      '  -t, --times \x1b[38;5;15m<int>\x1b[0m   Chained strings count (def: 1)\n'
+      '  -n, --break         Add a trailing linefeed (def: off)\n\n'
+      "\x1b[38;5;12mExample\x1b[0m:\n"
+      "   - rsum -l 16 -c '0-9' -s '-' -t 5 -n\n"
+      "  Return: A string of 5 '16 number' strings separated by \"-\" and trailing linebreak\n"
+      "  Default: 16 lenght alphanumeric string without trailing linebreak"
     )
     IFS= tlns="${lns[*]}"
+    # shellcheck disable=SC2059
     printf "${tlns}"
     exit
   fi
 
-  # shellcheck disable=SC1091
-  source "${HOME}/.config/bash/lib/rsum.sh"
-
-  if [ "${1}" != "-P" ]; then
-    rsum "${@}"
-  else
-    shift
-    case "${1}" in
-      'password')
-        # rsum -c '[:print:]' "${@}"
-        rsum -c '[:alnum:][:punct:]' "${@}"
-        ;;
-      'code-r')
-        rsum -c 'B-DF-HJ-NP-RT-Z236789' -s '-' -t5 -l5
-        ;;
-      *)
-        printf '%b\n' "Unknown preset: ${1}"
-        ;;
-    esac
-  fi
+  # shellcheck disable=SC1090
+  source ~/.config/bash/lib/rsum.sh
+  rsum "${@}"
 }
 
 main "${@}"

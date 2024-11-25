@@ -103,19 +103,18 @@ function barg.parse {
     if [ -n "${__swi__}" ]; then
       local STR="${__swi__}"
       while [[ "${STR}" =~ ${__swi_regex__} ]]; do
-        # local full_match="${BASH_REMATCH[1]}"
-        local short="${BASH_REMATCH[2]}"
-        local long="${BASH_REMATCH[3]}"
+        local short="-${BASH_REMATCH[2]}"
+        local long="--${BASH_REMATCH[3]}"
         local value="${BASH_REMATCH[5]:-${BASH_REMATCH[7]}}"
 
-        if barg.is_in_arr "-${short}" "${!_argv_table[@]}"; then
+        if barg.is_in_arr "${short}" "${!_argv_table[@]}"; then
           ! barg.var_exists "${__var__}" && declare -g "${__var__}=${value}"
-          barg.set_indices_to_empty $((${_argv_table["-${short}"]} - 1))
-          unset "_argv_table[-${short}]"
-        elif barg.is_in_arr "--${long}" "${!_argv_table[@]}"; then
+          barg.set_indices_to_empty $((${_argv_table["${short}"]} - 1))
+          unset "_argv_table[${short}]"
+        elif barg.is_in_arr "${long}" "${!_argv_table[@]}"; then
           ! barg.var_exists "${__var__}" && declare -g "${__var__}=${value}"
-          barg.set_indices_to_empty $((${_argv_table["-${long}"]} - 1))
-          unset "_argv_table[--${long}]"
+          barg.set_indices_to_empty $((${_argv_table["${long}"]} - 1))
+          unset "_argv_table[${long}]"
         fi
 
         STR="${STR/#"${BASH_REMATCH[0]}"/}"

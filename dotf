@@ -295,11 +295,15 @@ function backgrounds_manager {
         if ! ${BGM_ALL_GROUPS} && ! item_is_in_arr "${grp}" "${EXTRA_PARAMS[@]}"; then
           continue
         fi
-        mapfile -t it_home < <(yq -rM ".${grp}[] | .home" "${BGM_INDEX_FILE}")
-        local item_count="${#it_home[@]}"
-        lines+=("${grp}" "${item_count}")
+        mapfile -t it_name < <(yq -rM ".${grp}[] | .name" "${BGM_INDEX_FILE}")
+        local total="${#it_name[@]}"
+        local downloaded=0
+        for name in "${it_name[@]}"; do
+          [ -e "${BGM_MAIN_FOLDER}/${name}" ] && ((downloaded++))
+        done
+        lines+=("${grp}" "${downloaded}/${total}")
       done
-      printf '%-20s %3s background(s)\n' "${lines[@]}"
+      printf '%-20s %7s background(s) downloaded\n' "${lines[@]}"
       ;;
     download)
       declare -A gtotl=()
@@ -341,7 +345,6 @@ function backgrounds_manager {
         gtotl["${grp}"]="${gtotl["${grp}"]}/$((item_count - skipped))"
       done
 
-      printf '\n\n'
       for grp in "${!gtotl[@]}"; do
         log i 'Group %s: %s downloaded' "${grp}" "${gtotl["${grp}"]}"
       done

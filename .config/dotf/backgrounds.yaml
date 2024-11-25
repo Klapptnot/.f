@@ -1,0 +1,608 @@
+# Background collections
+#
+
+---
+__groups:
+  - outlook
+  - anime
+  - firewatch
+  - minimal
+  - fantasy
+  - cyberpunk
+
+outlook:
+  - home: https://www.wallpaperflare.com/sunrise-annapurna-massif-himalayas-minimal-mountains-4k-wallpaper-qmwzz/download
+    name: sunrise-annapurna-massif-himalayas-minimal-wallpaper-28d62d6860d03c28a04c618e3892b4ba.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/444/19/627/sunrise-annapurna-massif-himalayas-minimal-wallpaper-28d62d6860d03c28a04c618e3892b4ba.jpg
+    size: 3840x2160
+  - home: https://www.wallpaperflare.com/annapurna-himalayas-landscapes-mountains-nature-nepal-wallpaper-qqvnl/download
+    name: annapurna-himalayas-landscapes-mountains-wallpaper-22813220dda61e3b0a58529520b84992.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/192/76/906/annapurna-himalayas-landscapes-mountains-wallpaper-22813220dda61e3b0a58529520b84992.jpg
+    size: 1920x1200
+
+anime:
+  - home: https://www.wallpaperflare.com/anime-anime-girls-digital-art-artwork-2d-portrait-display-wallpaper-gjift/download
+    name: anime-anime-girls-digital-art-artwork-2d-hd-wallpaper-2f90bab4aa24717564de73059781f6fb.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/227/583/604/anime-anime-girls-digital-art-artwork-2d-hd-wallpaper-2f90bab4aa24717564de73059781f6fb.jpg
+    size: 1448x2200
+  - home: https://www.wallpaperflare.com/anime-anime-girls-digital-art-artwork-portrait-display-wallpaper-gjiaj/download
+    name: anime-anime-girls-digital-art-artwork-portrait-display-hd-wallpaper-db8499d4cd695d28027cc390266819f2.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/388/937/143/anime-anime-girls-digital-art-artwork-portrait-display-hd-wallpaper-db8499d4cd695d28027cc390266819f2.jpg
+    size: 2000x2933
+
+  # Sakura Saber, and more (Fate/Grand Order)
+  - home: https://www.wallpaperflare.com/anime-anime-girls-fate-grand-order-sakura-saber-girls-with-swords-wallpaper-cznpv/download
+    name: anime-anime-girls-fate-grand-order-sakura-saber-wallpaper-f8b60d88c0508cf8806c314ec8a2a47a.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/382/251/819/anime-anime-girls-fate-grand-order-sakura-saber-wallpaper-f8b60d88c0508cf8806c314ec8a2a47a.jpg
+    size: 3840x2160
+  - home: https://www.wallpaperflare.com/anime-anime-girls-fate-grand-order-sakura-saber-girls-with-swords-wallpaper-cypna/download
+    name: anime-anime-girls-fate-grand-order-sakura-saber-wallpaper-e3ea332a1885bccdf812ee3371885201.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/282/336/957/anime-anime-girls-fate-grand-order-sakura-saber-wallpaper-e3ea332a1885bccdf812ee3371885201.jpg
+    size: 2048x1152
+  - home: https://www.wallpaperflare.com/anime-anime-girls-mash-kyrielight-fate-series-shielder-fate-grand-order-wallpaper-pyhda/download
+    name: anime-anime-girls-mash-kyrielight-fate-series-wallpaper-1434741190999b068c1f205c069887b5.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/756/618/436/anime-anime-girls-mash-kyrielight-fate-series-wallpaper-1434741190999b068c1f205c069887b5.jpg
+    size: 2117x1455
+  - home: https://www.wallpaperflare.com/white-haired-animated-woman-with-katana-illustration-anime-anime-girls-wallpaper-puhmm/download
+    name: anime-anime-girls-fate-grand-order-sakura-saber-wallpaper-2b969c7d6351df4955147b29ed5c7cc0.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/222/466/510/anime-anime-girls-fate-grand-order-sakura-saber-wallpaper-2b969c7d6351df4955147b29ed5c7cc0.jpg
+    size: 2560x1440
+  - home: https://www.wallpaperflare.com/fate-series-fate-grand-order-avenger-fate-grand-order-jeanne-d-arc-alter-wallpaper-trrzc/download
+    name: fate-series-fate-grand-order-avenger-fate-grand-order-jeanne-d-arc-alter-wallpaper-d960788dc10a0ddbf6b788af7011565d.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/311/832/979/fate-series-fate-grand-order-avenger-fate-grand-order-jeanne-d-arc-alter-wallpaper-d960788dc10a0ddbf6b788af7011565d.jpg
+    size: 1920x1080
+  - home: https://www.wallpaperflare.com/anime-character-illustration-anime-girls-fate-apocrypha-fate-grand-order-wallpaper-slzhj/download
+    name: anime-anime-girls-fate-apocrypha-fate-grand-order-wallpaper-1003662ecf684080cdd7272448f243a6.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/617/795/617/anime-anime-girls-fate-apocrypha-fate-grand-order-wallpaper-1003662ecf684080cdd7272448f243a6.jpg
+    size: 3000x1326
+  - home: https://www.wallpaperflare.com/woman-holding-rose-illustration-anime-anime-girls-fate-grand-order-wallpaper-sokrg/download
+    name: anime-anime-girls-fate-grand-order-ishtar-fate-grand-order-wallpaper-3da6787d2a71ecc6588be23d64d1fec6.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/997/694/404/anime-anime-girls-fate-grand-order-ishtar-fate-grand-order-wallpaper-3da6787d2a71ecc6588be23d64d1fec6.jpg
+    size: 2400x1200
+
+  # Sparkle (Honkai: Star Rail)
+  - home: https://www.wallpaperflare.com/honkai-star-rail-sparkle-honkai-star-rail-anime-girls-wallpaper-yvyws/download
+    name: honkai-star-rail-sparkle-honkai-star-rail-anime-girls-hd-wallpaper-73d4f18ad364f67f29036bfae0d16b3c.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/415/108/1015/honkai-star-rail-sparkle-honkai-star-rail-anime-girls-hd-wallpaper-73d4f18ad364f67f29036bfae0d16b3c.jpg
+    size: 3000x1512
+  - home: https://www.wallpaperflare.com/honkai-star-rail-artwork-sparkle-honkai-star-rail-fox-mask-wallpaper-yvjrs/download
+    name: honkai-star-rail-artwork-sparkle-honkai-star-rail-fox-mask-anime-hd-wallpaper-4b56ccfd7341bf290554fbe91daccc60.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/727/263/775/honkai-star-rail-artwork-sparkle-honkai-star-rail-fox-mask-anime-hd-wallpaper-4b56ccfd7341bf290554fbe91daccc60.jpg
+    size: 2560x1440
+  - home: https://www.wallpaperflare.com/honkai-star-rail-artwork-sparkle-honkai-star-rail-anime-wallpaper-yvgxm/download
+    name: honkai-star-rail-artwork-sparkle-honkai-star-rail-anime-anime-girls-hd-wallpaper-94dc090cfaa451b654f03ee484609a06.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/709/1009/92/honkai-star-rail-artwork-sparkle-honkai-star-rail-anime-anime-girls-hd-wallpaper-94dc090cfaa451b654f03ee484609a06.jpg
+    size: 1904x865
+  - home: https://www.wallpaperflare.com/pixiv-anime-anime-games-anime-girls-honkai-star-rail-sparkle-honkai-star-rail-wallpaper-yvrpo/download
+    name: pixiv-anime-anime-games-anime-girls-honkai-star-rail-hd-wallpaper-3d6d18ed60643e39a29781379334085f.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/941/227/744/pixiv-anime-anime-games-anime-girls-honkai-star-rail-hd-wallpaper-3d6d18ed60643e39a29781379334085f.jpg
+    size: 1800x3742
+  - home: https://www.wallpaperflare.com/honkai-star-rail-artwork-sparkle-honkai-star-rail-anime-wallpaper-yvgxt/download
+    name: honkai-star-rail-artwork-sparkle-honkai-star-rail-anime-anime-girls-hd-wallpaper-158bcd47efb78ae2043d13a9e2e50612.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/580/992/15/honkai-star-rail-artwork-sparkle-honkai-star-rail-anime-anime-girls-hd-wallpaper-158bcd47efb78ae2043d13a9e2e50612.jpg
+    size: 5760x3240
+  - home: https://www.wallpaperflare.com/honkai-star-rail-artwork-sparkle-honkai-star-rail-red-eyes-wallpaper-yvjrh/download
+    name: honkai-star-rail-artwork-sparkle-honkai-star-rail-red-eyes-black-hair-hd-wallpaper-2b16bcad23419f6945441b19bd7cbc20.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/26/748/930/honkai-star-rail-artwork-sparkle-honkai-star-rail-red-eyes-black-hair-hd-wallpaper-2b16bcad23419f6945441b19bd7cbc20.jpg
+    size: 2560x1440
+  - home: https://www.wallpaperflare.com/honkai-star-rail-sparkle-honkai-star-rail-anime-anime-girls-wallpaper-yvyho/download
+    name: honkai-star-rail-sparkle-honkai-star-rail-anime-anime-girls-anime-games-hd-wallpaper-03570e624ed6aeb32078424470f77e20.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/501/178/510/honkai-star-rail-sparkle-honkai-star-rail-anime-anime-girls-anime-games-hd-wallpaper-03570e624ed6aeb32078424470f77e20.jpg
+    size: 2631x1776
+  - home: https://www.wallpaperflare.com/honkai-star-rail-artwork-sparkle-honkai-star-rail-anime-wallpaper-yvgxh/download
+    name: honkai-star-rail-artwork-sparkle-honkai-star-rail-anime-anime-girls-hd-wallpaper-28ef0f57d7ed58ad9a97e3cb66498af5.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/922/616/16/honkai-star-rail-artwork-sparkle-honkai-star-rail-anime-anime-girls-hd-wallpaper-28ef0f57d7ed58ad9a97e3cb66498af5.jpg
+    size: 1300x1839
+  - home: https://www.wallpaperflare.com/anime-anime-games-anime-girls-sparkle-honkai-star-rail-wallpaper-yvyve/download
+    name: anime-anime-games-anime-girls-sparkle-honkai-star-rail-honkai-star-rail-hd-wallpaper-6a63586778369d9b1e120982a3b46cd2.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/419/362/529/anime-anime-games-anime-girls-sparkle-honkai-star-rail-honkai-star-rail-hd-wallpaper-6a63586778369d9b1e120982a3b46cd2.jpg
+    size: 2560x4093
+  - home: https://www.wallpaperflare.com/honkai-star-rail-long-hair-portrait-display-brunette-sparkle-honkai-star-rail-wallpaper-yvyta/download
+    name: honkai-star-rail-long-hair-portrait-display-brunette-sparkle-honkai-star-rail-hd-wallpaper-88d91b1946528907600d57e7089236c9.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/132/40/54/honkai-star-rail-long-hair-portrait-display-brunette-sparkle-honkai-star-rail-hd-wallpaper-88d91b1946528907600d57e7089236c9.jpg
+    size: 2249x3810
+  - home: https://www.wallpaperflare.com/honkai-star-rail-sparkle-honkai-star-rail-wallpaper-yfnik/download
+    name: honkai-star-rail-sparkle-honkai-star-rail-hd-wallpaper-253bb03e478c34e13766f06cfb1febb7.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/738/726/423/honkai-star-rail-sparkle-honkai-star-rail-hd-wallpaper-253bb03e478c34e13766f06cfb1febb7.jpg
+    size: 1340x2282
+  - home: https://www.wallpaperflare.com/honkai-star-rail-anime-girls-sparkle-honkai-star-rail-wallpaper-yxlwh/download
+    name: honkai-star-rail-anime-girls-sparkle-honkai-star-rail-hd-wallpaper-fdc9613faa894c4e465a707371591596.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/749/321/120/honkai-star-rail-anime-girls-sparkle-honkai-star-rail-hd-wallpaper-fdc9613faa894c4e465a707371591596.jpg
+    size: 9964x5681
+  - home: https://www.wallpaperflare.com/anime-girls-sparkle-honkai-star-rail-wallpaper-yfoqg/download
+    name: anime-girls-sparkle-honkai-star-rail-honkai-star-rail-hd-wallpaper-173f32a4ff250f6a8f722421c141d795.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/167/756/877/anime-girls-sparkle-honkai-star-rail-honkai-star-rail-hd-wallpaper-173f32a4ff250f6a8f722421c141d795.jpg
+    size: 5000x3000
+  - home: https://www.wallpaperflare.com/sparkle-honkai-star-rail-anime-girls-wallpaper-ydetr/download
+    name: sparkle-honkai-star-rail-honkai-star-rail-anime-girls-hd-wallpaper-4912991ed490e31bf58fa340cbe845a1.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/903/669/138/sparkle-honkai-star-rail-honkai-star-rail-anime-girls-hd-wallpaper-4912991ed490e31bf58fa340cbe845a1.jpg
+    size: 2605x4230
+  - home: https://www.wallpaperflare.com/anime-girls-hoyoverse-honkai-star-rail-video-games-mihoyo-wallpaper-yvetw/download
+    name: anime-girls-hoyoverse-honkai-star-rail-video-games-mihoyo-hd-wallpaper-793048ed918a6d1b66e7683f1041866d.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/904/898/521/anime-girls-hoyoverse-honkai-star-rail-video-games-mihoyo-hd-wallpaper-793048ed918a6d1b66e7683f1041866d.jpg
+    size: 1920x1080
+  - home: https://www.wallpaperflare.com/honkai-star-rail-artwork-sparkle-honkai-star-rail-anime-wallpaper-yvdqu/download
+    name: honkai-star-rail-artwork-sparkle-honkai-star-rail-anime-anime-girls-hd-wallpaper-9ef484d3790aa5f7f89bf40a48d649ca.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/560/1002/516/honkai-star-rail-artwork-sparkle-honkai-star-rail-anime-anime-girls-hd-wallpaper-9ef484d3790aa5f7f89bf40a48d649ca.jpg
+    size: 3500x2112
+
+  # Zero Two (Darling In The FranXX)
+  - home: https://www.wallpaperflare.com/anime-darling-in-the-franxx-zero-two-darling-in-the-franxx-wallpaper-skkcz/download
+    name: anime-darling-in-the-franxx-zero-two-darling-in-the-franxx-wallpaper-00f3ccca91078025993d3f4c285f3fe5.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/325/179/787/anime-darling-in-the-franxx-zero-two-darling-in-the-franxx-wallpaper-00f3ccca91078025993d3f4c285f3fe5.jpg
+    size: 1920x1198
+  - home: https://www.wallpaperflare.com/darling-in-the-franxx-anime-girls-zero-two-darling-in-the-franxx-wallpaper-padok/download
+    name: darling-in-the-franxx-anime-girls-zero-two-darling-in-the-franxx-pink-hair-wallpaper-9bf6bccda3f18f09c5844b898d0c9ce0.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/951/514/360/darling-in-the-franxx-anime-girls-zero-two-darling-in-the-franxx-pink-hair-wallpaper-9bf6bccda3f18f09c5844b898d0c9ce0.jpg
+    size: 2560x1440
+  - home: https://www.wallpaperflare.com/pink-haired-girl-anime-character-anime-girls-darling-in-the-franxx-wallpaper-sirin/download
+    name: anime-anime-girls-darling-in-the-franxx-zero-two-darling-in-the-franxx-wallpaper-cdfdc67918877cd0675edd5d4b58576b.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/425/616/61/anime-anime-girls-darling-in-the-franxx-zero-two-darling-in-the-franxx-wallpaper-cdfdc67918877cd0675edd5d4b58576b.jpg
+    size: 2047x1447
+  - home: https://www.wallpaperflare.com/anime-anime-girls-picture-in-picture-darling-in-the-franxx-wallpaper-czetm/download
+    name: anime-anime-girls-picture-in-picture-darling-in-the-franxx-wallpaper-78e63d083020ec08b02c51ae2802f43a.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/210/1010/535/anime-anime-girls-picture-in-picture-darling-in-the-franxx-wallpaper-78e63d083020ec08b02c51ae2802f43a.jpg
+    size: 3840x2160
+  - home: https://www.wallpaperflare.com/anime-anime-girls-zero-two-darling-in-the-franxx-pink-hair-wallpaper-qgyri/download
+    name: anime-anime-girls-zero-two-darling-in-the-franxx-darling-in-the-franxx-wallpaper-d24e0205f2082de5a330e953dded7b63.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/294/965/187/anime-anime-girls-zero-two-darling-in-the-franxx-darling-in-the-franxx-wallpaper-d24e0205f2082de5a330e953dded7b63.jpg
+    size: 2046x1151
+  - home: https://www.wallpaperflare.com/female-pink-haired-anime-anime-girls-picture-in-picture-darling-in-the-franxx-wallpaper-phkgo/download
+    name: anime-anime-girls-picture-in-picture-darling-in-the-franxx-wallpaper-99c0f8ad213a1d3b06f7a8afb0a1e65d.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/772/112/956/anime-anime-girls-picture-in-picture-darling-in-the-franxx-wallpaper-99c0f8ad213a1d3b06f7a8afb0a1e65d.jpg
+    size: 1920x1080
+  - home: https://www.wallpaperflare.com/anime-darling-in-the-franxx-strelizia-darling-in-the-franxx-wallpaper-hztms/download
+    name: anime-darling-in-the-franxx-strelizia-darling-in-the-franxx-zero-two-darling-in-the-franxx-wallpaper-59e018fdb1facd5ba66788df70a166fd.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/763/343/586/anime-darling-in-the-franxx-strelizia-darling-in-the-franxx-zero-two-darling-in-the-franxx-wallpaper-59e018fdb1facd5ba66788df70a166fd.jpg
+    size: 1920x1080
+  - home: https://www.wallpaperflare.com/darling-in-the-franxx-zero-two-darling-in-the-franxx-anime-girls-wallpaper-pscze/download
+    name: darling-in-the-franxx-zero-two-darling-in-the-franxx-anime-girls-pink-hair-wallpaper-a836fdc8a0604ce8e09cc12eb822a47a.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/816/828/41/darling-in-the-franxx-zero-two-darling-in-the-franxx-anime-girls-pink-hair-wallpaper-a836fdc8a0604ce8e09cc12eb822a47a.jpg
+    size: 3840x2160
+
+  # Makima (Chainsaw Man)
+  - home: https://www.wallpaperflare.com/makima-chainsaw-man-anime-anime-girls-shapes-colorful-wallpaper-ywhwr/download
+    name: makima-chainsaw-man-anime-anime-girls-shapes-colorful-hd-wallpaper-c950c88db1dacd6b96b758df60c126ad.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/92/445/89/makima-chainsaw-man-anime-anime-girls-shapes-colorful-hd-wallpaper-c950c88db1dacd6b96b758df60c126ad.jpg
+    size: 1920x1080
+  - home: https://www.wallpaperflare.com/tatsukifujimoto-chainsaw-man-4k-makima-chainsaw-man-anime-wallpaper-yyqsi/download
+    name: tatsukifujimoto-chainsaw-man-4k-makima-chainsaw-man-anime-hd-wallpaper-9df832c95d037fd13a63f11a17771abd.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/668/742/547/tatsukifujimoto-chainsaw-man-4k-makima-chainsaw-man-anime-hd-wallpaper-9df832c95d037fd13a63f11a17771abd.jpg
+    size: 7680x4360
+  - home: https://www.wallpaperflare.com/anime-anime-girls-chainsaw-man-makima-chainsaw-man-wallpaper-yjhjp/download
+    name: anime-anime-girls-chainsaw-man-makima-chainsaw-man-hd-wallpaper-78b6cd480060fc98e08c114e4852543a.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/1017/509/319/anime-anime-girls-chainsaw-man-makima-chainsaw-man-hd-wallpaper-78b6cd480060fc98e08c114e4852543a.jpg
+    size: 3840x2160
+  - home: https://www.wallpaperflare.com/anime-girls-makima-chainsaw-man-wallpaper-yycby/download
+    name: anime-girls-anime-makima-chainsaw-man-chainsaw-man-hd-wallpaper-a8b9889a6f27ebe8d067111fbaeb2cf1.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/875/57/148/anime-girls-anime-makima-chainsaw-man-chainsaw-man-hd-wallpaper-a8b9889a6f27ebe8d067111fbaeb2cf1.jpg
+    size: 1883x3347
+  - home: https://www.wallpaperflare.com/anime-anime-girls-chainsaw-man-makima-chainsaw-man-wallpaper-yyoqp/download
+    name: anime-anime-girls-chainsaw-man-makima-chainsaw-man-hd-wallpaper-d7afd2d4cfc54fbadfb264f1f1d12735.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/426/293/126/anime-anime-girls-chainsaw-man-makima-chainsaw-man-hd-wallpaper-d7afd2d4cfc54fbadfb264f1f1d12735.jpg
+    size: 5120x2880
+  - home: https://www.wallpaperflare.com/chainsaw-man-makima-chainsaw-man-anime-girls-red-wallpaper-ymukg/download
+    name: chainsaw-man-makima-chainsaw-man-anime-girls-red-hd-wallpaper-b940082db16a1d7b76a7c89f50b1f6fd.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/561/326/558/chainsaw-man-makima-chainsaw-man-anime-girls-red-hd-wallpaper-b940082db16a1d7b76a7c89f50b1f6fd.jpg
+    size: 1920x1080
+  - home: https://www.wallpaperflare.com/chainsaw-man-tatsukifujimoto-4k-anime-anime-girls-mappa-wallpaper-yyqux/download
+    name: chainsaw-man-tatsukifujimoto-4k-anime-anime-girls-hd-wallpaper-8d9892f94d33ffe13ac3516ae7f7ca5d.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/182/40/912/chainsaw-man-tatsukifujimoto-4k-anime-anime-girls-hd-wallpaper-8d9892f94d33ffe13ac3516ae7f7ca5d.jpg
+    size: 7680x4360
+
+  # Keqing (Genshin Impact)
+  - home: https://www.wallpaperflare.com/anime-girls-genshin-impact-keqing-genshin-impact-wallpaper-ycoay/download
+    name: anime-girls-genshin-impact-keqing-genshin-impact-hd-wallpaper-1595629bc65cada1e11649f097a10292.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/324/573/153/anime-girls-genshin-impact-keqing-genshin-impact-hd-wallpaper-1595629bc65cada1e11649f097a10292.jpg
+    size: 1722x1037
+  - home: https://www.wallpaperflare.com/anime-anime-girls-simple-background-genshin-impact-doodle-wallpaper-ybnnr/download
+    name: anime-anime-girls-simple-background-genshin-impact-doodle-hd-wallpaper-d1907291090e7d8dd549387c40bc9552.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/547/353/123/anime-anime-girls-simple-background-genshin-impact-doodle-hd-wallpaper-d1907291090e7d8dd549387c40bc9552.jpg
+    size: 1800x979
+  - home: https://www.wallpaperflare.com/keqing-genshin-impact-mountains-wallpaper-ycvug/download
+    name: keqing-genshin-impact-genshin-impact-mountains-hd-wallpaper-e9b0d8bde15a3debc6a7a84f9081568d.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/394/254/451/keqing-genshin-impact-genshin-impact-mountains-hd-wallpaper-e9b0d8bde15a3debc6a7a84f9081568d.jpg
+    size: 1920x1080
+  - home: https://www.wallpaperflare.com/genshin-impact-keqing-genshin-impact-wallpaper-ymbxl/download
+    name: genshin-impact-keqing-genshin-impact-hd-wallpaper-e8165d3820405c98608c312e18c2f46a.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/165/649/187/genshin-impact-keqing-genshin-impact-hd-wallpaper-e8165d3820405c98608c312e18c2f46a.jpg
+    size: 3840x2160
+  - home: https://www.wallpaperflare.com/genshin-impact-anime-girls-keqing-genshin-impact-wallpaper-ycbqn/download
+    name: genshin-impact-anime-girls-keqing-genshin-impact-hd-wallpaper-9936da8ce7bbde514c52a458d07752aa.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/585/549/129/genshin-impact-anime-girls-keqing-genshin-impact-hd-wallpaper-9936da8ce7bbde514c52a458d07752aa.jpg
+    size: 1227x1600
+  - home: https://www.wallpaperflare.com/anime-girls-genshin-impact-keqing-genshin-impact-wallpaper-ybvpb/download
+    name: anime-girls-genshin-impact-keqing-genshin-impact-hd-wallpaper-d5e1d82de857980623127a7f61929b8a.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/697/846/422/anime-girls-genshin-impact-keqing-genshin-impact-hd-wallpaper-d5e1d82de857980623127a7f61929b8a.jpg
+    size: 1135x1680
+  - home: https://www.wallpaperflare.com/anime-girls-genshin-impact-keqing-genshin-impact-yaya-chan-wallpaper-ypmfo/download
+    name: anime-girls-genshin-impact-keqing-genshin-impact-yaya-chan-bodysuit-hd-wallpaper-53d61e2dbbd98ebe5dbd568bb577e512.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/10/389/221/anime-girls-genshin-impact-keqing-genshin-impact-yaya-chan-bodysuit-hd-wallpaper-53d61e2dbbd98ebe5dbd568bb577e512.jpg
+    size: 3277x4096
+  - home: https://www.wallpaperflare.com/genshin-impact-keqing-genshin-impact-wallpaper-ypbrv/download
+    name: genshin-impact-keqing-genshin-impact-hd-wallpaper-b357a65e7b6c23900edec86c1c94999e.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/609/310/365/genshin-impact-keqing-genshin-impact-hd-wallpaper-b357a65e7b6c23900edec86c1c94999e.jpg
+    size: 2000x1414
+  - home: https://www.wallpaperflare.com/anime-girls-genshin-impact-keqing-genshin-impact-shengtian-wallpaper-yptzu/download
+    name: anime-girls-genshin-impact-keqing-genshin-impact-shengtian-skirt-hd-wallpaper-477d8c0ff3d1a6969c1b4f9a44c4d017.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/491/399/818/anime-girls-genshin-impact-keqing-genshin-impact-shengtian-skirt-hd-wallpaper-477d8c0ff3d1a6969c1b4f9a44c4d017.jpg
+    size: 1984x2892
+  - home: https://www.wallpaperflare.com/genshin-impact-ganyu-genshin-impact-keqing-genshin-impact-wallpaper-ypjgd/download
+    name: genshin-impact-ganyu-genshin-impact-keqing-genshin-impact-purple-hair-twintails-hd-wallpaper-34a6f12ca48fc9dbca93037dafe03fad.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/462/1010/337/genshin-impact-ganyu-genshin-impact-keqing-genshin-impact-purple-hair-twintails-hd-wallpaper-34a6f12ca48fc9dbca93037dafe03fad.jpg
+    size: 3508x1974
+
+  # Yae Miko Guuji (Genshin Impact)
+  - home: https://www.wallpaperflare.com/genshin-impact-artwork-yae-miko-genshin-impact-inazuma-wallpaper-yalpw/download
+    name: genshin-impact-artwork-yae-miko-genshin-impact-inazuma-silhouette-hd-wallpaper-48f6ad6850309c9820ac71ae786204ba.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/526/808/983/genshin-impact-artwork-yae-miko-genshin-impact-inazuma-silhouette-hd-wallpaper-48f6ad6850309c9820ac71ae786204ba.jpg
+    size: 3840x2160
+  - home: https://www.wallpaperflare.com/genshin-impact-yae-miko-genshin-impact-anime-girls-pink-hair-wallpaper-yznpu/download
+    name: genshin-impact-yae-miko-genshin-impact-anime-girls-pink-hair-hd-wallpaper-80d94bcf235e0382e53270d53591f6be.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/677/226/340/genshin-impact-yae-miko-genshin-impact-anime-girls-pink-hair-hd-wallpaper-80d94bcf235e0382e53270d53591f6be.jpg
+    size: 5019x3003
+  - home: https://www.wallpaperflare.com/genshin-impact-yae-miko-genshin-impact-wallpaper-yekyq/download
+    name: genshin-impact-yae-miko-genshin-impact-hd-wallpaper-e6484563b7d68b6922e9c8be4f94c7be.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/803/817/124/genshin-impact-yae-miko-genshin-impact-hd-wallpaper-e6484563b7d68b6922e9c8be4f94c7be.jpg
+    size: 5016x3011
+  - home: https://www.wallpaperflare.com/genshin-impact-yae-miko-genshin-impact-anime-girls-pink-hair-wallpaper-yaqnr/download
+    name: genshin-impact-yae-miko-genshin-impact-anime-girls-anime-pink-hair-hd-wallpaper-58b68d6850604cf8d06c717ef85274ea.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/755/942/326/genshin-impact-yae-miko-genshin-impact-anime-girls-anime-pink-hair-hd-wallpaper-58b68d6850604cf8d06c717ef85274ea.jpg
+    size: 3840x2160
+  - home: https://www.wallpaperflare.com/genshin-impact-raiden-shogun-genshin-impact-yae-miko-genshin-impact-wallpaper-ywigi/download
+    name: genshin-impact-raiden-shogun-genshin-impact-yae-miko-genshin-impact-anime-games-vysakhjanan-hd-wallpaper-8960a84d714aadfb064738bf20c1a6ad.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/14/212/894/genshin-impact-raiden-shogun-genshin-impact-yae-miko-genshin-impact-anime-games-vysakhjanan-hd-wallpaper-8960a84d714aadfb064738bf20c1a6ad.jpg
+    size: 1920x1080
+  - home: https://www.wallpaperflare.com/genshin-impact-yae-miko-genshin-impact-atdan-anime-girls-wallpaper-yarpf/download
+    name: genshin-impact-yae-miko-genshin-impact-atdan-anime-girls-hd-wallpaper-2dd4bc5ddbeaaf9d3652ac664194ea41.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/654/79/760/genshin-impact-yae-miko-genshin-impact-atdan-anime-girls-hd-wallpaper-2dd4bc5ddbeaaf9d3652ac664194ea41.jpg
+    size: 1503x2400
+  - home: https://www.wallpaperflare.com/genshin-impact-yae-miko-genshin-impact-anime-anime-girls-wallpaper-yaede/download
+    name: genshin-impact-yae-miko-genshin-impact-anime-anime-girls-artwork-hd-wallpaper-8d8b0d5588fe59b7bba2877253a5d863.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/126/337/121/genshin-impact-yae-miko-genshin-impact-anime-anime-girls-artwork-hd-wallpaper-8d8b0d5588fe59b7bba2877253a5d863.jpg
+    size: 1362x1924
+
+  # Baal Raiden Shogun (Genshin Impact)
+  - home: https://www.wallpaperflare.com/genshin-impact-artwork-raiden-shogun-genshin-impact-anime-wallpaper-yynkq/download
+    name: genshin-impact-artwork-raiden-shogun-genshin-impact-anime-anime-girls-hd-wallpaper-fc5d83ff0fd61c046e3482c2f8d29cb0.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/415/522/405/genshin-impact-artwork-raiden-shogun-genshin-impact-anime-anime-girls-hd-wallpaper-fc5d83ff0fd61c046e3482c2f8d29cb0.jpg
+    size: 3750x6350
+  - home: https://www.wallpaperflare.com/genshin-impact-raiden-shogun-genshin-impact-wallpaper-ywgdq/download
+    name: genshin-impact-raiden-shogun-genshin-impact-hd-wallpaper-1bc60cedb3019f99c5c42b69ed0c9cf0.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/153/504/965/genshin-impact-raiden-shogun-genshin-impact-hd-wallpaper-1bc60cedb3019f99c5c42b69ed0c9cf0.jpg
+    size: 2560x1440
+  - home: https://www.wallpaperflare.com/genshin-impact-raiden-shogun-genshin-impact-sangonomiya-kokomi-genshin-impact-wallpaper-ywgxa/download
+    name: genshin-impact-raiden-shogun-genshin-impact-sangonomiya-kokomi-genshin-impact-yae-miko-genshin-impact-kamisato-ayaka-genshin-impact-hd-wallpaper-831a93ea68b50c9dd8226eb3a198d2e1.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/252/50/393/genshin-impact-raiden-shogun-genshin-impact-sangonomiya-kokomi-genshin-impact-yae-miko-genshin-impact-kamisato-ayaka-genshin-impact-hd-wallpaper-831a93ea68b50c9dd8226eb3a198d2e1.jpg
+    size: 2048x1152
+  - home: https://www.wallpaperflare.com/raiden-shogun-genshin-impact-genshin-impact-baal-wallpaper-ybfpq/download
+    name: raiden-shogun-genshin-impact-genshin-impact-baal-hd-wallpaper-c980381d917a7dabb6d7d8ef70c1464d.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/810/52/40/raiden-shogun-genshin-impact-genshin-impact-baal-hd-wallpaper-c980381d917a7dabb6d7d8ef70c1464d.jpg
+    size: 1920x1080
+  - home: https://www.wallpaperflare.com/genshin-impact-raiden-shogun-genshin-impact-anime-girls-wallpaper-yaqnu/download
+    name: genshin-impact-raiden-shogun-genshin-impact-anime-girls-anime-hd-wallpaper-aff057e552b7c1d690db0834049815cc.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/294/10/535/genshin-impact-raiden-shogun-genshin-impact-anime-girls-anime-hd-wallpaper-aff057e552b7c1d690db0834049815cc.jpg
+    size: 5424x3155
+  - home: https://www.wallpaperflare.com/anime-girls-genshin-impact-raiden-shogun-genshin-impact-wallpaper-yjqxr/download
+    name: anime-girls-genshin-impact-raiden-shogun-genshin-impact-hd-wallpaper-98266c9adf2c4729ee30e9b242395b10.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/796/564/864/anime-girls-genshin-impact-raiden-shogun-genshin-impact-hd-wallpaper-98266c9adf2c4729ee30e9b242395b10.jpg
+    size: 1400x2760
+  - home: https://www.wallpaperflare.com/genshin-impact-raiden-shogun-genshin-impact-wallpaper-yonxn/download
+    name: genshin-impact-raiden-shogun-genshin-impact-hd-wallpaper-2b8560d8272972992b9d5c97b4a6cc09.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/96/544/37/genshin-impact-raiden-shogun-genshin-impact-hd-wallpaper-2b8560d8272972992b9d5c97b4a6cc09.jpg
+    size: 7712x10240
+  - home: https://www.wallpaperflare.com/anime-girls-genshin-impact-raiden-shogun-genshin-impact-wallpaper-yjqxy/download
+    name: anime-girls-genshin-impact-raiden-shogun-genshin-impact-hd-wallpaper-88660d086020dce8407cd13e98a2548a.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/248/315/778/anime-girls-genshin-impact-raiden-shogun-genshin-impact-hd-wallpaper-88660d086020dce8407cd13e98a2548a.jpg
+    size: 3840x2160
+  - home: https://www.wallpaperflare.com/genshin-impact-raiden-shogun-genshin-impact-wallpaper-yywzj/download
+    name: genshin-impact-raiden-shogun-genshin-impact-hd-wallpaper-d8103c5ce5ccda4d6e0b83458ec1849f.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/118/163/642/genshin-impact-raiden-shogun-genshin-impact-hd-wallpaper-d8103c5ce5ccda4d6e0b83458ec1849f.jpg
+    size: 1500x3355
+  - home: https://www.wallpaperflare.com/genshin-impact-raiden-shogun-genshin-impact-wallpaper-yamzu/download
+    name: genshin-impact-raiden-shogun-genshin-impact-hd-wallpaper-258ce89cf890da199e86232a1d862c91.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/38/754/347/genshin-impact-raiden-shogun-genshin-impact-hd-wallpaper-258ce89cf890da199e86232a1d862c91.jpg
+    size: 2467x3490
+  - home: https://www.wallpaperflare.com/anime-girls-icwine-genshin-impact-raiden-shogun-genshin-impact-wallpaper-yetdj/download
+    name: anime-girls-icwine-genshin-impact-raiden-shogun-genshin-impact-hd-wallpaper-eeb5b5adc7a454f444cf31c4a85b69c2.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/921/643/779/anime-girls-icwine-genshin-impact-raiden-shogun-genshin-impact-hd-wallpaper-eeb5b5adc7a454f444cf31c4a85b69c2.jpg
+    size: 1030x1772
+
+  # Kamisato Ayaka (Genshin Impact)
+  - home: https://www.wallpaperflare.com/genshin-impact-kamisato-ayaka-genshin-impact-cherry-blossom-wallpaper-ybxdo/download
+    name: genshin-impact-kamisato-ayaka-genshin-impact-cherry-blossom-hd-wallpaper-4960183d911a5d0bb6d7b81fe021e60d.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/306/948/959/genshin-impact-kamisato-ayaka-genshin-impact-cherry-blossom-hd-wallpaper-4960183d911a5d0bb6d7b81fe021e60d.jpg
+    size: 1920x1080
+  - home: https://www.wallpaperflare.com/anime-girls-kamisato-ayaka-kamisato-ayaka-genshin-impact-wallpaper-ybfmw/download
+    name: anime-girls-kamisato-ayaka-kamisato-ayaka-genshin-impact-genshin-impact-cherry-blossom-hd-wallpaper-d77397d657582be84d356b99b6ce5233.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/198/683/829/anime-girls-kamisato-ayaka-kamisato-ayaka-genshin-impact-genshin-impact-cherry-blossom-hd-wallpaper-d77397d657582be84d356b99b6ce5233.jpg
+    size: 926x1654
+  - home: https://www.wallpaperflare.com/anime-anime-girls-kamisato-ayaka-genshin-impact-wallpaper-yexlc/download
+    name: anime-anime-girls-kamisato-ayaka-genshin-impact-hd-wallpaper-41bf0b146ab5bd23c7aaec4a8e1c2698.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/352/796/981/anime-anime-girls-kamisato-ayaka-genshin-impact-hd-wallpaper-41bf0b146ab5bd23c7aaec4a8e1c2698.jpg
+    size: 2000x1125
+  - home: https://www.wallpaperflare.com/kamisato-ayaka-genshin-impact-blue-hair-blue-eyes-anime-girls-wallpaper-yzqjf/download
+    name: kamisato-ayaka-genshin-impact-blue-hair-genshin-impact-blue-eyes-anime-girls-hd-wallpaper-db14b2528498d5cf9d41a97e36ffcbf0.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/773/476/30/kamisato-ayaka-genshin-impact-blue-hair-genshin-impact-blue-eyes-anime-girls-hd-wallpaper-db14b2528498d5cf9d41a97e36ffcbf0.jpg
+    size: 3163x6400
+  - home: https://www.wallpaperflare.com/genshin-impact-raiden-shogun-genshin-impact-wallpaper-ywgdq/download
+    name: genshin-impact-raiden-shogun-genshin-impact-hd-wallpaper-1bc60cedb3019f99c5c42b69ed0c9cf0.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/153/504/965/genshin-impact-raiden-shogun-genshin-impact-hd-wallpaper-1bc60cedb3019f99c5c42b69ed0c9cf0.jpg
+    size: 2560x1440
+
+
+firewatch:
+  - home: https://www.wallpaperflare.com/person-standing-on-mountain-cliff-painting-illustration-landscape-wallpaper-zui/download
+    name: illustration-landscape-digital-art-mountains-wallpaper-50f055697ff63eb3883fc7f67ba6b4b8.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/52/465/301/illustration-landscape-digital-art-mountains-wallpaper-50f055697ff63eb3883fc7f67ba6b4b8.jpg
+    size: 3840x2400
+  - home: https://www.wallpaperflare.com/firewatch-4k-best-wallpaper-temgv/download
+    name: firewatch-4k-best-wallpaper-e8f69da8c0b09c9880fc110ec8d2940a.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/827/65/320/firewatch-4k-best-wallpaper-e8f69da8c0b09c9880fc110ec8d2940a.jpg
+    size: 3840x2160
+  - home: https://www.wallpaperflare.com/towerhouse-digital-wallpaper-house-on-top-of-a-tower-in-the-mountains-painting-wallpaper-qi/download
+    name: firewatch-video-games-mountains-nature-wallpaper-d8c6cc1acf2cf7c96e70797232d9cb10.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/758/252/42/firewatch-video-games-mountains-nature-wallpaper-d8c6cc1acf2cf7c96e70797232d9cb10.jpg
+    size: 2560x1600
+  - home: https://www.wallpaperflare.com/firewatch-video-game-art-minimalism-simple-wallpaper-yshyt/download
+    name: firewatch-video-game-art-minimalism-simple-hd-wallpaper-39c0c8ddb1ea4d6b462798dff041961d.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/227/441/94/firewatch-video-game-art-minimalism-simple-hd-wallpaper-39c0c8ddb1ea4d6b462798dff041961d.jpg
+    size: 1920x1080
+  - home: https://www.wallpaperflare.com/illustration-of-mountains-surrounded-by-trees-under-white-clouds-wallpaper-ggm/download
+    name: mountains-forest-artwork-firewatch-wallpaper-82f06d94b7ca2320baa2a4bd5d75257d.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/880/841/120/mountains-forest-artwork-firewatch-wallpaper-82f06d94b7ca2320baa2a4bd5d75257d.jpg
+    size: 3840x2153
+  - home: https://www.wallpaperflare.com/firewatch-video-game-art-minimalism-simple-wallpaper-yshyb/download
+    name: firewatch-video-game-art-minimalism-simple-hd-wallpaper-d97078cde1faad2bf6b7a8ffd061d6ed.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/854/770/552/firewatch-video-game-art-minimalism-simple-hd-wallpaper-d97078cde1faad2bf6b7a8ffd061d6ed.jpg
+    size: 1920x1080
+  - home: https://www.wallpaperflare.com/white-and-black-crew-neck-shirt-firewatch-mountain-beauty-in-nature-wallpaper-pciwm/download
+    name: firewatch-wallpaper-9b36ecbd83a12fb9d5a4cb495dbcfc60.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/123/290/322/firewatch-wallpaper-9b36ecbd83a12fb9d5a4cb495dbcfc60.jpg
+    size: 2560x1440
+  - home: https://www.wallpaperflare.com/silhouette-of-trees-firewatch-forest-landscape-in-game-minimalistic-wallpaper-patou/download
+    name: firewatch-forest-landscape-in-game-wallpaper-1846fd8840004c68303c61feb86264fa.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/442/341/147/firewatch-forest-landscape-in-game-wallpaper-1846fd8840004c68303c61feb86264fa.jpg
+    size: 3840x2160
+  - home: https://www.wallpaperflare.com/silhouette-of-watch-tower-firewatch-video-games-mountains-wallpaper-wps/download
+    name: firewatch-video-games-mountains-nature-wallpaper-98666c7a3f2c6799ee808992f2490b30.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/375/206/386/firewatch-video-games-mountains-nature-wallpaper-98666c7a3f2c6799ee808992f2490b30.jpg
+    size: 2560x1600
+  - home: https://www.wallpaperflare.com/mountains-and-trees-wallpaper-brown-mountains-during-golden-hour-wallpaper-hin/download
+    name: wubalubadubdub-mountains-gamer-rick-and-morty-wallpaper-7886dd9850b03c68d04c915ef812748a.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/643/54/374/wubalubadubdub-mountains-gamer-rick-and-morty-wallpaper-7886dd9850b03c68d04c915ef812748a.jpg
+    size: 3840x2160
+  - home: https://www.wallpaperflare.com/video-game-firewatch-wallpaper-cakxr/download
+    name: video-game-firewatch-wallpaper-39d0486d019add8ba647b8ff908156ed.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/473/920/855/video-game-firewatch-wallpaper-39d0486d019add8ba647b8ff908156ed.jpg
+    size: 1920x1080
+  - home: https://www.wallpaperflare.com/minimalism-sunset-firewatch-wallpaper-stxho/download
+    name: minimalism-sunset-firewatch-wallpaper-c826cd88a0a0dcd830ecd1ee2832745a.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/742/496/36/minimalism-sunset-firewatch-wallpaper-c826cd88a0a0dcd830ecd1ee2832745a.jpg
+    size: 3840x2160
+  - home: https://www.wallpaperflare.com/firewatch-pc-ps4-horror-best-games-quest-wallpaper-qsrba/download
+    name: firewatch-pc-ps4-horror-wallpaper-48963d089030acb8d0fc61ce68e274da.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/496/315/636/firewatch-pc-ps4-horror-wallpaper-48963d089030acb8d0fc61ce68e274da.jpg
+    size: 3840x2160
+  - home: https://www.wallpaperflare.com/sun-and-mountain-illustration-drawing-evening-trees-mountains-wallpaper-mki/download
+    name: drawing-evening-sun-trees-wallpaper-8990c87d719aad0bb677489fb061568d.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/666/593/241/drawing-evening-sun-trees-wallpaper-8990c87d719aad0bb677489fb061568d.jpg
+    size: 1920x1080
+  - home: https://www.wallpaperflare.com/gray-mountain-wallpaper-firewatch-mountains-forest-sky-landscape-wallpaper-txjb/download
+    name: firewatch-mountains-forest-sky-wallpaper-6970588d817a0d4b66e718ff0031c61d.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/906/926/360/firewatch-mountains-forest-sky-wallpaper-6970588d817a0d4b66e718ff0031c61d.jpg
+    size: 1920x1080
+  - home: https://www.wallpaperflare.com/firewatch-artwork-artist-digital-art-hd-4k-5k-8k-10k-wallpaper-pkdkq/download
+    name: firewatch-artwork-artist-digital-art-wallpaper-a73c3b0c90d9fdcb5a4f8a588087b20e.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/704/522/472/firewatch-artwork-artist-digital-art-wallpaper-a73c3b0c90d9fdcb5a4f8a588087b20e.jpg
+    size: 11490x7182
+  - home: https://www.wallpaperflare.com/tower-house-firewatch-video-games-night-forest-trees-stars-wallpaper-mask/download
+    name: firewatch-video-games-night-forest-wallpaper-645c24588de97229544384c9f911f25d.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/765/670/368/firewatch-video-games-night-forest-wallpaper-645c24588de97229544384c9f911f25d.jpg
+    size: 3000x1688
+  - home: https://www.wallpaperflare.com/firewatch-mountains-forest-waterfall-tower-moon-stars-wallpaper-ybiko/download
+    name: firewatch-mountains-forest-waterfall-tower-hd-wallpaper-68f6fd18c0e04c1860fc116e38d2d4ea.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/547/391/758/firewatch-mountains-forest-waterfall-tower-hd-wallpaper-68f6fd18c0e04c1860fc116e38d2d4ea.jpg
+    size: 3840x2160
+  - home: https://www.wallpaperflare.com/artwork-digital-art-nature-landscape-river-trees-firewatch-wallpaper-gjilf/download
+    name: artwork-digital-art-nature-landscape-river-hd-wallpaper-38a6cd6810f0ccb8905cb1ee48c2342a.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/454/908/885/artwork-digital-art-nature-landscape-river-hd-wallpaper-38a6cd6810f0ccb8905cb1ee48c2342a.jpg
+    size: 3840x2160
+  - home: https://www.wallpaperflare.com/vaporwave-version-of-the-classic-firewatch-tree-plant-nature-wallpaper-pzrvk/download
+    name: vaporwave-version-of-the-classic-firewatch-wallpaper-697068dd410a3d7bc637d87f00d166bd.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/792/690/491/vaporwave-version-of-the-classic-firewatch-wallpaper-697068dd410a3d7bc637d87f00d166bd.jpg
+    size: 1920x1080
+
+minimal:
+  - home: https://www.wallpaperflare.com/multicolored-water-digital-wallpaper-colorful-liquid-minimalism-wallpaper-pmuwp/download
+    name: water-colorful-liquid-minimalism-wallpaper-cf9cf2cf3d695588777d823444b360f0.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/601/605/316/water-colorful-liquid-minimalism-wallpaper-cf9cf2cf3d695588777d823444b360f0.jpg
+    size: 2880x1800
+  - home: https://www.wallpaperflare.com/uchiha-clan-logo-minimalism-naruto-anime-dark-uchiha-sasuke-wallpaper-ymobo/download
+    name: uchiha-clan-logo-minimalism-naruto-anime-dark-hd-wallpaper-e910a8ede15acdfbf6e7f86fe071c61d.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/843/565/163/uchiha-clan-logo-minimalism-naruto-anime-dark-hd-wallpaper-e910a8ede15acdfbf6e7f86fe071c61d.jpg
+    size: 1920x1080
+  - home: https://www.wallpaperflare.com/minimalism-artwork-space-space-art-astronaut-simple-background-wallpaper-gjecj/download
+    name: minimalism-artwork-space-space-art-astronaut-hd-wallpaper-1d2628addad1ccb6d8db72cd34d1aef6.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/304/872/930/minimalism-artwork-space-space-art-astronaut-hd-wallpaper-1d2628addad1ccb6d8db72cd34d1aef6.jpg
+    size: 2400x1200
+  - home: https://www.wallpaperflare.com/iron-man-digital-wallpaper-hero-superhero-minimalism-artwork-wallpaper-mgaq/download
+    name: iron-man-hero-superhero-minimalism-wallpaper-e622530dac5578dcdff4dd6daffe3701.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/242/213/294/iron-man-hero-superhero-minimalism-wallpaper-e622530dac5578dcdff4dd6daffe3701.jpg
+    size: 2550x1440
+  - home: https://www.wallpaperflare.com/minimalism-black-background-error-simple-background-not-available-wallpaper-grxal/download
+    name: minimalism-black-background-error-simple-background-not-available-hd-wallpaper-f9e0186d713abd8be667c85fd06116cd.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/173/114/541/minimalism-black-background-error-simple-background-not-available-hd-wallpaper-f9e0186d713abd8be667c85fd06116cd.jpg
+    size: 1920x1080
+  - home: https://www.wallpaperflare.com/green-semi-circle-on-black-background-illustration-minimalism-wallpaper-hzzy/download
+    name: minimalism-sunset-simple-background-wallpaper-bf8c923f9dc915f8b76d721474d3c050.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/877/791/778/minimalism-sunset-simple-background-wallpaper-bf8c923f9dc915f8b76d721474d3c050.jpg
+    size: 2880x1800
+  - home: https://www.wallpaperflare.com/red-yellow-orange-and-blue-butterfly-digital-wallpaper-digital-art-wallpaper-hnyhj/download
+    name: digital-art-simple-background-minimalism-butterfly-wallpaper-298048adf1ba0d2b2697380f2051f67d.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/223/681/271/digital-art-simple-background-minimalism-butterfly-wallpaper-298048adf1ba0d2b2697380f2051f67d.jpg
+    size: 1920x1080
+  - home: https://www.wallpaperflare.com/digital-digital-art-artwork-illustration-simple-simple-background-wallpaper-gjblq/download
+    name: digital-digital-art-artwork-illustration-simple-hd-wallpaper-eb96fc8d83e11f1945d44bc9bddc9c30.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/269/848/994/digital-digital-art-artwork-illustration-simple-hd-wallpaper-eb96fc8d83e11f1945d44bc9bddc9c30.jpg
+    size: 2560x1440
+  - home: https://www.wallpaperflare.com/low-battery-illustration-simple-black-minimalism-coffee-black-background-wallpaper-pcysb/download
+    name: simple-black-minimalism-battery-wallpaper-d9c0b86d416a6ddbd6c708afc091563d.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/914/641/75/simple-black-minimalism-battery-wallpaper-d9c0b86d416a6ddbd6c708afc091563d.jpg
+    size: 1920x1080
+  - home: https://www.wallpaperflare.com/abstract-nature-dark-red-black-minimalism-minimal-art-wallpaper-oiqu/download
+    name: abstract-nature-dark-red-wallpaper-b856edc8a080bc7890dc31bef8a2547a.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/404/36/975/abstract-nature-dark-red-wallpaper-b856edc8a080bc7890dc31bef8a2547a.jpg
+    size: 3840x2160
+  - home: https://www.wallpaperflare.com/studio-ghibli-kiki-s-delivery-service-minimalism-anime-wallpaper-cubjp/download
+    name: studio-ghibli-kiki-s-delivery-service-minimalism-anime-wallpaper-e394268643c1a006c10153b1cd70f9f8.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/718/11/809/studio-ghibli-kiki-s-delivery-service-minimalism-anime-wallpaper-e394268643c1a006c10153b1cd70f9f8.jpg
+    size: 1440x900
+  - home: https://www.wallpaperflare.com/silhouette-of-mountain-simple-simple-background-minimalism-wallpaper-phxwd/download
+    name: simple-simple-background-minimalism-black-background-wallpaper-f8967d3850106c9810dce14e7892047a.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/658/800/994/simple-simple-background-minimalism-black-background-wallpaper-f8967d3850106c9810dce14e7892047a.jpg
+    size: 3840x2160
+  - home: https://www.wallpaperflare.com/yellow-sunflower-with-black-background-flowers-yellow-flowers-wallpaper-pqrgq/download
+    name: flowers-yellow-flowers-black-background-digital-art-wallpaper-c2517280dde6be5bea48f22510e879c2.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/444/479/808/flowers-yellow-flowers-black-background-digital-art-wallpaper-c2517280dde6be5bea48f22510e879c2.jpg
+    size: 1920x1200
+
+fantasy:
+  - home: https://www.wallpaperflare.com/digital-digital-art-artwork-fantasy-art-drawing-painting-wallpaper-gjwkg/download
+    name: digital-digital-art-artwork-fantasy-art-drawing-hd-wallpaper-d8562dc820d0acd8506c415eb8e2a49a.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/175/524/956/digital-digital-art-artwork-fantasy-art-drawing-hd-wallpaper-d8562dc820d0acd8506c415eb8e2a49a.jpg
+    size: 3840x2160
+  - home: https://www.wallpaperflare.com/digital-digital-art-artwork-fantasy-art-drawing-painting-wallpaper-gjwku/download
+    name: digital-digital-art-artwork-fantasy-art-drawing-hd-wallpaper-d8b62d28c0f06c48d03c114ec8f2b4aa.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/108/140/869/digital-digital-art-artwork-fantasy-art-drawing-hd-wallpaper-d8b62d28c0f06c48d03c114ec8f2b4aa.jpg
+    size: 3840x2160
+  - home: https://www.wallpaperflare.com/digital-digital-art-artwork-illustration-drawing-digital-painting-wallpaper-gjrrx/download
+    name: digital-digital-art-artwork-illustration-drawing-hd-wallpaper-98166df8f0901cc8c09ce13e08c2c4ca.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/184/515/626/digital-digital-art-artwork-illustration-drawing-hd-wallpaper-98166df8f0901cc8c09ce13e08c2c4ca.jpg
+    size: 3840x2160
+  - home: https://www.wallpaperflare.com/fantasy-themed-rain-forest-wallpaper-digital-art-artwork-jungle-wallpaper-ppoxq/download
+    name: digital-art-artwork-jungle-landscape-wallpaper-2eb9af262f058259523cd58c1267ace5.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/503/737/250/digital-art-artwork-jungle-landscape-wallpaper-2eb9af262f058259523cd58c1267ace5.jpg
+    size: 1920x900
+  - home: https://www.wallpaperflare.com/stars-fantasy-city-art-starry-neon-art-reflection-digital-art-wallpaper-cvffx/download
+    name: stars-fantasy-city-art-starry-wallpaper-692048ed811a5d4ba627281f3041163d.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/559/103/755/stars-fantasy-city-art-starry-wallpaper-692048ed811a5d4ba627281f3041163d.jpg
+    size: 1920x1080
+  - home: https://www.wallpaperflare.com/gameplay-screenshot-chains-landscape-tera-online-digital-art-wallpaper-ed/download
+    name: chains-landscape-tera-online-digital-art-wallpaper-89a0e85d711a1d4b467748af6031261d.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/325/997/284/chains-landscape-tera-online-digital-art-wallpaper-89a0e85d711a1d4b467748af6031261d.jpg
+    size: 1920x1080
+  - home: https://www.wallpaperflare.com/digital-digital-art-artwork-painting-drawing-digital-painting-wallpaper-gjwdn/download
+    name: digital-digital-art-artwork-painting-drawing-hd-wallpaper-f4f3c52c24b9b5c33430781cded1b351.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/943/826/490/digital-digital-art-artwork-painting-drawing-hd-wallpaper-f4f3c52c24b9b5c33430781cded1b351.jpg
+    size: 3840x2786
+  - home: https://www.wallpaperflare.com/black-and-red-trees-sun-rays-through-red-trees-dark-nature-wallpaper-p/download
+    name: dark-red-nature-forest-wallpaper-19b0e88d91ba7d9b9617a8ff6041964d.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/124/803/738/dark-red-nature-forest-wallpaper-19b0e88d91ba7d9b9617a8ff6041964d.jpg
+    size: 1920x1080
+  - home: https://www.wallpaperflare.com/silhouette-of-man-and-woman-fantasy-art-couple-sun-sunset-wallpaper-maqer/download
+    name: fantasy-art-couple-sun-sunset-wallpaper-0910d8ad615a6d0b9627986f1041867d.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/401/125/293/fantasy-art-couple-sun-sunset-wallpaper-0910d8ad615a6d0b9627986f1041867d.jpg
+    size: 1920x1080
+  - home: https://www.wallpaperflare.com/snow-mountain-artwork-fantasy-art-mountains-galaxy-men-concept-art-wallpaper-ppqid/download
+    name: artwork-fantasy-art-mountains-galaxy-wallpaper-d9e0085d61faaddbf667780f30e1163d.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/884/751/661/artwork-fantasy-art-mountains-galaxy-wallpaper-d9e0085d61faaddbf667780f30e1163d.jpg
+    size: 1920x1080
+  - home: https://www.wallpaperflare.com/digital-digital-art-artwork-fantasy-art-landscape-lights-wallpaper-udzdk/download
+    name: digital-digital-art-artwork-fantasy-art-landscape-hd-wallpaper-59b0e86dd1fa3dcb86e718bf70c136ad.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/591/220/869/digital-digital-art-artwork-fantasy-art-landscape-hd-wallpaper-59b0e86dd1fa3dcb86e718bf70c136ad.jpg
+    size: 1920x1080
+  - home: https://www.wallpaperflare.com/body-of-water-near-mountain-and-trees-painting-landscape-photo-of-lake-between-mountain-and-trees-painting-wallpaper-oe/download
+    name: landscape-lake-mountains-waterfall-wallpaper-64b5cee86ab85df83fc784652875ec59.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/890/877/129/landscape-lake-mountains-waterfall-wallpaper-64b5cee86ab85df83fc784652875ec59.jpg
+    size: 2200x1295
+  - home: https://www.wallpaperflare.com/night-cyberpunk-futuristic-city-artwork-digital-art-concept-art-wallpaper-pvrwe/download
+    name: night-cyberpunk-futuristic-city-artwork-wallpaper-e8a6cd881070ccf860eca1de3882e43a.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/410/1014/448/night-cyberpunk-futuristic-city-artwork-wallpaper-e8a6cd881070ccf860eca1de3882e43a.jpg
+    size: 3840x2160
+  - home: https://www.wallpaperflare.com/planet-digital-wallpaper-artwork-fantasy-art-concept-art-sky-wallpaper-pmbaa/download
+    name: artwork-fantasy-art-concept-art-sky-wallpaper-0910686d216a4dcbd6b7583f106186dd.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/529/596/1018/artwork-fantasy-art-concept-art-sky-wallpaper-0910686d216a4dcbd6b7583f106186dd.jpg
+    size: 1920x1080
+  - home: https://www.wallpaperflare.com/digital-digital-art-artwork-fantasy-art-drawing-painting-wallpaper-gjwkg/download
+    name: digital-digital-art-artwork-fantasy-art-drawing-hd-wallpaper-d8562dc820d0acd8506c415eb8e2a49a.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/175/524/956/digital-digital-art-artwork-fantasy-art-drawing-hd-wallpaper-d8562dc820d0acd8506c415eb8e2a49a.jpg
+    size: 3840x2160
+  - home: https://www.wallpaperflare.com/space-art-fantasy-art-sky-clouds-moonlight-universe-planet-wallpaper-tjqma/download
+    name: space-art-fantasy-art-sky-clouds-wallpaper-68165d18b0a06ca8208cc1fec83254ba.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/694/865/147/space-art-fantasy-art-sky-clouds-wallpaper-68165d18b0a06ca8208cc1fec83254ba.jpg
+    size: 3840x2160
+  - home: https://www.wallpaperflare.com/blue-and-purple-cosmic-star-wallpaper-man-and-dog-standing-on-top-of-planet-painting-wallpaper-hvw/download
+    name: fantasy-art-artwork-fan-art-science-fiction-wallpaper-a876bda8c0a03c38609c515e38f2347a.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/556/382/458/fantasy-art-artwork-fan-art-science-fiction-wallpaper-a876bda8c0a03c38609c515e38f2347a.jpg
+    size: 3840x2160
+  - home: https://www.wallpaperflare.com/mountain-and-waterfall-illustration-digital-art-fantasy-art-wallpaper-wbl/download
+    name: digital-art-fantasy-art-colorful-space-art-wallpaper-99330d2ae61a6c661d5ea4793fc17511.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/13/960/9/digital-art-fantasy-art-colorful-space-art-wallpaper-99330d2ae61a6c661d5ea4793fc17511.jpg
+    size: 2255x1080
+  - home: https://www.wallpaperflare.com/art-computer-digital-art-concept-art-mage-wizard-fantasy-art-wallpaper-cvfsv/download
+    name: art-computer-digital-art-concept-art-wallpaper-b9a0c85d016a9d0b66a7b84f509116ad.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/428/434/322/art-computer-digital-art-concept-art-wallpaper-b9a0c85d016a9d0b66a7b84f509116ad.jpg
+    size: 1920x1080
+  - home: https://www.wallpaperflare.com/futuristic-digital-wallpaper-digital-art-landscape-city-glowing-wallpaper-jbf/download
+    name: digital-art-landscape-city-glowing-wallpaper-835c3f55d99350d70ca46b22a4062bdf.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/195/688/973/digital-art-landscape-city-glowing-wallpaper-835c3f55d99350d70ca46b22a4062bdf.jpg
+    size: 4200x2400
+  - home: https://www.wallpaperflare.com/digital-art-artwork-fantasy-art-planet-sun-sunlight-nature-wallpaper-ysygf/download
+    name: digital-art-artwork-fantasy-art-planet-sun-hd-wallpaper-d866fd38b0b06cd800cc016ed8d284fa.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/535/845/69/digital-art-artwork-fantasy-art-planet-sun-hd-wallpaper-d866fd38b0b06cd800cc016ed8d284fa.jpg
+    size: 3840x2160
+
+cyberpunk:
+  - home: https://www.wallpaperflare.com/cyberpunk-purple-fantasy-art-city-fantasy-city-concept-art-wallpaper-cvfaq/download
+    name: cyberpunk-purple-fantasy-art-city-wallpaper-d910c8adf17a7dfbb617389f0091b69d.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/344/34/342/cyberpunk-purple-fantasy-art-city-wallpaper-d910c8adf17a7dfbb617389f0091b69d.jpg
+    size: 1920x1080
+  - home: https://www.wallpaperflare.com/black-signages-city-roads-with-lightings-and-cars-night-artwork-wallpaper-tgy/download
+    name: night-artwork-futuristic-city-cyberpunk-wallpaper-c8867df8e0a0ece8f06c31aef872443a.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/843/56/876/night-artwork-futuristic-city-cyberpunk-wallpaper-c8867df8e0a0ece8f06c31aef872443a.jpg
+    size: 3840x2160
+  - home: https://www.wallpaperflare.com/man-beside-car-digital-wallpaper-digital-art-futuristic-city-wallpaper-pcywk/download
+    name: digital-art-futuristic-city-car-artwork-wallpaper-90d095b99fd6ced3f8bfa7a6bba654b8.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/990/547/605/digital-art-futuristic-city-car-artwork-wallpaper-90d095b99fd6ced3f8bfa7a6bba654b8.jpg
+    size: 3840x2400
+  - home: https://www.wallpaperflare.com/white-vehicle-night-artwork-futuristic-city-cyberpunk-science-fiction-wallpaper-wpo/download
+    name: night-artwork-futuristic-city-cyberpunk-wallpaper-d8068de8d0006ce8201cc1ce98f2840a.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/910/24/10/night-artwork-futuristic-city-cyberpunk-wallpaper-d8068de8d0006ce8201cc1ce98f2840a.jpg
+    size: 3840x2160
+  - home: https://www.wallpaperflare.com/digital-digital-art-artwork-city-lights-street-car-vehicle-wallpaper-udzdl/download
+    name: digital-digital-art-artwork-city-lights-hd-wallpaper-7886ed48d0c0fc88f0ec11aec8b2a4da.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/632/790/513/digital-digital-art-artwork-city-lights-hd-wallpaper-7886ed48d0c0fc88f0ec11aec8b2a4da.jpg
+    size: 3840x2160
+  - home: https://www.wallpaperflare.com/cyber-science-fiction-digital-art-concept-art-cyberpunk-wallpaper-udydv/download
+    name: cyber-science-fiction-digital-art-concept-art-cyberpunk-hd-wallpaper-38361d08b060bcc8c07c110e281274aa.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/554/29/143/cyber-science-fiction-digital-art-concept-art-cyberpunk-hd-wallpaper-38361d08b060bcc8c07c110e281274aa.jpg
+    size: 3840x2160
+  - home: https://www.wallpaperflare.com/silhouette-of-person-standing-near-buildings-digital-wallpaper-wallpaper-tqz/download
+    name: digital-art-illustration-artwork-cityscape-wallpaper-b64fb76dbd4f1919433e8a91600da41b.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/364/318/503/digital-art-illustration-artwork-cityscape-wallpaper-b64fb76dbd4f1919433e8a91600da41b.jpg
+    size: 1920x960
+  - home: https://www.wallpaperflare.com/digital-digital-art-artwork-illustration-drawing-digital-painting-wallpaper-gjkgf/download
+    name: digital-digital-art-artwork-illustration-drawing-hd-wallpaper-a8c69dc850107c58a0dc21ae2822044a.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/266/749/195/digital-digital-art-artwork-illustration-drawing-hd-wallpaper-a8c69dc850107c58a0dc21ae2822044a.jpg
+    size: 3840x2160
+  - home: https://www.wallpaperflare.com/digital-wallpaper-of-city-street-city-view-during-nighttime-wallpaper-mfr/download
+    name: night-artwork-futuristic-city-cyberpunk-wallpaper-58b68d0810f06c28d05c31fed832144a.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/455/360/900/night-artwork-futuristic-city-cyberpunk-wallpaper-58b68d0810f06c28d05c31fed832144a.jpg
+    size: 3840x2160
+  - home: https://www.wallpaperflare.com/street-art-artwork-digital-art-futuristic-city-darkness-wallpaper-cvfkb/download
+    name: street-art-artwork-digital-art-wallpaper-a8a6cd18e050ecb810fcc1ae5862a4fa.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/944/948/10/street-art-artwork-digital-art-wallpaper-a8a6cd18e050ecb810fcc1ae5862a4fa.jpg
+    size: 3840x2160
+  - home: https://www.wallpaperflare.com/night-cyberpunk-futuristic-city-artwork-digital-art-concept-art-wallpaper-pvrwe/download
+    name: night-cyberpunk-futuristic-city-artwork-wallpaper-e8a6cd881070ccf860eca1de3882e43a.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/410/1014/448/night-cyberpunk-futuristic-city-artwork-wallpaper-e8a6cd881070ccf860eca1de3882e43a.jpg
+    size: 3840x2160
+  - home: https://www.wallpaperflare.com/cityscape-landscape-lights-city-lights-cyber-science-fiction-wallpaper-udowm/download
+    name: cityscape-landscape-city-lights-city-lights-hd-wallpaper-08e6fdb840802c18d0acd17e58d244fa.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/962/717/218/cityscape-landscape-city-lights-city-lights-hd-wallpaper-08e6fdb840802c18d0acd17e58d244fa.jpg
+    size: 3840x2160
+  - home: https://www.wallpaperflare.com/black-muscle-car-black-dodge-challenger-near-neon-gas-gas-station-wallpaper-phymj/download
+    name: car-purple-retrowave-landscape-wallpaper-2980284df1aabdebf60788cfd041866d.jpg
+    link: https://r4.wallpaperflare.com/wallpaper/663/420/862/car-purple-retrowave-landscape-wallpaper-2980284df1aabdebf60788cfd041866d.jpg
+    size: 1920x1080

@@ -71,8 +71,8 @@ needed_folders=(
 
 function post_install {
   [ -e "${HOME}/.geoinfo" ] || {
-    [ -z "${USER_GEOINFO}" ] && log w "No geographic info given, leaving empty"
-    echo "${USER_GEOINFO}" > "${HOME}/.geoinfo"
+    [ -z "${INSTALL_USER_GEOINFO}" ] && log w "No geographic info given, leaving empty"
+    echo "${INSTALL_USER_GEOINFO}" > "${HOME}/.geoinfo"
   }
 
   command -v hyperlock &>/dev/null && {

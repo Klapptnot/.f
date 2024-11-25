@@ -6,6 +6,8 @@
 if [[ "${BASH_SOURCE[0]}" != "${0}" ]]; then
   if ((BASH_VERSINFO[0] < 5)); then
     printf '%s\n' "For bash 4 or less, clone the repo and run the script normally"
+    printf '$ git clone --depth=1 https://github.com/Klapptnot/dotf.git "%s/repos/dotf"' "${HOME}"
+    printf '$ %s\n' "cd ${HOME}/repos/dotf" "bash ./dotf dotf install"
     exit 1
   fi
   if [ -d "${HOME}/dotf" ]; then
@@ -39,6 +41,9 @@ source ./.config/bash/lib/logger.sh || exit
 source ./.config/bash/lib/spinner.sh || exit
 
 function main {
+  read -r _ extglob_s < <(shopt extglob)
+  [ "${extglob_s}" == 'off' ] && shopt -s extglob
+
   MEPATH="$(realpath "${0}")"
   MELOC="$(dirname "${MEPATH}")"
   MENAME="$(basename "${MEPATH}")"
@@ -47,21 +52,33 @@ function main {
 
   barg.parse "${@}" << BARG || {
   #[progname="DOTF", subcmdr='true']
-  #[subcmds="install uninstall help config version"]
+  #[subcmds="install uninstall help backgrounds config version"]
+  #[extras='EXTRA_PARAMS']
   @install {
     h/help => "help"
     r/reset => "reset"
     u/update => "update"
   } |> "normal" => INSTALL_MODE
-  @install g/geoinf[str] => USER_GEOINFO
-  @install I/no-pkgs[bool] => NO_INSTALL_PKGS
+  @install g/geoinf[str] => INSTALL_USER_GEOINFO
+  @install n/no-pkgs[bool] => INSTALL_NO_PKGS
+
+  ! @backgrounds {
+    h/help => "help"
+    l/list => "list"
+    g/get => "download"
+    r/remove => "remove"
+  } |> "list" => BGM_MODE
+  @backgrounds i/index[str] |> "${HOME}/.config/dotf/backgrounds.yaml" => BGM_INDEX_FILE
+  @backgrounds d/bgmdir[str] |> "${HOME}/.local/share/backgrounds" => BGM_MAIN_FOLDER
+  @backgrounds a/all[bool] => BGM_ALL_GROUPS
+
   f/force[bool] => FORCE_OPERATION
 BARG
     printf '%s\n' "See help, run \`${MENAME} help\`"
     exit 1
   }
 
-  ${FORCE_OPERATION} && log i "Any operation can be forced"
+  ${FORCE_OPERATION} && log w "Any operation can be forced"
 
   ignore=()
   pacman_pkgs=()
@@ -82,9 +99,9 @@ BARG
           exit
         fi
       fi
-      do_install
+      set_up_dotf
       ;;
-    uninstall) do_uninstall ;;
+    uninstall) remove_dotf ;;
     config)
       if ! command -v nvim &> /dev/null; then
         log e "Neovim not installed or not in PATH"
@@ -92,7 +109,8 @@ BARG
       fi
       nvim "${MELOC}/.iconf.sh"
       ;;
-    help) do_help ;;
+    help) print_help_info "${EXTRA_PARAMS[@]}" ;;
+    backgrounds) backgrounds_manager ;;
     version)
       spinner.start "Gathering info from remote repo" &
       SPINNER_PID="${!}"
@@ -109,45 +127,75 @@ BARG
       fi
       ;;
   esac
+  [ "${extglob_s}" == 'off' ] && shopt -u extglob
+  return 0
 }
 
-function do_help {
+function print_help_info {
   local help=(
-    '{f87}dotf{r} - A simple script to manage dotfiles\n\n'
-    '\x1b[4mUsage:\x1b[24m\n'
-    '  {f84}dotf{r} <{f219}subcommand{r}> [{f96}options{r}]\n\n'
-    '  install [{f96}options{r}]  - Install all dotfiles\n'
-    '  uninstall          - Uninstall all dotfiles\n'
-    '  config             - Open the configuration file (neovim)\n'
-    '  help               - Show this message and exit\n'
-    '  version            - Show version, check updates and exit\n\n'
-    '\x1b[4mNotes:\x1b[24m\n'
-    'The script will detect the installed applications and configure them accordingly.\n'
-    'You can customize the installation process by editing the config file.\n\n'
-    '\x1b[4mSupported shells:\x1b[24m\n'
+    '{f12}dotf{r}: Setup manager, simple\n\n'
+    '{f12}Usage{r}:\n'
+    '  {f14}dotf{r} <{f2}subcommand{r}> [{f248}options{r}]\n\n'
+    '  install     [{f248}options{r}]  Set up dotf for this user\n'
+    '  backgrounds [{f248}options{r}]  Manage backgrounds\n'
+    '  uninstall              Remove dotf setup\n'
+    '  config                 Open the configuration file (neovim)\n'
+    '  help                   Show this message and exit\n'
+    '  version                Show version, check updates and exit\n\n'
+    '{f12}Notes{r}:\n'
+    '  The script will detect the installed applications and configure them accordingly.\n'
+    '  You can customize the installation process by editing the config file.\n\n'
+    '{f12}Supported shells{r}:\n'
     '  bash, nushell, fish, zsh\n'
-    '\x1b[4mSupported DEs:\x1b[24m\n'
-    '  Hyprland\n'
+    '{f12}Supported DEs{r}:\n'
+    '  Hyprland\n\n'
+    'By {f99}Klapptnot{r} {f117}https://github.com/Klapptnot{r}'
   )
   local help_install=(
-    '\x1b[4mUsage:\x1b[24m\n'
-    '  {f84}dotf{r} {f219}install{r} [{f96}options{r}]\n\n'
-    '  install [{f96}options{r}]  - Install all dotfiles\n'
-    '    -h, --help              Show this message and exit\n'
-    '    -r, --reset             Reset the dotfiles installation\n'
-    '    -u, --update            Update the dotfiles\n'
-    '    -g, --geoinf <loc>      Your city and country name, for weather info\n'
-    '    -I, --no-pkgs           Skip packages installation process\n\n'
-    '\x1b[4mNotes:\x1b[24m\n'
-    'Run `''dotf install -I` to update linked files after manual package additions.\n'
-    'Use `''-f` to force linking, replacing existing files with links in the config path.'
+    '{f12}dotf{r} {f2}install{r}: Set up dotf for this user\n\n'
+    '{f12}Usage{r}:\n'
+    '  {f14}dotf{r} {f2}install{r} [{f248}options{r}]\n\n'
+    '{f12}Options{r}:\n'
+    '  -h, --help              Show this message and exit\n'
+    '  -r, --reset             Reset the dotfiles installation\n'
+    '  -u, --update            Update the dotfiles\n'
+    '  -n, --no-pkgs           Skip packages installation process\n'
+    '  -g, --geoinf \x1b[38;5;15m<str>\x1b[0m      Your city and country name, for weather info\n\n'
+    '{f12}Notes{r}:\n'
+    '  Run `''dotf install -n` to update linked files after manual package additions.\n'
+    '  Use `''-f` to force linking, replacing existing files with links in the config path.'
+  )
+  local help_backgrounds=(
+    '{f12}dotf{r} {f2}backgrounds{r}: Manage backgrounds\n\n'
+    '{f12}Usage{r}:\n'
+    '  {f14}dotf{r} {f2}backgrounds{r} [{f248}options{r}]\n\n'
+    '{f12}Options{r}:\n'
+    '  -h, --help              Show this message and exit\n'
+    '  -l, --list              List groups available\n'
+    '  -r, --remove            Remove the downloaded backgrounds group\n'
+    '  -g, --get               Download the backgrounds group\n'
+    '  -i, --index \x1b[38;5;15m<path>\x1b[0m      Use a different backgrounds index\n'
+    '  -d, --bgmdir \x1b[38;5;15m<path>\x1b[0m     Where to save or manage backgrounds\n\n'
+    '{f12}Notes{r}:\n'
+    '  Backgrounds are saved under: {f87}~/.local/share/backgrounds{r} folder by default.\n'
+    '  Use `''-f` to force redownloading existing files, overwriting them.'
   )
 
-  if [ "${1}" == "install" ]; then
-    printfc "${help_install[*]}"
-  else
-    printfc "${help[*]}"
-  fi
+  case "${1}" in
+    install)
+      IFS= help_message="${help_install[*]}"
+      printfc "${help_message}"
+      ;;
+    backgrounds)
+      IFS= help_message="${help_backgrounds[*]}"
+      printfc "${help_message}"
+      ;;
+    *)
+      [ -n "${1}" ] && log e 'Unknown subcommand: %s' "${1}"
+      IFS= help_message="${help[*]}"
+      printfc "${help_message}"
+      ;;
+  esac
   exit
 }
 
@@ -205,9 +253,131 @@ function do_symlink_tree {
   done
 }
 
-function do_install {
+function backgrounds_manager {
+  if [ "${BGM_MODE}" == "help" ]; then
+    print_help_info backgrounds
+  fi
+
+  if ! command -v yq &> /dev/null; then
+    log e 'Command `''yq` is required, install it first'
+    return 1
+  fi
+
+  if [ ! -e "${BGM_MAIN_FOLDER}" ] || [ ! -d "${BGM_MAIN_FOLDER}" ]; then
+    log e 'Main folder does not exist or is inaccessible'
+    return 1
+  fi
+
+  if [ ! -e "${BGM_INDEX_FILE}" ] || [ ! -f "${BGM_INDEX_FILE}" ]; then
+    log e 'Index file does not exist or is inaccessible'
+    return 1
+  fi
+
+  if ! ${BGM_ALL_GROUPS} && ((EXTRA_PARAMS_COUNT < 1)); then
+    log e 'Pass group names as arguments, or pass the `''--all` flag'
+    return 1
+  fi
+
+  mapfile -t __groups < <(yq -rM .__groups[] "${BGM_INDEX_FILE}")
+
+  if ! ${BGM_ALL_GROUPS}; then
+    for ((i = 0; i < EXTRA_PARAMS_COUNT; i++)); do
+      if ! item_is_in_arr "${EXTRA_PARAMS[i]}" "${__groups[@]}"; then
+        log e 'The group "%s" does not exist' "${EXTRA_PARAMS[i]}"
+      fi
+    done
+  fi
+
+  case "${BGM_MODE}" in
+    list)
+      for grp in "${__groups[@]}"; do
+        if ! ${BGM_ALL_GROUPS} && ! item_is_in_arr "${grp}" "${EXTRA_PARAMS[@]}"; then
+          continue
+        fi
+        mapfile -t it_home < <(yq -rM ".${grp}[] | .home" "${BGM_INDEX_FILE}")
+        mapfile -t it_name < <(yq -rM ".${grp}[] | .name" "${BGM_INDEX_FILE}")
+        mapfile -t it_size < <(yq -rM ".${grp}[] | .size" "${BGM_INDEX_FILE}")
+        local item_count="${#it_home[@]}"
+        ((EXTRA_PARAMS_COUNT > 1)) && log i 'Group: %s\n' "${grp}"
+        for ((i = 0; i < item_count; i++)); do
+          log i 'Save name: %s\nHome page: %s\nSize (px): %s\n' "${it_name[i]}" "${it_home[i]}" "${it_size[i]}"
+        done
+      done
+      ;;
+    download)
+      declare -A gtotl=()
+      for grp in "${__groups[@]}"; do
+        if ! ${BGM_ALL_GROUPS} && ! item_is_in_arr "${grp}" "${EXTRA_PARAMS[@]}"; then
+          continue
+        fi
+        mapfile -t it_name < <(yq -rM ".${grp}[] | .name" "${BGM_INDEX_FILE}")
+        mapfile -t it_link < <(yq -rM ".${grp}[] | .link" "${BGM_INDEX_FILE}")
+        local item_count="${#it_link[@]}"
+        local spin_count="${item_count}"
+        local skipped=0
+        gtotl["${grp}"]=0
+
+        for ((i = 0; i < item_count; i++)); do
+          spinner.start "Downloading $((i - skipped))/${spin_count} files..." &
+          SPINNER_PID=${!}
+          if [ -e "${BGM_MAIN_FOLDER}/${it_name[i]}" ]; then
+            if ! ${FORCE_OPERATION}; then
+              log d 'File found, skipping %s' "${it_name[i]}"
+              ((spin_count--))
+              ((skipped++))
+              ((spin_count = item_count - skipped))
+              spinner.stop "${SPINNER_PID}"
+              continue
+            fi
+            log i 'File found, removing %s' "${it_name[i]}"
+            rm "${BGM_MAIN_FOLDER:?}/${it_name[i]}" || continue
+          fi
+          log d 'Downloading %s...' "${it_name[i]}"
+          if wget -P "${BGM_MAIN_FOLDER}" "${it_link[i]}" &> /dev/null; then
+            gtotl["${grp}"]=$((${gtotl["${grp}"]} + 1))
+            log d 'Downloaded successfully %s' "${it_name[i]}"
+          else
+            log e 'Failed to download %s' "${it_name[i]}"
+          fi
+          spinner.stop "${SPINNER_PID}"
+        done
+        gtotl["${grp}"]="${gtotl["${grp}"]}/$((item_count - skipped))"
+      done
+
+      printf '\n\n'
+      for grp in "${!gtotl[@]}"; do
+        log i 'Group %s: %s downloaded' "${grp}" "${gtotl["${grp}"]}"
+      done
+      ;;
+    remove)
+      local total_rmed=0
+      for grp in "${__groups[@]}"; do
+        if ! ${BGM_ALL_GROUPS} && ! item_is_in_arr "${grp}" "${EXTRA_PARAMS[@]}"; then
+          continue
+        fi
+        mapfile -t it_name < <(yq -rM ".${grp}[] | .name" "${BGM_INDEX_FILE}")
+        local item_count="${#it_name[@]}"
+
+        for ((i = 0; i < item_count; i++)); do
+          if [ -e "${BGM_MAIN_FOLDER}/${it_name[i]}" ]; then
+            log d 'Removing %s' "${it_name[i]}"
+            rm "${BGM_MAIN_FOLDER:?}/${it_name[i]}" || continue
+            ((total_rmed++))
+          fi
+        done
+      done
+      log i "Removed %d files" "${total_rmed}"
+      ;;
+    help)
+      print_help_info backgrounds
+      ;;
+  esac
+  return
+}
+
+function set_up_dotf {
   if [ "${INSTALL_MODE}" == "help" ]; then
-    do_help install
+    print_help_info install
   fi
 
   if [ "${INSTALL_MODE}" == "update" ]; then
@@ -231,9 +401,9 @@ function do_install {
     return
   fi
 
-  ${NO_INSTALL_PKGS} && log i "User rejected packages installation"
+  ${INSTALL_NO_PKGS} && log i "User rejected packages installation"
 
-  if ! ${NO_INSTALL_PKGS} && [ -z "${TERMUX_APP__PACKAGE_NAME@A}" ]; then
+  if ! ${INSTALL_NO_PKGS} && [ -z "${TERMUX_APP__PACKAGE_NAME@A}" ]; then
     log i "Installing packages with pacman"
     # Install packages
     sudo pacman -Syy --noconfirm --needed "${pacman_pkgs[@]}"
@@ -296,7 +466,7 @@ function do_install {
   log i "Installation process finished"
 }
 
-function do_uninstall {
+function remove_dotf {
   # Unlink files linked to this folder and remove
   # folders that are left empty after unlink process
 
@@ -346,6 +516,13 @@ function do_uninstall {
   fi
 
   log i "Uninstallation process finished"
+}
+
+function item_is_in_arr {
+  # This works with shopt -s extglob
+  local arr=("${@:2}")
+  printf -v t '%s' "${arr[@]/#!("${1}")/}"
+  test "${#t}" -gt 0
 }
 
 # shellcheck disable=SC2155

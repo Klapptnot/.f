@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/bash
 
 # Usage:
 #   str.json_unescape <<< 'A string\n\tThat will be \"unescaped\"'

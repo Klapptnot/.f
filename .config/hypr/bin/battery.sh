@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/bash
 
 function main {
   local format_it='\{\{([a-z_]+)\}\}'

@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/bash
 
 # |>----|>----|>----|><-><|----<|----<|----<|
 # |>    from Klapptnot's Hyprland setup    <|

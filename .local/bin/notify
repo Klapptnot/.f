@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/bash
 # shellcheck disable=SC1090
 
 source ~/.config/bash/lib/barg.sh

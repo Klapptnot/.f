@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/bash
 
 function main {
   if [[ "${1}" =~ ^-f|--full|full$ ]]; then

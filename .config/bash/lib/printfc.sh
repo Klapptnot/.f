@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/bash
 
 # printf wrapper for colors support
 # DOES NOT SUPPORT printf FLAGS

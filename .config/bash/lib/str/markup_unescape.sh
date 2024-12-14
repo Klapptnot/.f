@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/bash
 
 # Usage:
 #   str.markup_unescape <<< 'escape &amp; &quot;quote&quot;&#63;' # escape & "quote"?

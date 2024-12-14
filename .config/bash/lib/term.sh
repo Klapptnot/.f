@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/bash
 
 function term.color.from_hex {
   read -r s < /dev/stdin

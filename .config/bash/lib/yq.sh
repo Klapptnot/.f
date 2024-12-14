@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/bash
 
 # $ yq.sh <yaml_value_path> [file]
 # $ command | yq.sh <yaml_value_path>

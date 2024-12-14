@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/bash
 
 # Usage:
 #  str.json_escape <<< $'A string\n\tThat will be "escaped"'

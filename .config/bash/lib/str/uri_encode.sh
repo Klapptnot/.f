@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/bash
 
 # Usage:
 #   str.uri_encode <<< "I 💜 bash" # I%20%F0%9F%92%9C%20bash

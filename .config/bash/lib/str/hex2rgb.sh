@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/bash
 
 # Usage:
 #   str.hex2rgb <<< "#784dFF" # rgb(120,77,255)

@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/bash
 
 # Usage:
 #  str.markup_escape_all <<< "escape" # &#101;&#115;&#99;&#97;&#112;&#101;

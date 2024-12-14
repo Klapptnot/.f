@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/bash
 
 # Display a nice functional progress bar
 # Usage: rsum [options]

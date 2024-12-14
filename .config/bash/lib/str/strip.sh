@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/bash
 
 # Strip leading or trailing [:space:] from stdin input
 # Usage:

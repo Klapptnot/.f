@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/bash
 
 # shellcheck disable=SC2120
 function __mirkop_get_short_pwd {

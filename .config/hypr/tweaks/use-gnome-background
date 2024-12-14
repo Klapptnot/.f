@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+
+function main {
+  local theme_key="${1:-dark}"
+  if [ "${theme_key}" == 'light' ]; then
+    theme_key="picture-uri"
+  else
+    theme_key="picture-uri-dark"
+  fi
+
+  for cmd in hyprpaper gsettings hyprctl jq; do
+    if ! command -v "${cmd}" &> /dev/null; then
+      printf '%s is not an executable, or is not accessible\n' "${cmd}" >&2
+      return 1
+    fi
+  done
+
+  # Get a list of all monitors available
+  mapfile -t monitors < <(hyprctl -j monitors all | jq -rM '.[] | .name')
+
+  local curr_back="<none>"
+
+  while true; do
+    read -r bg_dark < <(gsettings get org.gnome.desktop.background "${theme_key}")
+    # Remove the quotes from the string
+    local bg_dark="${bg_dark:8:-1}"
+
+    if [ "${bg_dark}" != "${curr_back}" ] && ((${#bg_dark} > 2)); then
+      # Load new background path
+      hyprctl-wrapper hyprpaper preload "${bg_dark}"
+
+      # Set it for all monitors
+      for monitor in "${monitors[@]}"; do
+        hyprctl-wrapper hyprpaper wallpaper "${monitor}, ${bg_dark}"
+      done
+
+      hyprctl-wrapper hyprpaper unload "${curr_back}" # Unload previous background
+      curr_back="${bg_dark}"
+    fi
+    sleep 1
+  done
+}
+
+function hyprctl-wrapper {
+  printf '$ hyprctl %s\n' "${*@Q}"
+  hyprctl "${@}"
+} 2>&1
+
+main "${@}"

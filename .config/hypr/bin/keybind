@@ -35,7 +35,7 @@ function main {
   local CMD="${4}"
   local ARGS="${5}"
   # shellcheck disable=SC2086 # I actually want word spliting in ${ARGS}
-  hyprctl dispatch "${CMD}" ${ARGS} | printf 'Command: "%s" results in: %s\n' "${CMD} ${ARGS}" "$(< /dev/stdin)"
+  hyprctl -- dispatch "${CMD}" ${ARGS} | printf 'Command: "%s" results in: %s\n' "${CMD} ${ARGS}" "$(head -n 1 < /dev/stdin)"
 }
 
 function show_window {
@@ -61,7 +61,7 @@ function show_window {
       fi
       ((matches_count++))
     else
-      printf '[>>>] Line not in format: %s\n' "${line}" >&2
+      printf '\x1b[38;5;13m[>>>] Line not in format:\x1b[0m %s\n' "${line}" >&2
     fi
     ((total_count++))
   done <<< "$(grep -oP "^[^#\ ]*bind${bind_flags}\s*=.*" "${CONFIG_FILE}")"
@@ -69,8 +69,8 @@ function show_window {
   title="${title}(${matches_count}/${total_count})"
 
   ((matches_count != total_count)) && {
-    printf '\n[>>>] Some lines don'\''t follow the format. Hint: add spaces at start to ignore line\n' >&2
-    printf '[>>>] Use this format: bind[flags] = [mod], <key>, <dispatcher>...[, [args]] # [description]\n' >&2
+    printf '\n\x1b[38;5;13m[>>>] Some lines don'\''t follow the format. Hint: add spaces at start to ignore line\x1b[0m\n' >&2
+    printf '\x1b[38;5;13m[>>>] Use this format: bind[flags] = [mod], <key>, <dispatcher>...[, [args]] # [description]\x1b[0m\n' >&2
   }
 
   # Detect monitor resolution and scale
@@ -99,6 +99,14 @@ function show_window {
     --dclick-action "${THIS_SCRIPT} %s" \
     --column="Mod key" --column="Key" --column="Description" --column="Hyprland dispatcher" --column="Command args" \
     "${BINDINGS[@]}"
+}
+
+function expand-variables {
+  declare -nag __EXPANDED_ARR="${1}"
+
+  for ((i=0;i<${#__EXPANDED_ARR[@]};i++)); do
+    __EXPANDED_ARR[i]="$(eval "echo -n \"${__EXPANDED_ARR[i]}\"")"
+  done
 }
 
 main "${@}"

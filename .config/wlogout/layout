@@ -30,7 +30,7 @@
 }
 {
     "label" : "lock",
-    "action" : "hyprlock",
+    "action" : "hyprlock --immediate",
     "text" : "Lock",
     "keybind" : "l"
 }

@@ -34,24 +34,33 @@ BARG
     ['paused']=""
     ['stopped']=""
   )
-  MEDIA_ART_CACHE_LOC=~/.cache/hyprland/medialock.cache
+  MEDIA_ART_CACHE_LOC=~/.cache/hyprland/medialock_cover_art.png
 
-  if [ "${BARG_SUBCOMMAND}" == "artup" ]; then
-    test -f "${MEDIA_ART_CACHE_LOC}" && rm "${MEDIA_ART_CACHE_LOC}" 2> /dev/null
-    touch "${MEDIA_ART_CACHE_LOC}"
-    media_art_cache &> /dev/null &
-    return
-  elif [ "${BARG_SUBCOMMAND}" == "artdown" ]; then
-    test -f "${MEDIA_ART_CACHE_LOC}" && rm "${MEDIA_ART_CACHE_LOC}" 2> /dev/null
-    return
-  elif [ "${BARG_SUBCOMMAND}" == "hwman" ]; then
-    hyprlock_mw_source_manager &> /dev/null &
-    return
-  elif [ "${BARG_SUBCOMMAND}" == "waybar" ]; then
-    PARAM[0]='{"text": "{{title}} ~ {{artist}}", "tooltip": "Player: {{playerName}} => {{title}}", "alt": "{{statusicon}} {{elapsed}} - {{duration}}", "class": "{{status}}"}'
-    MARKUP_ESCAPE=true
-    URI_ESCAPE=false
-  fi
+  case "${BARG_SUBCOMMAND}" in
+    'artup')
+      test -f "${MEDIA_ART_CACHE_LOC}" && rm "${MEDIA_ART_CACHE_LOC}" 2> /dev/null
+      touch "${MEDIA_ART_CACHE_LOC}"
+      media_art_cache &> /dev/null &
+      return
+      ;;
+    'artdown')
+      test -f "${MEDIA_ART_CACHE_LOC}" && rm "${MEDIA_ART_CACHE_LOC}" 2> /dev/null
+      return
+      ;;
+    'hwman')
+      hyprlock_mw_source_manager &> /dev/null &
+      return
+      ;;
+    'waybar')
+      PARAM[0]='{"text": "{{title}} ~ {{artist}}", "tooltip": "Player: {{playerName}} => {{title}}", "alt": "{{statusicon}} {{elapsed}} - {{duration}}", "class": "{{status}}"}'
+      MARKUP_ESCAPE=true
+      URI_ESCAPE=false
+      ;;
+    'metadata') ;;
+    *)
+      return
+      ;;
+  esac
 
   # If subcommand is `metadata`
 

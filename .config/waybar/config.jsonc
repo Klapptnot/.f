@@ -337,10 +337,10 @@
   "custom/updates": {
     "format": "{}",
     "return-type": "json",
-    "exec": "~/.config/hypr/bin/updates.sh",
-    "exec-if": "~/.config/hypr/bin/updates.sh show",
+    "exec": "~/.config/waybar/bin/updates.sh waybar-json",
+    "exec-if": "~/.config/waybar/bin/updates.sh should-show",
     "interval": 15,
-    "on-click": "kitty -e yay -Syyu && notify-send 'The system has been updated'"
+    "on-click": "~/.config/waybar/bin/updates.sh do-upgrade"
   },
   "custom/playerctl": {
     "format": "<span>{icon}{}</span>",

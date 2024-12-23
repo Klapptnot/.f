@@ -5,8 +5,8 @@
 
 # Simple, nice and customizable shell prompt
 
-def path-shorten [path: string] -> string {
-  let path_parts = ($path | split row (char path_sep))
+def path-shorten []: string -> string {
+  let path_parts = ($in | split row (char path_sep))
   let parts_count = ($path_parts | length) - 1
   $path_parts | enumerate | each { |part|
     if $part.index == $parts_count {
@@ -19,14 +19,14 @@ def path-shorten [path: string] -> string {
   } | str join (char path_sep)
 }
 
-def get-path-fg-color [path: path] -> record<fg: string> {
+def get-path-fg-color []: string -> record<fg: string> {
   if ((which cksum).command?.0? == null) {
     return {
       fg: $env.mirko.color.dir
     }
   }
   let hex = (
-    (pwd | cksum | split row " ").0
+    ($in | cksum | split row " ").0
     | awk '{printf "%x", $1}'
     | fill --width 6 --character 0
     | parse --regex '(?P<r>.{2})(?P<g>.{2})(?P<b>.{2})'
@@ -43,9 +43,22 @@ def get-path-fg-color [path: path] -> record<fg: string> {
   }
 }
 
-def git-status-info [path: path] -> record<f: int, i: int, d: int, u: int, U: int, b: string> {
+def get-last-command-duration []: nothing -> string {
+  let duration = (
+    history | last 1
+      | get duration.0
+      | into string
+  )
+  if ($duration | str length) > 0 {
+    $duration | str replace --regex --all '([0-9]+)' $"(ansi plum1)${1}(ansi reset)"
+  } else {
+    ""
+  }
+}
+
+def git-status-info []: string -> record<f: int, i: int, d: int, u: int, U: int, b: string> {
   let changes = (git diff --shortstat | complete | get stdout | parse --regex '\s*(?<f>[0-9]+)[^0-9]*(?<i>[0-9]+)[^0-9]*(?<d>[0-9]+)')
-  let untracked = (git ls-files --other --exclude-standard $path | complete | get stdout | lines)
+  let untracked = (git ls-files --other --exclude-standard $in | complete | get stdout | lines)
   let u_folders = ($untracked | each { $in | path dirname } | uniq | length)
 
 
@@ -61,18 +74,18 @@ def git-status-info [path: path] -> record<f: int, i: int, d: int, u: int, U: in
 }
 
 def __left_prompt_command [] {
-  let dir = match (do --ignore-shell-errors { $env.PWD | path relative-to $nu.home-path }) {
+  let dir = match (do --ignore-errors { $env.PWD | path relative-to $nu.home-path }) {
     null => $env.PWD
     '' => '~'
     $relative_pwd => ([~, $relative_pwd] | path join)
   }
 
   if $env.mirko.ldir != $dir {
-    $env.mirko.sdir = (path-shorten $dir)
+    $env.mirko.sdir = ($dir | path-shorten)
   }
 
   if $env.mirko.ldir != $dir and $env.mirko.rdircolor {
-    $env.mirko.color.cdir = (get-path-fg-color $dir)
+    $env.mirko.color.cdir = ($dir | get-path-fg-color)
   }
 
   # Save last dir for next call
@@ -93,44 +106,33 @@ def __left_prompt_command [] {
 
 def __right_prompt_command [] {
   # create a right prompt in grey with brigth grey separators and am/pm underlined
-  let time_segment = ([
-    (ansi reset)
-    (ansi grey74)
-    (date now | format date '%x %X') # try to respect user's locale
-  ] | str join | str replace --regex --all "([/:])" $"(ansi grey85)${1}(ansi grey74)" |
-    str replace --regex --all "([AP]M)" $"(ansi white_underline)${1}")
+  let time_segment = (
+    $"(ansi reset)(ansi grey74)(date now | format date '%x %X')" # try to respect user's locale
+      | str replace --regex --all "([/:])" $"(ansi grey85)${1}(ansi grey74)"
+      | str replace --regex --all "([AP]M)" $"(ansi white_underline)${1}(ansi reset)"
+  )
 
-  let last_exit_code = if ($env.LAST_EXIT_CODE != 0) {
-    $"(ansi rb)[($env.LAST_EXIT_CODE)]"
-  } else { "" }
-
+  let last_exit_code = if ($env.LAST_EXIT_CODE != 0) { $" (ansi rb)[($env.LAST_EXIT_CODE)]" } else { "" }
   let git_path = (git rev-parse --show-toplevel | complete | get stdout)
   let col = $env.mirko.color.git
 
   let git_info = match [(($git_path | str length) > 0), ($env.mirko.collapse > (term size).columns)] {
     [true, true] => {
-      let data = git-status-info $git_path
-      $"($col.a)($data.f)($col.s)@($col.a)($data.b)($col.s) "         # <files>@<branch>
+      let data = ($git_path | git-status-info)
+      $"($col.a)($data.f)($col.s)@($col.a)($data.b)($col.s)(ansi reset) "         # <files>@<branch>
     },
     [true, false] => {
-      let data = git-status-info $git_path
+      let data = ($git_path | git-status-info)
       [
         $"($col.a)($data.f)($col.s)@($col.a)($data.b)($col.s) =>",         # <files>@<branch>
         $" ($col.i)+($col.a)($data.i)($col.s)/($col.d)-($col.a)($data.d)", # +<additions>/-<deletions>
-        $" \(● ($data.u)($col.s)@($col.a)($data.U)\) "                      # <untracked_files>@<untracked_folders>
+        $" \(● ($data.u)($col.s)@($col.a)($data.U)\)(ansi reset) "                      # <untracked_files>@<untracked_folders>
       ] | str join
     },
     _ => ""
   }
 
-  let duration = do {
-    let duration = (history | last 1 | get duration | into string)
-    if ($duration | length) > 0 {
-      $duration | str replace --regex --all '([0-9]+)' $"(ansi plum1)${1}(ansi reset)"
-    } else {
-      ""
-    }
-  }
+  let duration = get-last-command-duration
 
   ([$git_info, $duration, $last_exit_code, " ", $time_segment] | str join)
 }

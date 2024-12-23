@@ -1,8 +1,7 @@
 # Disco prompt port with baterries
-# Author: Brandon Piesch (?<contact>@klapptnot|klapptnot@gmail.com)
+# Author: Brandon Piesch
 
-
-function Set-DiscoConfig {
+function Set-DiscoOption {
   <#
   .SYNOPSIS
 
@@ -19,27 +18,27 @@ function Set-DiscoConfig {
 
   .PARAMETER UserColor
 
-  Sets the color of the username component. Accepts HEX codes (e.g., '#00FF00') or Minecraft color codes (e.g., '&a', only for foreground).
+  Sets the color of the username component. Accepts HEX codes.
 
   .PARAMETER AtColor
 
-  Sets the color of the "@" symbol preceding the hostname. Accepts HEX codes or Minecraft color codes.
+  Sets the color of the "@" symbol preceding the hostname. Accepts HEX codes.
 
   .PARAMETER HostColor
 
-  Sets the color of the hostname component. Accepts HEX codes or Minecraft color codes.
+  Sets the color of the hostname component. Accepts HEX codes.
 
   .PARAMETER CwdColor
 
-  Sets the color of the current working directory (CWD) component. Ignored when CwdHashColor is $true. Accepts HEX codes or Minecraft color codes.
+  Sets the color of the current working directory (CWD) component. Ignored when CwdHashColor is $true. Accepts HEX codes.
 
   .PARAMETER NormalColor
 
-  Sets the color of non-error text in the prompt. Accepts HEX codes or Minecraft color codes.
+  Sets the color of non-error text in the prompt. Accepts HEX codes.
 
   .PARAMETER ErrorColor
 
-  Sets the color of error text in the prompt. Accepts HEX codes or Minecraft color codes.
+  Sets the color of error text in the prompt. Accepts HEX codes.
 
   .PARAMETER HostName
 
@@ -78,10 +77,6 @@ function Set-DiscoConfig {
   Set-DiscoConfig -UserColor '#00FF00' -CwdShorten $true -StickyStatus $true
 
   This sets the username color to green, enables CWD shortening, and enables sticky status.
-
-  .NOTES
-
-For more information on Minecraft color codes, see https://minecraft.fandom.com/wiki/Formatting_codes
   #>
 
   [CmdletBinding()]
@@ -130,7 +125,7 @@ For more information on Minecraft color codes, see https://minecraft.fandom.com/
       colors   = @{
         user   = "#eb6434"
         at     = "#e8e8e8"
-        host   = "#9b5ced"
+        host   = "#fbdc5d"
         cwd    = "#e8e8e8"
         normal = "#e8e8e8"
         error  = "#de4b4b"
@@ -146,7 +141,7 @@ For more information on Minecraft color codes, see https://minecraft.fandom.com/
         { "#user#$($str.user)#r#" }
         { "#at#$($str.at)#r#" }
         { "#host#$($str.host)#r#" }
-        { if ($str.duration) { Convert-MinecraftColorsToANSI ":&d$($str.duration)&r" } }
+        { if ($str.duration) { ":`e[38;2;255;85;255m$($str.duration)`e[0m" } }
         { ":$($colors.cwd)$($str.cwd)$($colors.normal)" }
         { if ($str.status) { "$($str.status)" } }
         { "$($str.delim)$($colors.reset) " }

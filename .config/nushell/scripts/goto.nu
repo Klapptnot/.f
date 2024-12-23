@@ -3,7 +3,7 @@
 # |>   https://github.com/Klapptnot/dotf   <|
 # |>----|>----|>----|><-><|----<|----<|----<|
 
-def get-aliased-paths [] -> table<alias: string[], expand: string[]> {
+def get-aliased-paths []: nothing -> table<alias: list<string>, expand: list<string>> {
   let def = if ("~/.config/dotf/goto.idx" | path exists) {
     (open ~/.config/dotf/goto.idx | lines)
   } else {
@@ -21,7 +21,7 @@ def get-aliased-paths [] -> table<alias: string[], expand: string[]> {
   $def | parse "{alias} {expand}" | str trim
 }
 
-def complete-aliases [] -> string[] {
+def complete-aliases []: nothing -> list<string> {
   get-aliased-paths | get alias
 }
 
@@ -31,7 +31,7 @@ export def --env gt [
   ...mods: string  # Modifiers for path or alias
   --list (-l),     # Display the aliases definitions
   --return (-r)    # Return the path instead of going to it
-] -> string {
+]: nothing -> any {
 
   let path = ($path | default $env.HOME)
   mut args = $mods

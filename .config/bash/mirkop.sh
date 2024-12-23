@@ -37,6 +37,10 @@ function __mirkop_cursor_position {
 }
 
 function __mirkop_get_cwd_color {
+  if [ -n "${MIRKOP_DIR_COLOR}" ]; then
+    printf '%s' "${MIRKOP_DIR_COLOR}"
+    return
+  fi
   if command -v cksum &> /dev/null; then
     read -r s < <(pwd -P | cksum | cut -d' ' -f1 | printf '%-6x' "$(< /dev/stdin)" | tr ' ' '0' | head -c 6)
     local r=$((16#${s:0:2}))
@@ -73,6 +77,12 @@ function __mirkop_load_prompt_config {
 
     printf '\\033[38;2;%d;%d;%dm' ${r} ${g} ${b}
   }
+
+  IFS=$'\n\t' read -r do_rdircolor < <(yq.sh .rdircolor ~/.config/mirkop.yaml)
+  if [[ "${do_rdircolor}" != "true" ]]; then
+    IFS=$'\n\t' read -r dir_color < <(yq.sh .color.dir.fg ~/.config/mirkop.yaml | hex_to_shell)
+    declare -g MIRKOP_DIR_COLOR="${dir_color}"
+  fi
 
   IFS=$'\n\t' read -r username < <(yq.sh .str.user ~/.config/mirkop.yaml)
   IFS=$'\n\t' read -r hostname < <(yq.sh .str.host ~/.config/mirkop.yaml)

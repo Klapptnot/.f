@@ -124,9 +124,9 @@ def __right_prompt_command [] {
     [true, false] => {
       let data = ($git_path | git-status-info)
       [
-        $"($col.a)($data.f)($col.s)@($col.a)($data.b)($col.s) =>",         # <files>@<branch>
-        $" ($col.i)+($col.a)($data.i)($col.s)/($col.d)-($col.a)($data.d)", # +<additions>/-<deletions>
-        $" \(● ($data.u)($col.s)@($col.a)($data.U)\)(ansi reset) "                      # <untracked_files>@<untracked_folders>
+        $"($col.a)($data.f)($col.s)@($col.a)($data.b)($col.s)",     # <files>@<branch>
+        $" ($col.i)+($data.i)($col.s)/($col.d)-($data.d)($col.a)",  # +<additions>/-<deletions>
+        $" \(● ($data.u)($col.s)@($col.a)($data.U)\)(ansi reset) "  # <untracked_files>@<untracked_folders>
       ] | str join
     },
     _ => ""

@@ -2,13 +2,13 @@ if ("~/.config/.paths" | path exists) {
   let lns = (open --raw ~/.config/.paths | lines | str trim | path expand)
 
   for ln in $lns {
-    if ($ln | str starts-with '#') {
+    if ($ln | str length) < 1 or ($ln | str starts-with '#') {
       continue
     }
     if ($ln | str starts-with '@prepend ') {
       load-env { PATH: ($env.PATH | split row (char esep) | prepend ($ln | str substring 9.. | str trim)) }
     } else {
-      load-env { PATH: ($env.PATH | split row (char esep) | append ($ln | str trim)) }
+      load-env { PATH: ($env.PATH | split row (char esep) | append $ln) }
     }
   }
 }

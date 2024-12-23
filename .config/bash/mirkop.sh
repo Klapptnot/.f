@@ -62,6 +62,11 @@ function __mirkop_load_prompt_config {
   function hex_to_shell {
     read -r s < /dev/stdin
 
+    if [[ ${#s} -ne 7 || ${s:0:1} != "#" ]]; then
+      printf '\\033[0m'
+      return
+    fi
+
     local r=$((16#${s:1:2}))
     local g=$((16#${s:3:2}))
     local b=$((16#${s:5:2}))
@@ -86,40 +91,88 @@ function __mirkop_load_prompt_config {
   IFS=$'\n\t' read -r c_norm < <(yq.sh .color.normal.fg ~/.config/mirkop.yaml | hex_to_shell)
 
   IFS=$'\n\t' read -r c_error < <(yq.sh .color.error.fg ~/.config/mirkop.yaml | hex_to_shell)
+  IFS=$'\n\t' read -r c_jobs < <(yq.sh .color.jobs.fg ~/.config/mirkop.yaml | hex_to_shell)
+  IFS=$'\n\t' read -r git_ins < <(yq.sh .color.git.i.fg ~/.config/mirkop.yaml | hex_to_shell)
+  IFS=$'\n\t' read -r git_del < <(yq.sh .color.git.d.fg ~/.config/mirkop.yaml | hex_to_shell)
+  IFS=$'\n\t' read -r git_any < <(yq.sh .color.git.a.fg ~/.config/mirkop.yaml | hex_to_shell)
+  IFS=$'\n\t' read -r git_sep < <(yq.sh .color.git.s.fg ~/.config/mirkop.yaml | hex_to_shell)
 
   # shellcheck disable=SC2034
   declare -g MIRKOP_PROMPT_STR=(
-    "${username}"
-    "${from_str}"
-    "${hostname}"
-    "${delim}"
+    [0]="${username}" # Username
+    [1]="${from_str}" # From string
+    [2]="${hostname}" # Hostname
+    [3]="${delim}"    # Delimiter
   )
 
   # shellcheck disable=SC2034
   declare -g MIRKOP_PROMPT_COLORS=(
-    "${c_user}"
-    "${c_from}"
-    "${c_host}"
-    "${c_norm}"
-    "${c_error}"
+    [0]="${c_user}"  # User color
+    [1]="${c_from}"  # From color
+    [2]="${c_host}"  # Host color
+    [3]="${c_norm}"  # Normal color
+    [4]="${c_error}" # Error color
+    [5]="${git_ins}" # Git insertions color
+    [6]="${git_del}" # Git deletions color
+    [7]="${git_any}" # Git any changes color
+    [8]="${git_sep}" # Git separator color
+    [9]="${c_jobs}"  # Jobs color
   )
+}
+
+function __mirkop_git_info {
+  local git_branch=""
+
+  if ! command -v git &> /dev/null || ! git rev-parse --is-inside-work-tree &> /dev/null; then
+    printf '\n0\n'
+    return
+  fi
+
+  read -r mods _ _ inss _ dels _ < <(git diff --shortstat 2> /dev/null)
+  read -r git_branch < <(git branch --show-current 2> /dev/null)
+  mapfile -t untracked < <(git ls-files --other --exclude-standard 2> /dev/null)
+  mapfile -t untracked_dirs < <(dirname -- "${untracked[@]}" 2> /dev/null | sort -u)
+
+  # <files>@<branch> +<additions>/-<deletions> (● <untracked_files>@<untracked_folders>)
+  printf '%b%d%b@%b%s%b %b+%d%b/%b-%d%b %b(● %d%b@%b%d%b)\033[0m\n' \
+    "${MIRKOP_PROMPT_COLORS[7]}" "${mods}" "${MIRKOP_PROMPT_COLORS[8]}" \
+    "${MIRKOP_PROMPT_COLORS[7]}" "${git_branch}" "${MIRKOP_PROMPT_COLORS[8]}" \
+    "${MIRKOP_PROMPT_COLORS[5]}" "${inss}" "${MIRKOP_PROMPT_COLORS[8]}" \
+    "${MIRKOP_PROMPT_COLORS[6]}" "${dels}" "${MIRKOP_PROMPT_COLORS[8]}" \
+    "${MIRKOP_PROMPT_COLORS[7]}" "${#untracked[@]}" "${MIRKOP_PROMPT_COLORS[8]}" \
+    "${MIRKOP_PROMPT_COLORS[7]}" "${#untracked_dirs[@]}" "${MIRKOP_PROMPT_COLORS[8]}"
+
+  : "${MIRKOP_PROMPT_COLORS[7]}${MIRKOP_PROMPT_COLORS[8]}${MIRKOP_PROMPT_COLORS[7]}"
+  : "${_}${MIRKOP_PROMPT_COLORS[8]}${MIRKOP_PROMPT_COLORS[5]}${MIRKOP_PROMPT_COLORS[8]}"
+  : "${_}${MIRKOP_PROMPT_COLORS[6]}${MIRKOP_PROMPT_COLORS[8]}${MIRKOP_PROMPT_COLORS[7]}"
+  : "${_}${MIRKOP_PROMPT_COLORS[8]}${MIRKOP_PROMPT_COLORS[7]}${MIRKOP_PROMPT_COLORS[8]}\033[0m"
+  : "${_@E}--"          # Somehow, it needs 2 characters to be right, so I added 2 dashes
+  printf '%d\n' "${#_}" # Return the length of the color escape sequences
 }
 
 function __mirkop_print_prompt_right {
   local rprompt_parts=()
   local comp=0
 
+  {
+    read -r git_info
+    read -r color_length
+  } < <(__mirkop_git_info)
+
+  ((comp = comp + color_length))
+  rprompt_parts+=("${git_info} ")
+
   jobs &> /dev/null # Prevent from printing finished jobs after command
   read -r num_jobs < <(jobs -r | wc -l)
-
-  if ((num_jobs > 1)); then
-    rprompt_parts+=("${num_jobs} jobs ")
-  elif ((num_jobs > 0)); then
-    rprompt_parts+=("${num_jobs} job ")
+  if ((num_jobs > 0)); then
+    rprompt_parts+=("${MIRKOP_PROMPT_COLORS[9]}${num_jobs}  \033[0m ")
+    : "${MIRKOP_PROMPT_COLORS[9]}\033[0m--"
+    : "${_@E}"
+    ((comp = comp + ${#_}))
   fi
 
   if ((${1} != 0)); then
-    rprompt_parts+=("${MIRKOP_PROMPT_COLORS[4]}[${1}]\x1b[0m ")
+    rprompt_parts+=("${MIRKOP_PROMPT_COLORS[4]}[${1}]\033[0m ")
     : "${MIRKOP_PROMPT_COLORS[4]}\033[0m"
     : "${_@E}"
     ((comp = comp + ${#_}))
@@ -127,8 +180,12 @@ function __mirkop_print_prompt_right {
 
   IFS=$'\n\t' read -r TIME_S < <(date +'%x %X') && rprompt_parts+=("${TIME_S}")
 
+  # Compensate the length of the right prompt
+  # by adding the color escape sequences offset
+  ((comp = COLUMNS + comp))
+
   printf -v rprompt_string "%b" "${rprompt_parts[@]}"
-  printf "%$((COLUMNS + comp))s\x1b[0G" "${rprompt_string}"
+  printf "%${comp}s\x1b[0G" "${rprompt_string}"
 }
 
 function __mirkop_generate_prompt_left {

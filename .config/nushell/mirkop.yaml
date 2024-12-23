@@ -30,8 +30,14 @@ color:
     fg: "#e8e8e8"
   from:
     fg: "#e8e8e8"
+  jobs:
+    fg: "#ff79c6"
   git:
-    i: seagreen1b
-    d: red1
-    a: lightcyan1
-    s: def
+    i:
+      fg: "#54ff9f"
+    d:
+      fg: "#ff7f7f"
+    a:
+      fg: "#e0ffff"
+    s:
+      fg: "#e8e8e8"

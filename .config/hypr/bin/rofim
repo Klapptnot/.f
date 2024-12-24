@@ -21,13 +21,11 @@ function main {
   shift 1
 
   ROFI_THEME_HOME=''
-  [[ "${mode}" == 'rofi-'* ]] && {
-    ! command -v rofi &> /dev/null && {
-      log e "Rofi not installed or not in PATH" >&2
-      exit
-    }
-    ROFI_THEME_HOME="$(get_rofi_theme_path)"
+  ! command -v rofi &> /dev/null && {
+    log e "Rofi not installed or not in PATH" >&2
+    exit
   }
+  ROFI_THEME_HOME="$(get_rofi_theme_path)"
 
   function no_tlf {
     printf '%s' "${2:0:(${#2} - 1)}"
@@ -35,10 +33,10 @@ function main {
 
   killall rofi &> /dev/null
   case "${mode}" in
-    rofi-runner)
+    runner)
       rofi -show drun -theme "${ROFI_THEME_HOME}/drun.rasi" || exit
       ;;
-    rofi-clipboard)
+    clipboard)
       cliphist list |
         sed 's/\([0-9]*\)\t\(.*\)/\2\r\1/g' | # The \t is ugly
         rofi -dmenu -p '   Clip ' -theme "${ROFI_THEME_HOME}/clipboard.rasi" |
@@ -46,22 +44,19 @@ function main {
         cliphist decode |
         wl-copy
       ;;
-    rofi-emoji)
+    emoji)
       python3 ~/.config/hypr/bin/emoji.py list |
         rofi -dmenu -p ' 󰱨 Emoji ' -theme "${ROFI_THEME_HOME}/emoji.rasi" |
         python3 ~/.config/hypr/bin/emoji.py decode |
         wl-copy
       ;;
-    rofi-wifi)
+    wifi)
       while true; do
         rofi_wifi_menu_do || break
       done
       ;;
-    rofi-bluetooth)
+    bluetooth)
       return
-      ;;
-    gnome-control-center)
-      XDG_CURRENT_DESKTOP=GNOME XDG_SESSION_DESKTOP=gnome gnome-control-center &
       ;;
   esac
 }

@@ -178,7 +178,7 @@
     "format-disconnected": "󰤮 N/A",
     "tooltip-format": "{ipaddr} => {bandwidthTotalBytes} ({signalStrength}%)",
     "max-width": 32,
-    "on-click": "~/.config/hypr/bin/launch rofi-wifi"
+    "on-click": "~/.config/hypr/bin/rofim wifi"
   },
   "backlight": {
     "tooltip": false,
@@ -331,7 +331,7 @@
   },
   "custom/launcher": {
     "format": " ",
-    "on-click": "rofi -show drun",
+    "on-click": "~/.config/hypr/bin/rofim runner",
     "on-click-right": "killall rofi"
   },
   "custom/updates": {

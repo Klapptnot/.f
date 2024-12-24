@@ -1,10 +1,8 @@
 #!/usr/bin/bash
 
 function main {
-  local theme_key="${1:-dark}"
-  if [ "${theme_key}" == 'light' ]; then
-    theme_key="picture-uri"
-  else
+  local theme_key="picture-uri"
+  if [ "${1:-light}" == 'dark' ]; then
     theme_key="picture-uri-dark"
   fi
   shift 1

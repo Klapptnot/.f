@@ -12,6 +12,7 @@ function main {
 
   r/restart[bool] => DO_RESTART
   a/run-at[str] |> "0:0:0:0" => SPAWN_AT
+  g/as-gnome[bool] => LAUNCH_AS_GNOME
 BARG
 
   if ${show_usage}; then
@@ -37,6 +38,7 @@ BARG
       log i 'Process will be spawned in %s seconds' "${run_at}"
     fi
   fi
+
   log d 'Command to run: %s' "${cmd_line}"
   spawner "${run_at}" "${EXEC_LINE[@]}" &
 }
@@ -51,7 +53,11 @@ function spawner {
     fi
   fi
 
-  exec "${@}" &> /dev/null
+  if "${LAUNCH_AS_GNOME}"; then
+    XDG_CURRENT_DESKTOP=GNOME XDG_SESSION_DESKTOP=gnome exec "${@}" &> /dev/null
+  else
+    exec "${@}" &> /dev/null
+  fi
 }
 
 main "${@}"

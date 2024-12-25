@@ -70,24 +70,24 @@ function __mirkop_git_info {
     return
   fi
 
-  read -r mods _ _ inss _ dels _ < <(git diff --shortstat 2> /dev/null)
+  read -r mod _ _ ins _ del _ < <(git diff --shortstat 2> /dev/null)
   read -r git_branch < <(git branch --show-current 2> /dev/null)
   mapfile -t untracked < <(git ls-files --other --exclude-standard 2> /dev/null)
   mapfile -t untracked_dirs < <(dirname -- "${untracked[@]}" 2> /dev/null | sort -u)
 
   # <files>@<branch> +<additions>/-<deletions> (● <untracked_files>@<untracked_folders>)
   printf '%b%d%b@%b%s%b %b+%d%b/%b-%d%b %b(● %d%b@%b%d%b)\033[0m\n' \
-    "${MIRKOP_COLORS[8]}" "${mods}" "${MIRKOP_COLORS[9]}" \
-    "${MIRKOP_COLORS[8]}" "${git_branch}" "${MIRKOP_COLORS[9]}" \
-    "${MIRKOP_COLORS[6]}" "${inss}" "${MIRKOP_COLORS[9]}" \
-    "${MIRKOP_COLORS[7]}" "${dels}" "${MIRKOP_COLORS[9]}" \
-    "${MIRKOP_COLORS[8]}" "${#untracked[@]}" "${MIRKOP_COLORS[9]}" \
-    "${MIRKOP_COLORS[8]}" "${#untracked_dirs[@]}" "${MIRKOP_COLORS[9]}"
+    "${MIRKOP_COLORS[9]}" "${mod}" "${MIRKOP_COLORS[10]}" \
+    "${MIRKOP_COLORS[9]}" "${git_branch}" "${MIRKOP_COLORS[10]}" \
+    "${MIRKOP_COLORS[7]}" "${ins}" "${MIRKOP_COLORS[10]}" \
+    "${MIRKOP_COLORS[8]}" "${del}" "${MIRKOP_COLORS[10]}" \
+    "${MIRKOP_COLORS[9]}" "${#untracked[@]}" "${MIRKOP_COLORS[10]}" \
+    "${MIRKOP_COLORS[9]}" "${#untracked_dirs[@]}" "${MIRKOP_COLORS[10]}" 2> /dev/null
 
-  : "${MIRKOP_COLORS[8]}${MIRKOP_COLORS[9]}${MIRKOP_COLORS[8]}"
-  : "${_}${MIRKOP_COLORS[9]}${MIRKOP_COLORS[6]}${MIRKOP_COLORS[9]}"
-  : "${_}${MIRKOP_COLORS[7]}${MIRKOP_COLORS[9]}${MIRKOP_COLORS[8]}"
-  : "${_}${MIRKOP_COLORS[9]}${MIRKOP_COLORS[8]}${MIRKOP_COLORS[9]}\033[0m"
+  : "${MIRKOP_COLORS[9]}${MIRKOP_COLORS[10]}${MIRKOP_COLORS[9]}"
+  : "${_}${MIRKOP_COLORS[10]}${MIRKOP_COLORS[7]}${MIRKOP_COLORS[10]}"
+  : "${_}${MIRKOP_COLORS[8]}${MIRKOP_COLORS[10]}${MIRKOP_COLORS[9]}"
+  : "${_}${MIRKOP_COLORS[10]}${MIRKOP_COLORS[9]}${MIRKOP_COLORS[10]}\033[0m"
   : "${_@E}--"          # Somehow, it needs 2 characters to be right, so I added 2 dashes
   printf '%d\n' "${#_}" # Return the length of the color escape sequences
 }
@@ -108,8 +108,8 @@ function __mirkop_generate_prompt_left {
     "\[${MIRKOP_COLORS[0]}\]${MIRKOP_STRINGS[0]}\[${MIRKOP_COLORS[3]}\]" # User
     "\[${MIRKOP_COLORS[1]}\]${MIRKOP_STRINGS[1]}\[${MIRKOP_COLORS[3]}\]" # From
     "\[${MIRKOP_COLORS[2]}\]${MIRKOP_STRINGS[2]}\[${MIRKOP_COLORS[3]}\]" # Host
-    ":\[${pwd_color}\]${short_cwd}\[${MIRKOP_COLORS[3]}\]"                         # CWD
-    "${MIRKOP_STRINGS[3]} "                                                            # Status and delim
+    ":\[${pwd_color}\]${short_cwd}\[${MIRKOP_COLORS[3]}\]"               # CWD
+    "${MIRKOP_STRINGS[3]} "                                              # Status and delim
   )
   printf -v prompt_string '%s' "${prompt_parts[@]}"
 
@@ -131,8 +131,8 @@ function __mirkop_print_prompt_right {
   jobs &> /dev/null # Prevent from printing finished jobs after command
   read -r num_jobs < <(jobs -r | wc -l)
   if ((num_jobs > 0)); then
-    rprompt_parts+=("${MIRKOP_COLORS[9]}${num_jobs}  \033[0m ")
-    : "${MIRKOP_COLORS[9]}\033[0m--"
+    rprompt_parts+=("${MIRKOP_COLORS[6]}${num_jobs}  \033[0m ")
+    : "${MIRKOP_COLORS[6]}\033[0m--"
     : "${_@E}"
     ((comp = comp + ${#_}))
   fi
@@ -155,39 +155,50 @@ function __mirkop_print_prompt_right {
 }
 
 function __mirkop_transient_prompt_left {
-  local LAST_COMMAND="${1}"
   read -r pwd_color < <(__mirkop_get_cwd_color)
   read -r short_cwd < <(__mirkop_get_short_pwd)
-  read -r command < <(sed -E 's/\x1b/\\x1b/g' <<< "${LAST_COMMAND}")
-  ((${#command} > 150)) && command="${command:0:147}..."
+  read -r command < <(sed -E 's/\x1b/\\x1b/g' <<< "${1}")
+  # ((${#command} > 128)) && command="${command:0:125}..."
 
   printf '\x1b[1A\x1b[0G\x1b[0K%b%s\x1b[0m:%s \x1b[38;5;14m%s\x1b[0m\n' "${pwd_color}" "${short_cwd}" "${MIRKOP_STRINGS[3]}" "${command}"
-}
-
-function __mirkop_transient_prompt {
-  local LAST_COMMAND="${1}"
-  if [ "${MIRKOP_CONFIG[0]}" == 'true' ] && ${MIRKOP_LOADED_FULL}; then
-    __mirkop_transient_prompt_left "${LAST_COMMAND}"
-  fi
 }
 
 function __mirkop_generate_prompt {
   local last_exit_code="${?}"
   __mirkop_generate_prompt_left "${last_exit_code}"
-  if [ "${OBASH_COMMAND}" != '__mirkop_generate_prompt' ]; then
-    __mirkop_transient_prompt "${LAST_COMMAND:-ls -la # history empty}"
+  if ((MIRKOP_TRANSIENT_COUNT > 1)); then
+    __mirkop_transient_prompt #"${LAST_COMMAND[@]}"
   fi
   __mirkop_print_prompt_right "${last_exit_code}"
-  ${MIRKOP_LOADED_FULL} || read -r LAST_COMMAND < <(fc -ln -1)
+  # ${MIRKOP_LOADED_FULL} || {
+  #   read -r last_hit_cmd < <(fc -ln -1)
+  #   LAST_COMMAND=("${last_hit_cmd}")
+  # }
   MIRKOP_LOADED_FULL=true
 }
 
+function __mirkop_transient_prompt {
+  local cmd_line=""
+  local oIFS="${IFS}"
+  IFS='|' cmd_line="${*}"
+  IFS="${oIFS}"
+  read -r cmd_line < <(sed -E 's/\x1b/\\x1b/g;s/\r/\\r/g;s/\n/\\n/g' <<< "${cmd_line}")
+  if [ "${MIRKOP_CONFIG[0]}" == 'true' ] && ${MIRKOP_LOADED_FULL}; then
+    __mirkop_transient_prompt_left "${cmd_line}"
+  fi
+}
+
 function __mirkop_pre_command_hook {
-  OBASH_COMMAND+="${BASH_COMMAND}"
-  if [ "${BASH_COMMAND}" != __mirkop_generate_prompt ]; then
-    LAST_COMMAND="${BASH_COMMAND}"
-    [ "${BASH_COMMAND}" != 'clear' ] && OBASH_COMMAND=""
-    __mirkop_transient_prompt "${BASH_COMMAND:-ls -la # history empty}"
+  ((MIRKOP_TRANSIENT_COUNT++))
+  if [[ "${BASH_COMMAND}" != __mirkop_generate_prompt && "${BASH_COMMAND}" != clear ]]; then
+    MIRKOP_TRANSIENT_COUNT=0
+    LAST_COMMAND_ITER+=("${BASH_COMMAND}")
+
+    __mirkop_transient_prompt "${LAST_COMMAND_ITER[@]}"
+  else
+    # ((${#LAST_COMMAND_ITER[@]} > 0)) && LAST_COMMAND=("${LAST_COMMAND_ITER[@]}")
+    LAST_COMMAND_ITER=()
+    # LAST_COMMAND_STATUS=("${PIPESTATUS[@]}")
   fi
 }
 
@@ -231,11 +242,11 @@ function __mirkop_load_prompt_config {
   IFS=$'\n\t' read -r c_norm < <(yq.sh .color.normal.fg ~/.config/mirkop.yaml | hex_to_shell) # [3]
   IFS=$'\n\t' read -r c_error < <(yq.sh .color.error.fg ~/.config/mirkop.yaml | hex_to_shell) # [4]
   IFS=$'\n\t' read -r c_dir < <(yq.sh .color.dir.fg ~/.config/mirkop.yaml | hex_to_shell)     # [5]
+  IFS=$'\n\t' read -r c_jobs < <(yq.sh .color.jobs.fg ~/.config/mirkop.yaml | hex_to_shell)   # [10]
   IFS=$'\n\t' read -r git_ins < <(yq.sh .color.git.i.fg ~/.config/mirkop.yaml | hex_to_shell) # [6]
   IFS=$'\n\t' read -r git_del < <(yq.sh .color.git.d.fg ~/.config/mirkop.yaml | hex_to_shell) # [7]
   IFS=$'\n\t' read -r git_any < <(yq.sh .color.git.a.fg ~/.config/mirkop.yaml | hex_to_shell) # [8]
   IFS=$'\n\t' read -r git_sep < <(yq.sh .color.git.s.fg ~/.config/mirkop.yaml | hex_to_shell) # [9]
-  IFS=$'\n\t' read -r c_jobs < <(yq.sh .color.jobs.fg ~/.config/mirkop.yaml | hex_to_shell)   # [10]
 
   # shellcheck disable=SC2034
   declare -ga MIRKOP_CONFIG=(
@@ -255,25 +266,33 @@ function __mirkop_load_prompt_config {
 
   # shellcheck disable=SC2034
   declare -g MIRKOP_COLORS=(
-    [0]="${c_user}"  # User color
-    [1]="${c_from}"  # From color
-    [2]="${c_host}"  # Host color
-    [3]="${c_norm}"  # Normal color
-    [4]="${c_error}" # Error color
-    [5]="${c_dir}"   # Directory color
-    [6]="${git_ins}" # Git insertions color
-    [7]="${git_del}" # Git deletions color
-    [8]="${git_any}" # Git any changes color
-    [9]="${git_sep}" # Git separator color
-    [10]="${c_jobs}" # Jobs color
+    [0]="${c_user}"   # User color
+    [1]="${c_from}"   # From color
+    [2]="${c_host}"   # Host color
+    [3]="${c_norm}"   # Normal color
+    [4]="${c_error}"  # Error color
+    [5]="${c_dir}"    # Directory color
+    [6]="${c_jobs}"   # Jobs color
+    [7]="${git_ins}"  # Git insertions color
+    [8]="${git_del}"  # Git deletions color
+    [9]="${git_any}"  # Git any changes color
+    [10]="${git_sep}" # Git separator color
   )
 }
 
-# shellcheck disable=SC1090
-source ~/.config/bash/lib/yq.sh
-__mirkop_load_prompt_config && {
-  MIRKOP_LOADED_FULL=false
-  trap -- '__mirkop_pre_command_hook' DEBUG
-  PROMPT_COMMAND='__mirkop_generate_prompt'
+function __mirkop_main {
+  # shellcheck disable=SC1090
+  source ~/.config/bash/lib/yq.sh
+  __mirkop_load_prompt_config && {
+    MIRKOP_LOADED_FULL=false
+    trap -- '__mirkop_pre_command_hook' DEBUG
+    PROMPT_COMMAND='__mirkop_generate_prompt'
+    MIRKOP_TRANSIENT_COUNT=0
+    # LAST_COMMAND=()
+    LAST_COMMAND_ITER=()
+    # LAST_COMMAND_STATUS=()
+  }
+  unset -f yq.sh
 }
-unset -f yq.sh
+
+__mirkop_main

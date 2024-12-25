@@ -20,10 +20,8 @@ def path-shorten []: string -> string {
 }
 
 def get-path-fg-color []: string -> record<fg: string> {
-  if ((which cksum).command?.0? == null) {
-    return {
-      fg: $env.mirko.color.dir
-    }
+  if ((which cksum).command?.0? == null) or $env.mirko.rdircolor != true {
+    return $env.mirko.color.dir
   }
   let hex = (
     ($in | cksum | split row " ").0
@@ -73,19 +71,22 @@ def git-status-info []: string -> record<f: int, i: int, d: int, u: int, U: int,
   }
 }
 
-def __left_prompt_command [] {
+def __left_prompt_command [--transient]: nothing -> string {
   let dir = match (do --ignore-errors { $env.PWD | path relative-to $nu.home-path }) {
     null => $env.PWD
     '' => '~'
     $relative_pwd => ([~, $relative_pwd] | path join)
   }
 
-  if $env.mirko.ldir != $dir {
-    $env.mirko.sdir = ($dir | path-shorten)
+  if $env.mirkov.ldir != $dir {
+    $env.mirkov.sdir = ($dir | path-shorten)
   }
 
-  if $env.mirko.ldir != $dir and $env.mirko.rdircolor {
-    $env.mirko.color.cdir = ($dir | get-path-fg-color)
+  if $env.mirkov.ldir != $dir {
+    $env.mirkov.cdir = ($dir | get-path-fg-color)
+  }
+  if $transient {
+    return $"(ansi --escape $env.mirkov.cdir)($env.mirkov.sdir)(ansi reset):"
   }
 
   # Save last dir for next call
@@ -101,16 +102,20 @@ def __left_prompt_command [] {
     (ansi --escape $env.mirko.color.normal)
   ] | str join)
 
-  $"($identity):(ansi --escape $env.mirko.color.cdir)($env.mirko.sdir)(ansi reset)"
+  $"($identity):(ansi --escape $env.mirkov.cdir)($env.mirkov.sdir)(ansi reset)"
 }
 
-def __right_prompt_command [] {
+def __right_prompt_command [--transient]: nothing -> string {
   # create a right prompt in grey with brigth grey separators and am/pm underlined
   let time_segment = (
-    $"(ansi reset)(ansi grey74)(date now | format date '%x %X')" # try to respect user's locale
+    $"(ansi reset)(ansi grey74)(date now | format date '%X')" # try to respect user's locale
       | str replace --regex --all "([/:])" $"(ansi grey85)${1}(ansi grey74)"
       | str replace --regex --all "([AP]M)" $"(ansi white_underline)${1}(ansi reset)"
   )
+
+  if $transient {
+    return $"(ansi --escape $env.mirko.color.normal)($time_segment)(ansi reset)"
+  }
 
   let last_exit_code = if ($env.LAST_EXIT_CODE != 0) { $" (ansi rb)[($env.LAST_EXIT_CODE)]" } else { "" }
   let git_path = (git rev-parse --show-toplevel | complete | get stdout)
@@ -161,8 +166,11 @@ $env.mirko.color.git =   {
 $env.mirko.str.from = (if ($env.SSH_TTY? | default nothing) == nothing { $env.mirko.str.from.base } else { $env.mirko.str.from.sshd })
 
 # PWD shortening variables, last short path and short
-$env.mirko.ldir = ""
-$env.mirko.sdir = ""
+$env.mirkov = {
+  ldir: "",
+  sdir: "",
+  cdir: ""
+}
 
 # PROMPT_INDICATOR character for admin|sudo and normal user
 $env.mirko.str.char = (if (is-admin) { $env.mirko.str.char.root } else { $env.mirko.str.char.else })
@@ -172,6 +180,8 @@ $env.PROMPT_COMMAND = {|| __left_prompt_command }
 $env.PROMPT_COMMAND_RIGHT = {|| __right_prompt_command }
 $env.PROMPT_INDICATOR = {|| $env.mirko.str.char }
 
-$env.TRANSIENT_PROMPT_COMMAND = {|| "󱓞 " }
-# $env.TRANSIENT_PROMPT_COMMAND_RIGHT = {|| "⏎" }
-$env.TRANSIENT_PROMPT_INDICATOR = {|| $env.mirko.str.char }
+if $env.mirko.transient == true {
+  $env.TRANSIENT_PROMPT_COMMAND = {|| __left_prompt_command --transient }
+  $env.TRANSIENT_PROMPT_COMMAND_RIGHT = {|| __right_prompt_command --transient }
+  $env.TRANSIENT_PROMPT_INDICATOR = {|| $env.mirko.str.char }
+}

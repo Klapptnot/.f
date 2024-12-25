@@ -14,8 +14,11 @@ str:
   from:
     base: " at "
     sshd: " in "
+
 collapse: 120
+date_fmt: "%X"
 rdircolor: true
+transient: true
 
 color:
   host:

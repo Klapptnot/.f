@@ -65,12 +65,14 @@ PS1='[\u@\h \W]\$ '
 
 alias gt='goto'
 alias git='git --no-pager'
+alias ls='ls --color=yes'
 
 if ! clear &> /dev/null; then
   [[ "${TERM}" == 'xterm'* ]] && bind -x '"\C-l": printf '\''\x1b[0H\x1b[3J'\'
 else
   bind -x '"\C-l": clear'
 fi
+
 bind -x '"\C-o": __fzf_nvim_open_file'
 bind -x '"\C-u": __fzf_cat_file'
 

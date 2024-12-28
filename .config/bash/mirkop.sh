@@ -2,6 +2,7 @@
 
 # shellcheck disable=SC2120
 function __mirkop_get_short_pwd {
+  [ "${PWD}" == "${MIRKOP_LAST_PWD}" ] && printf '%b' "${MIRKOP_LAST_SPWD}" && return
   local short_pwd_s=""
   local old_pwd="${PWD}"
   if [[ "${PWD}" == "${HOME}"* ]]; then
@@ -24,16 +25,12 @@ function __mirkop_get_short_pwd {
 function __mirkop_cursor_position {
   # based on a script from http://invisible-island.net/xterm/xterm.faq.html
   exec < /dev/tty
-  oldstty=$(stty -g)
+  read -r oldstty < <(stty -g)
   stty raw -echo min 0
-  # on my system, the following line can be replaced by the line below it
   printf "\033[6n" > /dev/tty
-  [ "${TERM}" == "xterm" ] && tput u7 > /dev/tty # when TERM=xterm (and relatives)
-  IFS=';' read -r -d R -a pos
+  IFS='[' read -d R -rs _ pos
   stty "${oldstty}"
-  row="${pos[0]:2}" # strip off the ESC[
-  col="${pos[1]}"
-  printf "%s;%s" "${row}" "${col}"
+  printf "%s" "${pos}"
 }
 
 function __mirkop_get_cwd_color {
@@ -41,6 +38,7 @@ function __mirkop_get_cwd_color {
     printf '%s' "${MIRKOP_DIR_COLORS[5]}"
     return
   fi
+  [ "${PWD}" == "${MIRKOP_LAST_PWD}" ] && printf '%s' "${MIRKOP_LAST_PWDC}" && return
   if command -v cksum &> /dev/null; then
     read -r s < <(pwd -P | cksum | cut -d' ' -f1 | printf '%-6x' "$(< /dev/stdin)" | tr ' ' '0' | head -c 6)
     local r=$((16#${s:0:2}))
@@ -96,10 +94,7 @@ function __mirkop_generate_prompt_left {
   # Set the string for exit status indicator
   local last_exit_code="${1}"
 
-  IFS=';' read -r _ col < <(__mirkop_cursor_position 2> /dev/null)
-  ((col > 1)) && printf "\x1b[38;5;242m⏎\x1b[0m\n"
-
-  local prompt_parts=()
+  local -a prompt_parts=()
 
   read -r pwd_color < <(__mirkop_get_cwd_color)
   read -r short_cwd < <(__mirkop_get_short_pwd)
@@ -117,7 +112,7 @@ function __mirkop_generate_prompt_left {
 }
 
 function __mirkop_print_prompt_right {
-  local rprompt_parts=()
+  local -a rprompt_parts=()
   local comp=0
 
   {
@@ -157,52 +152,104 @@ function __mirkop_print_prompt_right {
 function __mirkop_transient_prompt_left {
   read -r pwd_color < <(__mirkop_get_cwd_color)
   read -r short_cwd < <(__mirkop_get_short_pwd)
-  read -r command < <(sed -E 's/\x1b/\\x1b/g' <<< "${1}")
+  read -r command < <(sed -E 's/\x1b/\\x1b/g;s/\r/\\r/g;s/\n/\\n/g') # read from stdin
   # ((${#command} > 128)) && command="${command:0:125}..."
 
-  printf '\x1b[1A\x1b[0G\x1b[0K%b%s\x1b[0m:%s \x1b[38;5;14m%s\x1b[0m\n' "${pwd_color}" "${short_cwd}" "${MIRKOP_STRINGS[3]}" "${command}"
+  local _t=""
+  [[ "${MIRKOP_CONFIG[3]}" == 'true' && -n "${command}" ]] && printf -v _t '\x1b]0;%s:%s %s\x07' "${short_cwd}" "${MIRKOP_STRINGS[3]}" "${command}"
+  MIRKOP_SET_TITLE="${_t}"
+  printf '\x1b7\x1b[%sH\x1b[0G\x1b[0K%b%s\x1b[0m:%s \x1b[38;5;14m%s\x1b[0m\x1b8' "${MIRKOP_LAST_POSITION}" "${pwd_color}" "${short_cwd}" "${MIRKOP_STRINGS[3]}" "${command}"
 }
 
 function __mirkop_generate_prompt {
   local last_exit_code="${?}"
+
+  local oIFS="${IFS}"
+  IFS=';' read -r row col < <(__mirkop_cursor_position 2> /dev/null)
+  IFS="${oIFS}"
+
+  # If the last command prints data with no trailing linefeed
+  # add an indicator, and a linefeed
+  ((col > 1)) && printf "\x1b[38;5;242m⏎\x1b[0m\n" && ((row++))
+
   __mirkop_generate_prompt_left "${last_exit_code}"
-  if ((MIRKOP_TRANSIENT_COUNT > 1)); then
-    __mirkop_transient_prompt #"${LAST_COMMAND[@]}"
-  fi
   __mirkop_print_prompt_right "${last_exit_code}"
-  # ${MIRKOP_LOADED_FULL} || {
-  #   read -r last_hit_cmd < <(fc -ln -1)
-  #   LAST_COMMAND=("${last_hit_cmd}")
-  # }
   MIRKOP_LOADED_FULL=true
+  MIRKOP_LAST_POSITION="${row};${col}"
 }
 
 function __mirkop_transient_prompt {
-  local cmd_line=""
-  local oIFS="${IFS}"
-  IFS='|' cmd_line="${*}"
-  IFS="${oIFS}"
-  read -r cmd_line < <(sed -E 's/\x1b/\\x1b/g;s/\r/\\r/g;s/\n/\\n/g' <<< "${cmd_line}")
-  if [ "${MIRKOP_CONFIG[0]}" == 'true' ] && ${MIRKOP_LOADED_FULL}; then
-    __mirkop_transient_prompt_left "${cmd_line}"
+  [ "${MIRKOP_CONFIG[0]}" != 'true' ] && return
+
+  # Overwrite the prompt cursor position, so it doesn't
+  # randomly move around after `clear` command is issued
+  [ "${LAST_COMMAND}" == 'clear' ] && {
+    MIRKOP_LAST_POSITION='1;1'
+    LAST_COMMAND_ITER=()
+    return # Don't print the transient prompt
+  }
+
+  # If the prompt was printed in the last row
+  # of the terminal, set the position to the row above
+  # so that the transient prompt doesn't get overwritten
+  if [ "${MIRKOP_LAST_POSITION}" == "${LINES};1" ]; then
+    MIRKOP_LAST_POSITION="$((LINES - 1));1"
   fi
+
+  [[ "${LAST_COMMAND}" == __* ]] && {
+    ((MIRKOP_TRANSIENT_CMD == 0)) && __mirkop_transient_prompt_left "${MIRKOP_LAST_POSITION}" <<< ""
+    LAST_COMMAND_ITER=()
+    MIRKOP_TRANSIENT_CMD=0
+    return # Don't increment the transient command counter
+  }
+
+  # MIRKOP_TRANSIENT_NOCMD=0
+  ((MIRKOP_TRANSIENT_CMD++))
+
+  LAST_COMMAND_ITER+=("${LAST_COMMAND}")
+
+  local cmd_line_string=""
+  local oIFS="${IFS}"
+  IFS=';' cmd_line_string="${LAST_COMMAND_ITER[*]}"
+  IFS="${oIFS}"
+
+  __mirkop_transient_prompt_left "${MIRKOP_LAST_POSITION}" <<< "${cmd_line_string}"
+}
+
+function __mirkop_set_title {
+  [ "${MIRKOP_CONFIG[3]}" != 'true' ] && MIRKOP_SET_TITLE=""
+  printf '%b' "${MIRKOP_SET_TITLE}"
+}
+
+function __mirkop_reset_title {
+  read -r cwd < <(__mirkop_get_short_pwd)
+  printf '\x1b]0;%s\x07' "${cwd}"
+}
+
+function __mirkop_update_term_size {
+  read -r LINES COLUMNS < <(stty size)
 }
 
 function __mirkop_pre_command_hook {
-  ((MIRKOP_TRANSIENT_COUNT++))
-  if [[ "${BASH_COMMAND}" != __mirkop_generate_prompt && "${BASH_COMMAND}" != clear ]]; then
-    MIRKOP_TRANSIENT_COUNT=0
-    LAST_COMMAND_ITER+=("${BASH_COMMAND}")
-
-    __mirkop_transient_prompt "${LAST_COMMAND_ITER[@]}"
-  else
-    # ((${#LAST_COMMAND_ITER[@]} > 0)) && LAST_COMMAND=("${LAST_COMMAND_ITER[@]}")
-    LAST_COMMAND_ITER=()
-    # LAST_COMMAND_STATUS=("${PIPESTATUS[@]}")
-  fi
+  [ "${MIRKOP_LOADED_FULL}" != 'true' ] && return
+  # run pre-command hooks
+  declare -g LAST_COMMAND="${BASH_COMMAND}"
+  # declare -g LAST_COMMAND_STATUS=("${PIPESTATUS[@]}")
+  for cmd in "${MIRKOP_PRECMD_HOOKS[@]}"; do ${cmd}; done
 }
 
+function __mirkop_post_command_hook {
+  # run post-command hooks
+  for cmd in "${MIRKOP_POSCMD_HOOKS[@]}"; do ${cmd}; done
+}
+
+#region Configuration
 function __mirkop_load_prompt_config {
+  # shellcheck disable=SC1090
+  # It is hilarious that I have to source this
+  # as yq command makes the script slower by 2 seconds
+  # AND yq.sh SCRIPT IS A FOR-EACH-LINE LOOP
+  source ~/.config/bash/lib/yq.sh || return 1
   function hex_to_shell {
     read -r s < /dev/stdin
 
@@ -242,30 +289,30 @@ function __mirkop_load_prompt_config {
   IFS=$'\n\t' read -r c_norm < <(yq.sh .color.normal.fg ~/.config/mirkop.yaml | hex_to_shell) # [3]
   IFS=$'\n\t' read -r c_error < <(yq.sh .color.error.fg ~/.config/mirkop.yaml | hex_to_shell) # [4]
   IFS=$'\n\t' read -r c_dir < <(yq.sh .color.dir.fg ~/.config/mirkop.yaml | hex_to_shell)     # [5]
-  IFS=$'\n\t' read -r c_jobs < <(yq.sh .color.jobs.fg ~/.config/mirkop.yaml | hex_to_shell)   # [10]
-  IFS=$'\n\t' read -r git_ins < <(yq.sh .color.git.i.fg ~/.config/mirkop.yaml | hex_to_shell) # [6]
-  IFS=$'\n\t' read -r git_del < <(yq.sh .color.git.d.fg ~/.config/mirkop.yaml | hex_to_shell) # [7]
-  IFS=$'\n\t' read -r git_any < <(yq.sh .color.git.a.fg ~/.config/mirkop.yaml | hex_to_shell) # [8]
-  IFS=$'\n\t' read -r git_sep < <(yq.sh .color.git.s.fg ~/.config/mirkop.yaml | hex_to_shell) # [9]
+  IFS=$'\n\t' read -r c_jobs < <(yq.sh .color.jobs.fg ~/.config/mirkop.yaml | hex_to_shell)   # [6]
+  IFS=$'\n\t' read -r git_ins < <(yq.sh .color.git.i.fg ~/.config/mirkop.yaml | hex_to_shell) # [7]
+  IFS=$'\n\t' read -r git_del < <(yq.sh .color.git.d.fg ~/.config/mirkop.yaml | hex_to_shell) # [8]
+  IFS=$'\n\t' read -r git_any < <(yq.sh .color.git.a.fg ~/.config/mirkop.yaml | hex_to_shell) # [9]
+  IFS=$'\n\t' read -r git_sep < <(yq.sh .color.git.s.fg ~/.config/mirkop.yaml | hex_to_shell) # [10]
 
   # shellcheck disable=SC2034
   declare -ga MIRKOP_CONFIG=(
     [0]="${do_transient_p}"
     [1]="${do_rdircolor}"
     [2]="${date_fmt}"
+    [3]=true # Manage window title
   )
 
   # shellcheck disable=SC2034
-  declare -g MIRKOP_STRINGS=(
+  declare -ga MIRKOP_STRINGS=(
     [0]="${username}" # Username
     [1]="${from_str}" # From string
     [2]="${hostname}" # Hostname
     [3]="${delim}"    # Delimiter
-    [4]="${date_fmt}" # Date format string
   )
 
   # shellcheck disable=SC2034
-  declare -g MIRKOP_COLORS=(
+  declare -ga MIRKOP_COLORS=(
     [0]="${c_user}"   # User color
     [1]="${c_from}"   # From color
     [2]="${c_host}"   # Host color
@@ -278,21 +325,38 @@ function __mirkop_load_prompt_config {
     [9]="${git_any}"  # Git any changes color
     [10]="${git_sep}" # Git separator color
   )
+  unset -f hex_to_shell
+  unset -f yq.sh
+  return 0
 }
+#endregion
 
 function __mirkop_main {
-  # shellcheck disable=SC1090
-  source ~/.config/bash/lib/yq.sh
-  __mirkop_load_prompt_config && {
-    MIRKOP_LOADED_FULL=false
+  if __mirkop_load_prompt_config; then
+    declare -g MIRKOP_LOADED_FULL=false
+    declare -g MIRKOP_LAST_POSITION='0;0'
+    declare -g MIRKOP_TRANSIENT_CMD=0
+    declare -g MIRKOP_SET_TITLE=""
+    declare -g MIRKOP_LAST_PWD=""
+    declare -g MIRKOP_LAST_SPWD=""
+    declare -g MIRKOP_LAST_PWDC=""
+    # declare -g MIRKOP_TRANSIENT_NOCMD=0
+    declare -ga LAST_COMMAND_ITER=()
+    # declare -ga LAST_COMMAND_STATUS=()
+
+    declare -ga MIRKOP_PRECMD_HOOKS=(
+      '__mirkop_update_term_size'
+      '__mirkop_transient_prompt'
+      '__mirkop_set_title'
+    )
+    declare -ga MIRKOP_POSCMD_HOOKS=(
+      '__mirkop_generate_prompt'
+      '__mirkop_reset_title'
+    )
+
     trap -- '__mirkop_pre_command_hook' DEBUG
-    PROMPT_COMMAND='__mirkop_generate_prompt'
-    MIRKOP_TRANSIENT_COUNT=0
-    # LAST_COMMAND=()
-    LAST_COMMAND_ITER=()
-    # LAST_COMMAND_STATUS=()
-  }
-  unset -f yq.sh
+    PROMPT_COMMAND='__mirkop_post_command_hook'
+  fi
 }
 
 __mirkop_main

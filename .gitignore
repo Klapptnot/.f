@@ -1,3 +1,9 @@
+# Any of nushell history files may ...
 .config/nushell/history*
+# beacuse of auth?
 .gitconfig
+# Kind of hidden files
 **/_*
+**/._*
+
+.local/share/glib-2.0/schemas/gschemas.compiled

@@ -1,0 +1,10 @@
+theme = "catppuccin-mocha"
+background-opacity = 0.6
+gtk-titlebar = false
+
+font-family = "CaskaydiaCove Nerd Font"
+font-style = "bold"
+font-size = 10.5
+
+shell-integration = "fish"
+

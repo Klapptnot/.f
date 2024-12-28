@@ -47,7 +47,7 @@ function term.cursor.go_to {
   printf "%b" "\x1b[${l};${c}H"
 }
 
-function cursos.pos {
+function term.cursor.pos {
   local pos="0;0"
   IFS='[' read -p $'\e[6n' -d R -rs _ pos
   printf "%s" "${pos}"

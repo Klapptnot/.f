@@ -203,7 +203,7 @@ function do_symlink_cleaning {
   local source="${1}"
   local target="${2}"
 
-  mapfile -t broken_links < <(find "${target}" -type l ! -exec test -e {} ';' -print)
+  mapfile -t broken_links < <(find "${target}" -type l ! -exec test -e {} ';' -print 2> /dev/null)
   local linked_to=()
   for l in "${!broken_links[@]}"; do
     read -r linked_to_ < <(realpath -LP "${broken_links[l]}" 2> /dev/null)

@@ -1,6 +1,6 @@
-# shellcheck disable=SC2148,SC1090,SC1091
+# shellcheck disable=SC2148,SC1090,SC1091,SC2120
 # If not running interactively, don't do anything
-[[ "${-}" == *i* ]] || return
+[[ "${-}" != *i* ]] && return
 
 # See bash(1) for more options
 HISTCONTROL=ignoreboth:erasedups                                                     # Remove duplicates in history, ignore commands starting with space
@@ -28,46 +28,43 @@ shopt -s checkwinsize
 # colored GCC warnings and errors
 export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
-# Alias definitions.
-# You may want to put all your additions into a separate file like
-# ~/.bash_aliases, instead of adding them here directly.
-# See /usr/share/doc/bash-doc/examples in the bash-doc package.
-
-# shellcheck disable=SC1090
-[ -f ~/.bash_aliases ] && source ~/.bash_aliases
-
-# enable programmable completion features (you don't need to enable
-# this, if it's already enabled in /etc/bash.bashrc and /etc/profile
-# sources /etc/bash.bashrc).
-
-if ! shopt -oq posix; then
-  [ -f "${PREFIX}/share/bash-completion/bash_completion" ] &&
-    source "${PREFIX}/share/bash-completion/bash_completion"
-  [ -f "/usr/share/bash-completion/bash_completion" ] &&
-    source "/usr/share/bash-completion/bash_completion"
-  [ -f "${PREFIX}/etc/bash_completion" ] &&
-    source "${PREFIX}/etc/bash_completion"
-  [ -f "/etc/bash_completion" ] &&
-    source "/etc/bash_completion"
-fi
-
 PS1='[\u@\h \W]\$ '
 
-# In case of rustup
-[ -f ~/.cargo/env ] && source ~/.cargo/env
-# Add cd helper
-[ -f ~/.config/bash/goto.sh ] && source ~/.config/bash/goto.sh
-# Change prompt
-[ -f ~/.config/bash/mirkop.sh ] && source ~/.config/bash/mirkop.sh
-# Load util functions
-[ -f ~/.config/bash/functions.sh ] && source ~/.config/bash/functions.sh
+# Define array of source files with comments
+BASHRC_SOURCED=(
+  "${HOME}/.cargo/env"                         # In case of rustup
+  "${HOME}/.bash_aliases"                      # Load aliases
+  "${HOME}/.config/bash/goto.sh"               # Add cd helper
+  "${HOME}/.config/bash/mirkop.sh"             # Change prompt
+  "${HOME}/.config/bash/functions.sh"          # Load util functions
+  "${HOME}/.config/bash/carapace.sh"           # Load carapace completion
+  # "/usr/share/bash-completion/bash_completion" # Load bash completion
+  "dummy just to make it fail"
+)
+
+# Source each file if it exists
+for file in "${BASHRC_SOURCED[@]}"; do
+  if [ -f "${file}" ]; then
+    if ! source "${file}" &> /dev/null; then
+      printf '~''/.bashrc:%s Failed to source %s\n' "${LINENO}" "${file}" >&2
+    fi
+  fi
+done
 
 alias gt='goto'
 alias git='git --no-pager'
 alias ls='ls --color=yes'
 
 if ! clear &> /dev/null; then
-  function clear { printf '\x1b[0H\x1b[3J'; }
+  # The sequence is ESC [ H ESC [ 2 J with -x
+  # ESC [ 0 H ESC [ 3 J to clear scrollback buffer
+  function clear {
+    if [ "${1}" == '-x' ]; then
+      printf '\x1b[0H\x1b[2J'
+      return
+    fi
+    printf '\x1b[0H\x1b[3J'
+  }
 fi
 
 bind -x '"\C-l": clear'

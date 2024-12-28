@@ -93,10 +93,6 @@
     "format-muted": "  Muted",
     "format-bluetooth": " {icon} {volume}%",
     "format-bluetooth-muted": "   Muted",
-    "on-click": "pamixer -t",
-    "on-click-right": "pavucontrol",
-    "on-scroll-up": "pamixer -i 2",
-    "on-scroll-down": "pamixer -d 2",
     "scroll-step": 5,
     "format-icons": {
       "headphone": "",
@@ -111,9 +107,23 @@
         ""
       ]
     },
-    "smooth-scrolling-threshold": 1
+    "smooth-scrolling-threshold": 1,
+    "on-click": "pamixer -t",
+    "on-click-right": "pavucontrol",
+    "on-scroll-up": "pamixer -i 2",
+    "on-scroll-down": "pamixer -d 2"
   },
   "pulseaudio#microphone": {
+    "format": "{format_source}",
+    "format-source": "󰍬 {volume}%",
+    "format-source-muted": "󰍭 Muted",
+    "on-click": "pamixer --default-source -t",
+    "on-scroll-up": "pamixer --default-source -i 2",
+    "on-scroll-down": "pamixer --default-source -d 2",
+    "scroll-step": 5,
+    "smooth-scrolling-threshold": 1
+  },
+  "wireplumber#microphone": {
     "format": "{format_source}",
     "format-source": "󰍬 {volume}%",
     "format-source-muted": "󰍭 Muted",
@@ -141,6 +151,7 @@
         ""
       ]
     },
+    "smooth-scrolling-threshold": 1,
     "on-click": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
     "on-scroll-up": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 2%+",
     "on-scroll-down": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 2%-"
@@ -311,7 +322,7 @@
   "group/audio-grp": {
     "orientation": "horizontal",
     "modules": [
-      "pulseaudio",
+      "wireplumber",
       "pulseaudio#microphone"
     ]
   },

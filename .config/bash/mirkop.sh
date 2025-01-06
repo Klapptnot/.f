@@ -158,7 +158,13 @@ function __mirkop_transient_prompt_left {
   local _t=""
   [[ "${MIRKOP_CONFIG[3]}" == 'true' && -n "${command}" ]] && printf -v _t '\x1b]0;%s:%s %s\x07' "${short_cwd}" "${MIRKOP_STRINGS[3]}" "${command}"
   MIRKOP_SET_TITLE="${_t}"
-  printf '\x1b7\x1b[%sH\x1b[0G\x1b[0K%b%s\x1b[0m:%s \x1b[38;5;14m%s\x1b[0m\x1b8' "${MIRKOP_LAST_POSITION}" "${pwd_color}" "${short_cwd}" "${MIRKOP_STRINGS[3]}" "${command}"
+  printf '%b%s\x1b[0m:%s \x1b[38;5;14m%s\x1b[0m' "${pwd_color}" "${short_cwd}" "${MIRKOP_STRINGS[3]}" "${command}"
+}
+
+function __mirkop_transient_prompt_right {
+  IFS=$'\n\t' read -r TIME_S < <(date "+${MIRKOP_CONFIG[2]}") && rprompt_parts+=("${TIME_S}")
+
+  printf "%*s\x1b[0G" "${COLUMNS}" "${TIME_S}"
 }
 
 function __mirkop_generate_prompt {
@@ -197,7 +203,12 @@ function __mirkop_transient_prompt {
   fi
 
   [[ "${LAST_COMMAND}" == __* ]] && {
-    ((MIRKOP_TRANSIENT_CMD == 0)) && __mirkop_transient_prompt_left "${MIRKOP_LAST_POSITION}" <<< ""
+    ((MIRKOP_TRANSIENT_CMD == 0)) && {
+      printf '\x1b7\x1b[%sH\x1b[0G\x1b[0K' "${MIRKOP_LAST_POSITION}"
+      __mirkop_transient_prompt_right
+      __mirkop_transient_prompt_left <<< ""
+      printf '\x1b8\x1b[0G'
+    }
     LAST_COMMAND_ITER=()
     MIRKOP_TRANSIENT_CMD=0
     return # Don't increment the transient command counter
@@ -210,10 +221,13 @@ function __mirkop_transient_prompt {
 
   local cmd_line_string=""
   local oIFS="${IFS}"
-  IFS=';' cmd_line_string="${LAST_COMMAND_ITER[*]}"
+  IFS=';' cmd_line_string="${LAST_COMMAND_ITER[0]}"
   IFS="${oIFS}"
 
-  __mirkop_transient_prompt_left "${MIRKOP_LAST_POSITION}" <<< "${cmd_line_string}"
+  printf '\x1b7\x1b[%sH\x1b[0G\x1b[0K' "${MIRKOP_LAST_POSITION}"
+  __mirkop_transient_prompt_right
+  __mirkop_transient_prompt_left <<< "${cmd_line_string}"
+  printf '\x1b8\x1b[0G'
 }
 
 function __mirkop_set_title {

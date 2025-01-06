@@ -8,6 +8,7 @@ function main {
   local show_usage=false
   barg.parse "${@}" << BARG || show_usage=true
   #[progname='spawn']
+  #[subcmds='help']
   #[reqextras='true', extras='EXEC_LINE']
 
   r/restart[bool] => DO_RESTART
@@ -18,6 +19,9 @@ BARG
   if ${show_usage}; then
     printf 'spawn [OPTIONS] <command>\n'
     return
+  elif [ "${BARG_SUBCOMMAND}" == 'help' ]; then
+    show_help_message
+    return
   fi
 
   if ! command -v "${EXEC_LINE[0]}" &> /dev/null; then
@@ -27,20 +31,58 @@ BARG
 
   printf -v cmd_line ' %q' "${EXEC_LINE[@]:1}"
   local cmd_line="${EXEC_LINE[0]}${cmd_line}"
-  IFS=':' read -r seconds minutes hours days <<< "${SPAWN_AT}"
 
-  ((run_at = (days * 24 * 60 * 60) + (hours * 60 * 60) + (minutes * 60) + seconds))
+  read -r t_sec t_str < <(time_parse <<< "${SPAWN_AT}")
 
-  if ((run_at > 0)); then
+  if ((t_sec > 0)); then
     if ${DO_RESTART}; then
-      log i 'Process will be restarted in %s seconds' "${run_at}"
+      log i 'Process will be restarted in %s' "${t_str[*]}"
     else
-      log i 'Process will be spawned in %s seconds' "${run_at}"
+      log i 'Process will be spawned in %s' "${t_str[*]}"
     fi
   fi
 
   log d 'Command to run: %s' "${cmd_line}"
-  spawner "${run_at}" "${EXEC_LINE[@]}" &
+  spawner "${t_sec}" "${EXEC_LINE[@]}" &
+}
+
+function time_parse {
+  IFS=':' read -r seconds minutes hours days
+
+  # Just to ensure that the seconds are the correct value
+  ((t_sec = (days * 24 * 60 * 60) + (hours * 60 * 60) + (minutes * 60) + seconds))
+  ((d = t_sec / 86400, h = (t_sec % 86400) / 3600, m = (t_sec % 3600) / 60, s = t_sec % 60))
+  local lll=('s')
+  local t_str_a=()
+  ((d > 0)) && t_str_a+=("${d} day${lll[1 - (d > 1)]}")
+  ((h > 0)) && t_str_a+=("${h} hour${lll[1 - (h > 1)]}")
+  ((m > 0)) && t_str_a+=("${m} min${lll[1 - (m > 1)]}")
+  ((s > 0)) && t_str_a+=("${s} sec${lll[1 - (s > 1)]}")
+  local t_str="${t_str_a[*]}"
+  unset -v lll d h m s t_str_a
+
+  printf '%s %s\n' "${t_sec}" "${t_str}"
+}
+
+function show_help_message {
+  local help_lines=(
+    "\x1b[1;34mspawn\x1b[0m: Command line tool to spawn processes"
+    ""
+    '\x1b[1;34mUsage\x1b[0m:'
+    "  \x1b[38;5;14mspawn\x1b[0m [OPTIONS] <command>"
+    "  \x1b[38;5;14mspawn\x1b[0m help"
+    ""
+    '\x1b[1;34mOptions\x1b[0m:'
+    '  -r, --restart            Restart the process if it is already running'
+    '  -a, --run-at <str>       Time to wait before spawning the process (format: seconds:minutes:hours:days, default: 0:0:0:0)'
+    '  -g, --as-gnome           Launch the process as a GNOME session'
+    ""
+    '\x1b[1;34mExamples:\x1b[0m'
+    "  spawn -a 0:0:1:0 my_command"
+    "  spawn -r -a 0:0:5:0 -g my_command"
+  )
+
+  printf '%b\n' "${help_lines[@]}"
 }
 
 function spawner {

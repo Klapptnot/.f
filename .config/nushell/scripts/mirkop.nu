@@ -54,9 +54,9 @@ def get-last-command-duration []: nothing -> string {
   }
 }
 
-def git-status-info []: string -> record<f: int, i: int, d: int, u: int, U: int, b: string> {
+def git-status-info []: nothing -> record<f: int, i: int, d: int, u: int, U: int, b: string> {
   let changes = (git diff --shortstat | complete | get stdout | parse --regex '\s*(?<f>[0-9]+)[^0-9]*(?<i>[0-9]+)[^0-9]*(?<d>[0-9]+)')
-  let untracked = (git ls-files --other --exclude-standard $in | complete | get stdout | lines)
+  let untracked = (git ls-files --other --exclude-standard | complete | get stdout | lines)
   let u_folders = ($untracked | each { $in | path dirname } | uniq | length)
 
 
@@ -118,16 +118,17 @@ def __right_prompt_command [--transient]: nothing -> string {
   }
 
   let last_exit_code = if ($env.LAST_EXIT_CODE != 0) { $" (ansi rb)[($env.LAST_EXIT_CODE)]" } else { "" }
-  let git_path = (git rev-parse --show-toplevel | complete | get stdout)
+  let is_git_repo = ((git rev-parse --show-toplevel | complete | get exit_code) == 0)
   let col = $env.mirko.color.git
+  let should_collapse = ($env.mirko.collapse > (term size).columns)
 
-  let git_info = match [(($git_path | str length) > 0), ($env.mirko.collapse > (term size).columns)] {
+  let git_info = match [($is_git_repo), ($should_collapse)] {
     [true, true] => {
-      let data = ($git_path | git-status-info)
+      let data = (git-status-info)
       $"($col.a)($data.f)($col.s)@($col.a)($data.b)($col.s)(ansi reset) "         # <files>@<branch>
     },
     [true, false] => {
-      let data = ($git_path | git-status-info)
+      let data = (git-status-info)
       [
         $"($col.a)($data.f)($col.s)@($col.a)($data.b)($col.s)",     # <files>@<branch>
         $" ($col.i)+($data.i)($col.s)/($col.d)-($data.d)($col.a)",  # +<additions>/-<deletions>

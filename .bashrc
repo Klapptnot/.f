@@ -39,7 +39,6 @@ BASHRC_SOURCED=(
   "${HOME}/.config/bash/functions.sh"          # Load util functions
   "${HOME}/.config/bash/carapace.sh"           # Load carapace completion
   # "/usr/share/bash-completion/bash_completion" # Load bash completion
-  "dummy just to make it fail"
 )
 
 # Source each file if it exists
@@ -59,7 +58,7 @@ if ! clear &> /dev/null; then
   # The sequence is ESC [ H ESC [ 2 J with -x
   # ESC [ 0 H ESC [ 3 J to clear scrollback buffer
   function clear {
-    if [ "${1}" == '-x' ]; then
+    if [[ "${*}" = '-'*'x'* ]]; then
       printf '\x1b[0H\x1b[2J'
       return
     fi

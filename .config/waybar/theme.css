@@ -30,9 +30,9 @@
 /* All borders */
 @define-color borders  transparent;
 /* background normal */
-@define-color backgnd  #161620;
+@define-color backgnd  transparent; /* #161620; */
 /* background hover */
-@define-color backgho  #203030;
+@define-color backgho  transparent; /* #203030; */
 /* tooltip text */
 @define-color tooltip  @color7;
 /* window info */

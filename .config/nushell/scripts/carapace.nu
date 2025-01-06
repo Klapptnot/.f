@@ -21,8 +21,13 @@ let carapace_completer = { |spans: list<string>|
   )
 
   # So, fallback to nushell if its empty
-  if $completions != '[]' {
+  if $completions != '[]' and $completions != '' {
     ($completions | from json)
+  } else if ((grep -qP $'^($spans.0)$' ~/.nucomp_scripts | complete | get exit_code) == 0) {
+    let completions = (^$spans.0 -nucomp ...($spans))
+    if $completions != '[]' {
+      ($completions | from json)
+    }
   }
   # else {
   #   let files = (

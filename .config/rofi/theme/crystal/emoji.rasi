@@ -1,5 +1,5 @@
 configuration {
-  font: "Plus Jakarta Sans 14";
+  font: "CaskaydiaCove Nerd Font 14";
   disable-history: false;
   hide-scrollbar: true;
   fake-trasparency: true;
@@ -13,7 +13,7 @@ window {
   height: 30%;
   border: 2px;
   border-color: @border;
-  border-radius: 8px;
+  border-radius: 20px;
   background-color: @trasparent;
   location: center;
 }
@@ -47,5 +47,5 @@ element-text {
 element selected {
   background-color: @selected;
   border-radius: 5px;
-  text-color: @background;
+  text-color: @selected-fg;
 }

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist gettext-domain="gsettings-desktop-schemas">
+    <schema id="dev.klapptnot.prefs" path="/dev/klapptnot/prefs/">
+        <key name="theme-mode" type="s">
+            <default>'dark'</default>
+            <summary>Light/Dark Theme Selection</summary>
+            <description>Choose between light and dark color schemes for the desktop environment.</description>
+        </key>
+        <key name="theme-accent" type="s">
+            <default>'violet'</default>
+            <summary>Accent Color</summary>
+            <description>Primary accent color used for highlights and interactive elements in the interface.</description>
+        </key>
+    </schema>
+</schemalist>
+

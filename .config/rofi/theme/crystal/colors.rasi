@@ -1,0 +1,15 @@
+* {
+    width:          600;
+    border:         #8823dbd0;
+    trasparent:     #00000000;
+    background:     #fafaff08;
+    background-alt: #28283900;
+    foreground:     #d9e0eeff;
+    selected:       #38383800;
+    selected-fg:    #7aa2f7ff;
+    prompt:         #7aa2f700;
+    prompt-fg:      #f6f6ffff;
+    active:         #abe9b300;
+    urgent:         #f28fad00;
+}
+

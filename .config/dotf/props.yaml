@@ -1,6 +1,6 @@
 ---
 
-shenv:
+shell_env:
   FZF_DEFAULT_COMMAND: fd --type file --follow --hidden --exclude .git
   LS_COLORS: $ vivid generate 'catppuccin-mocha'
   FZF_DEFAULT_OPTS: >
@@ -11,4 +11,4 @@ shenv:
     --pointer '>' --marker '='
 
 rofi:
-  theme: DarkPlain
+  theme: crystal

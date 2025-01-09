@@ -68,23 +68,21 @@ if status is-login
   # Add user paths to PATH
   for line in (cat ~/.config/.paths 2>/dev/null)
     set -l line (echo $line | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
-    if string match -q '#*' $line
+    if string match -q '#*' "$line"; or test -n "$line"
       continue
     end
-    if test -n "$line"
-      set -l line (realpath "$line")
-      if string match -q '@prepend *' $line
-        set path (string trim (echo $line | cut -d''-1f2-))
-        set -gx PATH $PATH $path
-      else
-        set -gx PATH $PATH $line
-      end
+    set -l line (realpath "$line")
+    if string match -q '@prepend *' $line
+      set path (string trim (echo $line | cut -d''-1f2-))
+      set -gx PATH $PATH $path
+    else
+      set -gx PATH $PATH $line
     end
   end
 
   # Use .dotf.yaml to set environment variables
-  for key in (bash_yq .shenv ~/.config/dotf/props.yaml | string split " ")
-    set -l value (bash_yq ".shenv.$key" ~/.config/dotf/props.yaml)
+  for key in (bash_yq .shell_env ~/.config/dotf/props.yaml | string split " ")
+    set -l value (bash_yq ".shell_env.$key" ~/.config/dotf/props.yaml)
     if string match -q -- '$ *' $value
       set -x $key (eval (string replace '$ ' '' $value))
     else

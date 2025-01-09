@@ -90,8 +90,8 @@ unset -v line
 
 source ~/.config/bash/lib/yq.sh
 # Use .dotf.yaml to set environment variables
-for key in $(yq.sh .shenv ~/.config/dotf/props.yaml); do
-  value="$(yq.sh ".shenv.${key}" ~/.config/dotf/props.yaml)"
+for key in $(yq.sh .shell_env ~/.config/dotf/props.yaml); do
+  value="$(yq.sh ".shell_env.${key}" ~/.config/dotf/props.yaml)"
   if [[ "${value}" == "$ "* ]]; then
     export "${key}=$(eval "${value:2}")"
   else

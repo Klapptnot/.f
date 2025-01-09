@@ -1,0 +1,57 @@
+configuration {
+  font: "Plus Jakarta Regular 14";
+  show-icons: false;
+  icon-theme: "Papirus-Dark";
+  disable-history: false;
+  hide-scrollbar: true;
+  fake-trasparency: true;
+}
+
+@theme "colors"
+
+window {
+  trasparency: "real";
+  border: 2px;
+  border-color: @border;
+  border-radius: 20px;
+  background-color: @background;
+  location: center;
+}
+
+mainbox {
+  background-color: @background;
+  children: [ "message", "inputbar" ];
+}
+
+inputbar {
+  children: ["entry"];
+  background-color: @trasparent;
+  border: 0px 0px 2px 0px;
+  padding: 8px 5px 8px 5px;
+}
+
+message {
+  background-color: @trasparent;
+  border-color: @border;
+  border: 0px 0px 3px 0px;
+  padding: 0.4em;
+  spacing: 0.4em;
+}
+
+textbox {
+  background-color: inherit;
+  text-color: @foreground;
+}
+
+entry {
+  padding: 6px 16px 6px 16px;
+  text-color: @foreground;
+  border-radius: 5px;
+  background-color: @trasparent;
+  placeholder: " Write now";
+}
+
+
+listview, mode-switcher {
+  enabled: false;
+}

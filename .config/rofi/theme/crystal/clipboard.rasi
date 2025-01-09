@@ -1,20 +1,18 @@
 configuration {
-  modi: "drun";
   font: "CaskaydiaCove Nerd Font 14";
-  show-icons: true;
-  icon-theme: "Papirus-Dark";
-  drun-display-format: "{icon} {name} [<span weight="light" size="small"><i>{generic}</i></span>]";
-  disable-history: false;
+  show-icons: false;
   hide-scrollbar: true;
+  sidebar-mode: true;
   fake-trasparency: true;
 }
 
 @theme "colors"
 
 window {
-  height: 65%;
-  width: 35%;
-  border-radius: 8px;
+  trasparency: "real";
+  height: 50%;
+  border: 2px;
+  border-radius: 20px;
   background-color: @background;
   location: center;
 }
@@ -29,16 +27,15 @@ inputbar {
   border-radius: 3px 3px 0px 0px;
   border-color: @border;
   border: 0px 0px 2px 0px;
-  padding: 12px 5px 8px 0px;
+  padding: 12px 5px 8px 5px;
 }
 
 entry {
   padding: 6px 16px 6px 16px;
   text-color: @foreground;
   border-radius: 5px;
-  border-color: @border;
   background-color: @trasparent;
-  placeholder: "  Apps";
+  placeholder: "   Clipboard";
 }
 
 textbox-prompt-colon {
@@ -47,10 +44,9 @@ textbox-prompt-colon {
 }
 
 listview {
-  margin: 0px 10px 0px 0px;
+  margin: 10px;
   columns: 1;
   background-color: @trasparent;
-  padding: 12px 0px 12px 12px;
 }
 
 element {
@@ -59,22 +55,13 @@ element {
   text-color: @foreground;
 }
 
-element-text,
-element-icon {
+element-text {
   background-color: inherit;
   text-color: inherit;
-}
-
-element-icon {
-  size: 25px;
 }
 
 element selected {
   background-color: @selected;
   border-radius: 5px;
   text-color: @selected-fg;
-}
-
-mode-switcher {
-  enabled: false;
 }

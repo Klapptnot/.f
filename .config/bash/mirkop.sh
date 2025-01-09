@@ -91,9 +91,6 @@ function __mirkop_git_info {
 }
 
 function __mirkop_generate_prompt_left {
-  # Set the string for exit status indicator
-  local last_exit_code="${1}"
-
   local -a prompt_parts=()
 
   read -r pwd_color < <(__mirkop_get_cwd_color)
@@ -178,7 +175,7 @@ function __mirkop_generate_prompt {
   # add an indicator, and a linefeed
   ((col > 1)) && printf "\x1b[38;5;242m⏎\x1b[0m\n" && ((row++))
 
-  __mirkop_generate_prompt_left "${last_exit_code}"
+  __mirkop_generate_prompt_left
   __mirkop_print_prompt_right "${last_exit_code}"
   MIRKOP_LOADED_FULL=true
   MIRKOP_LAST_POSITION="${row};${col}"
